@@ -112,7 +112,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 	}
 
 	@Override
-	public Enumeration<TreeNode> children() {
+	public Enumeration<? extends TreeNode> children() {
 		return Collections.enumeration(children);
 	}
 

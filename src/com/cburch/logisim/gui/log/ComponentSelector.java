@@ -279,7 +279,7 @@ class ComponentSelector extends JTree {
 			return true;
 		}
 
-		public Enumeration<?> children() {
+		public Enumeration<? extends TreeNode> children() {
 			return Collections.enumeration(Collections.emptySet());
 		}
 	}
