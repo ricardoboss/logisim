@@ -3,17 +3,6 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collections;
-import java.util.Set;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.circuit.WidthIncompatibilityData;
@@ -30,6 +19,12 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.GraphicsUtil;
 
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.Set;
+
 class CanvasPainter implements PropertyChangeListener {
 	private static final Set<Component> NO_COMPONENTS = Collections.emptySet();
 
@@ -38,7 +33,7 @@ class CanvasPainter implements PropertyChangeListener {
 	private Component haloedComponent = null;
 	private Circuit haloedCircuit = null;
 	private WireSet highlightedWires = WireSet.EMPTY;
-	
+
 	CanvasPainter(Canvas canvas) {
 		this.canvas = canvas;
 		this.grid = new GridPainter(canvas);
@@ -46,14 +41,14 @@ class CanvasPainter implements PropertyChangeListener {
 		AppPreferences.PRINTER_VIEW.addPropertyChangeListener(this);
 		AppPreferences.ATTRIBUTE_HALO.addPropertyChangeListener(this);
 	}
-	
+
 	//
 	// accessor methods
 	//
 	GridPainter getGridPainter() {
 		return grid;
 	}
-	
+
 	Component getHaloedComponent() {
 		return haloedComponent;
 	}
@@ -82,14 +77,14 @@ class CanvasPainter implements PropertyChangeListener {
 		int h = bds.getHeight();
 		double a = Canvas.SQRT_2 * w;
 		double b = Canvas.SQRT_2 * h;
-		canvas.repaint((int) Math.round(bds.getX() + w/2.0 - a/2.0),
-			(int) Math.round(bds.getY() + h/2.0 - b/2.0),
+		canvas.repaint((int) Math.round(bds.getX() + w / 2.0 - a / 2.0),
+			(int) Math.round(bds.getY() + h / 2.0 - b / 2.0),
 			(int) Math.round(a), (int) Math.round(b));
 	}
-	
+
 	public void propertyChange(PropertyChangeEvent event) {
 		if (AppPreferences.PRINTER_VIEW.isSource(event)
-				|| AppPreferences.ATTRIBUTE_HALO.isSource(event)) {
+			|| AppPreferences.ATTRIBUTE_HALO.isSource(event)) {
 			canvas.repaint();
 		}
 	}
@@ -118,10 +113,10 @@ class CanvasPainter implements PropertyChangeListener {
 		drawWithUserState(g, gScaled, proj);
 		drawWidthIncompatibilityData(g, gScaled, proj);
 		Circuit circ = proj.getCurrentCircuit();
-		
+
 		CircuitState circState = proj.getCircuitState();
 		ComponentDrawContext ptContext = new ComponentDrawContext(canvas,
-				circ, circState, g, gScaled);
+			circ, circState, g, gScaled);
 		ptContext.setHighlightedWires(highlightedWires);
 		gScaled.setColor(Color.RED);
 		circState.drawOscillatingPoints(ptContext);
@@ -145,7 +140,7 @@ class CanvasPainter implements PropertyChangeListener {
 		// draw halo around component whose attributes we are viewing
 		boolean showHalo = AppPreferences.ATTRIBUTE_HALO.getBoolean();
 		if (showHalo && haloedComponent != null && haloedCircuit == circ
-				&& !hidden.contains(haloedComponent)) {
+			&& !hidden.contains(haloedComponent)) {
 			GraphicsUtil.switchToWidth(g, 3);
 			g.setColor(Canvas.HALO_COLOR);
 			Bounds bds = haloedComponent.getBounds(g).expand(5);
@@ -153,8 +148,8 @@ class CanvasPainter implements PropertyChangeListener {
 			int h = bds.getHeight();
 			double a = Canvas.SQRT_2 * w;
 			double b = Canvas.SQRT_2 * h;
-			g.drawOval((int) Math.round(bds.getX() + w/2.0 - a/2.0),
-				(int) Math.round(bds.getY() + h/2.0 - b/2.0),
+			g.drawOval((int) Math.round(bds.getX() + w / 2.0 - a / 2.0),
+				(int) Math.round(bds.getY() + h / 2.0 - b / 2.0),
 				(int) Math.round(a), (int) Math.round(b));
 			GraphicsUtil.switchToWidth(g, 1);
 			g.setColor(Color.BLACK);
@@ -164,7 +159,7 @@ class CanvasPainter implements PropertyChangeListener {
 		CircuitState circState = proj.getCircuitState();
 		boolean printerView = AppPreferences.PRINTER_VIEW.getBoolean();
 		ComponentDrawContext context = new ComponentDrawContext(canvas,
-				circ, circState, base, g, printerView);
+			circ, circState, base, g, printerView);
 		context.setHighlightedWires(highlightedWires);
 		circ.draw(context, hidden);
 		sel.draw(context, hidden);
@@ -178,7 +173,7 @@ class CanvasPainter implements PropertyChangeListener {
 			gCopy.dispose();
 		}
 	}
-	
+
 	private void drawWidthIncompatibilityData(Graphics base, Graphics g, Project proj) {
 		Set<WidthIncompatibilityData> exceptions;
 		exceptions = proj.getCurrentCircuit().getWidthIncompatibilityData();
@@ -195,14 +190,20 @@ class CanvasPainter implements PropertyChangeListener {
 				// ensure it hasn't already been drawn
 				boolean drawn = false;
 				for (int j = 0; j < i; j++) {
-					if (ex.getPoint(j).equals(p)) { drawn = true; break; }
+					if (ex.getPoint(j).equals(p)) {
+						drawn = true;
+						break;
+					}
 				}
 				if (drawn) continue;
 
 				// compute the caption combining all similar points
 				String caption = "" + w.getWidth();
 				for (int j = i + 1; j < ex.size(); j++) {
-					if (ex.getPoint(j).equals(p)) { caption += "/" + ex.getBitWidth(j); break; }
+					if (ex.getPoint(j).equals(p)) {
+						caption += "/" + ex.getBitWidth(j);
+						break;
+					}
 				}
 				g.drawOval(p.getX() - 4, p.getY() - 4, 8, 8);
 				g.drawString(caption, p.getX() + 5, p.getY() + 2 + fm.getAscent());

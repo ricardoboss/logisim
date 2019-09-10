@@ -3,41 +3,29 @@
 
 package com.cburch.logisim.std.io;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceDataSingleton;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstanceLogger;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.util.GraphicsUtil;
+
+import java.awt.*;
 
 public class Led extends InstanceFactory {
 	public Led() {
 		super("LED", Strings.getter("ledComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR,
-				Io.ATTR_ACTIVE,
-				StdAttr.LABEL, Io.ATTR_LABEL_LOC,
-				StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR
-			}, new Object[] {
-				Direction.WEST, new Color(240, 0, 0), Color.DARK_GRAY,
-				Boolean.TRUE,
-				"", Io.LABEL_CENTER,
-				StdAttr.DEFAULT_LABEL_FONT, Color.BLACK
-			});
+		setAttributes(new Attribute[]{
+			StdAttr.FACING, Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR,
+			Io.ATTR_ACTIVE,
+			StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+			StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR
+		}, new Object[]{
+			Direction.WEST, new Color(240, 0, 0), Color.DARK_GRAY,
+			Boolean.TRUE,
+			"", Io.LABEL_CENTER,
+			StdAttr.DEFAULT_LABEL_FONT, Color.BLACK
+		});
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("led.gif");
-		setPorts(new Port[] { new Port(0, 0, Port.INPUT, 1) });
+		setPorts(new Port[]{new Port(0, 0, Port.INPUT, 1)});
 		setInstanceLogger(Logger.class);
 	}
 
@@ -96,7 +84,7 @@ public class Led extends InstanceFactory {
 		}
 
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT,
-				x, y, halign, valign);
+			x, y, halign, valign);
 	}
 
 	@Override
@@ -109,14 +97,14 @@ public class Led extends InstanceFactory {
 			data.setValue(val);
 		}
 	}
-	
+
 	@Override
 	public void paintGhost(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		Bounds bds = painter.getBounds();
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawOval(bds.getX() + 1, bds.getY() + 1,
-				bds.getWidth() - 2, bds.getHeight() - 2);
+			bds.getWidth() - 2, bds.getHeight() - 2);
 	}
 
 	@Override
@@ -148,12 +136,12 @@ public class Led extends InstanceFactory {
 		public String getLogName(InstanceState state, Object option) {
 			return state.getAttributeValue(StdAttr.LABEL);
 		}
-	
+
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			if (data == null) return Value.FALSE;
-			return data.getValue() == Value.TRUE ? Value.TRUE : Value.FALSE; 
+			return data.getValue() == Value.TRUE ? Value.TRUE : Value.FALSE;
 		}
 	}
 }

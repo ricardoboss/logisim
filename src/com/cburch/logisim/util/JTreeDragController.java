@@ -3,9 +3,8 @@
 
 package com.cburch.logisim.util;
 
-import java.awt.Point;
-
-import javax.swing.JTree;
+import javax.swing.*;
+import java.awt.*;
 
 /* This comes from "Denis" at http://forum.java.sun.com/thread.jspa?forumID=57&threadID=296255 */
 
@@ -29,8 +28,8 @@ import javax.swing.JTree;
 
 public interface JTreeDragController {
 	public boolean canPerformAction(JTree target, Object draggedNode,
-			int action, Point location);
+									int action, Point location);
 
 	public boolean executeDrop(JTree tree, Object draggedNode,
-			Object newParentNode, int action);
+							   Object newParentNode, int action);
 }

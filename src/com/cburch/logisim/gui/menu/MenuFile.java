@@ -3,20 +3,18 @@
 
 package com.cburch.logisim.gui.menu;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.gui.opts.OptionsFrame;
 import com.cburch.logisim.gui.prefs.PreferencesFrame;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
 import com.cburch.logisim.util.MacCompatibility;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 class MenuFile extends Menu implements ActionListener {
 	private LogisimMenuBar menubar;
@@ -34,7 +32,7 @@ class MenuFile extends Menu implements ActionListener {
 	public MenuFile(LogisimMenuBar menubar) {
 		this.menubar = menubar;
 		openRecent = new OpenRecent(menubar);
-		
+
 		int menuMask = getToolkit().getMenuShortcutKeyMask();
 
 		newi.setAccelerator(KeyStroke.getKeyStroke(
@@ -50,7 +48,7 @@ class MenuFile extends Menu implements ActionListener {
 		print.setAccelerator(KeyStroke.getKeyStroke(
 			KeyEvent.VK_P, menuMask));
 		quit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, menuMask));
+			KeyEvent.VK_Q, menuMask));
 
 		add(newi);
 		add(open);
@@ -108,7 +106,7 @@ class MenuFile extends Menu implements ActionListener {
 		setEnabled(true);
 		menubar.fireEnableChanged();
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		Project proj = menubar.getProject();

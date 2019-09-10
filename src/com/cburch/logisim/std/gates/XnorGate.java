@@ -3,8 +3,6 @@
 
 package com.cburch.logisim.std.gates;
 
-import java.awt.Graphics;
-
 import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.Expressions;
 import com.cburch.logisim.data.AttributeSet;
@@ -14,6 +12,8 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.util.GraphicsUtil;
+
+import java.awt.*;
 
 class XnorGate extends AbstractGate {
 	public static XnorGate FACTORY = new XnorGate();
@@ -30,14 +30,14 @@ class XnorGate extends AbstractGate {
 	protected String getRectangularLabel(AttributeSet attrs) {
 		return XorGate.FACTORY.getRectangularLabel(attrs);
 	}
-	
+
 	@Override
 	public void paintIconShaped(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		GraphicsUtil.drawCenteredArc(g,   0, - 5, 22, -90,  53);
-		GraphicsUtil.drawCenteredArc(g,   0, 23, 22,  90, -53);
-		GraphicsUtil.drawCenteredArc(g,  -8,  9, 16, -30, 60);
-		GraphicsUtil.drawCenteredArc(g, -10,  9, 16, -30, 60);
+		GraphicsUtil.drawCenteredArc(g, 0, -5, 22, -90, 53);
+		GraphicsUtil.drawCenteredArc(g, 0, 23, 22, 90, -53);
+		GraphicsUtil.drawCenteredArc(g, -8, 9, 16, -30, 60);
+		GraphicsUtil.drawCenteredArc(g, -10, 9, 16, -30, 60);
 		g.drawOval(16, 8, 4, 4);
 	}
 
@@ -48,7 +48,7 @@ class XnorGate extends AbstractGate {
 
 	@Override
 	protected void paintDinShape(InstancePainter painter, int width, int height,
-			int inputs) {
+								 int inputs) {
 		PainterDin.paintXnor(painter, width, height, false);
 	}
 
@@ -73,5 +73,7 @@ class XnorGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.FALSE; }
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
 }

@@ -4,20 +4,20 @@
 package com.cburch.logisim.tools.key;
 
 public class JoinedConfigurator implements KeyConfigurator, Cloneable {
+	private KeyConfigurator[] handlers;
+
+	private JoinedConfigurator(KeyConfigurator[] handlers) {
+		this.handlers = handlers;
+	}
+
 	public static JoinedConfigurator create(KeyConfigurator a, KeyConfigurator b) {
-		return new JoinedConfigurator(new KeyConfigurator[] { a, b });
+		return new JoinedConfigurator(new KeyConfigurator[]{a, b});
 	}
 
 	public static JoinedConfigurator create(KeyConfigurator[] configs) {
 		return new JoinedConfigurator(configs);
 	}
-	
-	private KeyConfigurator[] handlers;
-	
-	private JoinedConfigurator(KeyConfigurator[] handlers) {
-		this.handlers = handlers;
-	}
-	
+
 	@Override
 	public JoinedConfigurator clone() {
 		JoinedConfigurator ret;
@@ -34,7 +34,7 @@ public class JoinedConfigurator implements KeyConfigurator, Cloneable {
 		}
 		return ret;
 	}
-	
+
 	public KeyConfigurationResult keyEventReceived(KeyConfigurationEvent event) {
 		KeyConfigurator[] hs = handlers;
 		if (event.isConsumed()) {

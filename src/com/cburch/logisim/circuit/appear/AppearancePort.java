@@ -3,13 +3,6 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.model.Handle;
 import com.cburch.draw.model.HandleGesture;
@@ -18,20 +11,24 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.std.wiring.Pin;
 import com.cburch.logisim.util.UnmodifiableList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.awt.*;
+import java.util.List;
 
 public class AppearancePort extends AppearanceElement {
+	public static final Color COLOR = Color.BLUE;
 	private static final int INPUT_RADIUS = 4;
 	private static final int OUTPUT_RADIUS = 5;
 	private static final int MINOR_RADIUS = 2;
-	public static final Color COLOR = Color.BLUE;
-	
 	private Instance pin;
-	
+
 	public AppearancePort(Location location, Instance pin) {
 		super(location);
 		this.pin = pin;
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof AppearancePort) {
@@ -51,7 +48,7 @@ public class AppearancePort extends AppearanceElement {
 	public String getDisplayName() {
 		return Strings.get("circuitPort");
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		Location loc = getLocation();
@@ -65,26 +62,26 @@ public class AppearancePort extends AppearanceElement {
 		ret.setAttribute("pin", "" + pinLoc.getX() + "," + pinLoc.getY());
 		return ret;
 	}
-	
+
 	public Instance getPin() {
 		return pin;
 	}
-	
+
 	void setPin(Instance value) {
 		pin = value;
 	}
-	
+
 	private boolean isInput() {
 		Instance p = pin;
 		return p == null || Pin.FACTORY.isInputPin(p);
 	}
-	
+
 	@Override
 	public Bounds getBounds() {
 		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
 		return super.getBounds(r);
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, boolean assumeFilled) {
 		if (isInput()) {
@@ -97,13 +94,13 @@ public class AppearancePort extends AppearanceElement {
 	@Override
 	public List<Handle> getHandles(HandleGesture gesture) {
 		Location loc = getLocation();
-		
+
 		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
-		return UnmodifiableList.create(new Handle[] {
-				new Handle(this, loc.translate(-r, -r)),
-				new Handle(this, loc.translate(r, -r)),
-				new Handle(this, loc.translate(r, r)),
-				new Handle(this, loc.translate(-r, r)) });
+		return UnmodifiableList.create(new Handle[]{
+			new Handle(this, loc.translate(-r, -r)),
+			new Handle(this, loc.translate(r, -r)),
+			new Handle(this, loc.translate(r, r)),
+			new Handle(this, loc.translate(-r, r))});
 	}
 
 	@Override

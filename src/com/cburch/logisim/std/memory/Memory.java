@@ -3,47 +3,52 @@
 
 package com.cburch.logisim.std.memory;
 
-import java.util.List;
-
 import com.cburch.logisim.tools.FactoryDescription;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
+import java.util.List;
+
 public class Memory extends Library {
 	protected static final int DELAY = 5;
-	
+
 	private static FactoryDescription[] DESCRIPTIONS = {
 		new FactoryDescription("D Flip-Flop", Strings.getter("dFlipFlopComponent"),
-				"dFlipFlop.gif", "DFlipFlop"),
+			"dFlipFlop.gif", "DFlipFlop"),
 		new FactoryDescription("T Flip-Flop", Strings.getter("tFlipFlopComponent"),
-				"tFlipFlop.gif", "TFlipFlop"),
+			"tFlipFlop.gif", "TFlipFlop"),
 		new FactoryDescription("J-K Flip-Flop", Strings.getter("jkFlipFlopComponent"),
-				"jkFlipFlop.gif", "JKFlipFlop"),
+			"jkFlipFlop.gif", "JKFlipFlop"),
 		new FactoryDescription("S-R Flip-Flop", Strings.getter("srFlipFlopComponent"),
-				"srFlipFlop.gif", "SRFlipFlop"),
+			"srFlipFlop.gif", "SRFlipFlop"),
 		new FactoryDescription("Register", Strings.getter("registerComponent"),
-				"register.gif", "Register"),
+			"register.gif", "Register"),
 		new FactoryDescription("Counter", Strings.getter("counterComponent"),
-				"counter.gif", "Counter"),
+			"counter.gif", "Counter"),
 		new FactoryDescription("Shift Register", Strings.getter("shiftRegisterComponent"),
-				"shiftreg.gif", "ShiftRegister"),
+			"shiftreg.gif", "ShiftRegister"),
 		new FactoryDescription("Random", Strings.getter("randomComponent"),
-				"random.gif", "Random"),
+			"random.gif", "Random"),
 		new FactoryDescription("RAM", Strings.getter("ramComponent"),
-				"ram.gif", "Ram"),
+			"ram.gif", "Ram"),
 		new FactoryDescription("ROM", Strings.getter("romComponent"),
-				"rom.gif", "Rom"),
+			"rom.gif", "Rom"),
 	};
-	
+
 	private List<Tool> tools = null;
 
-	public Memory() { }
+	public Memory() {
+	}
 
 	@Override
-	public String getName() { return "Memory"; }
+	public String getName() {
+		return "Memory";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("memoryLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("memoryLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

@@ -11,9 +11,9 @@ import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Tool;
 
 public class ProjectExplorerToolNode extends ProjectExplorerModel.Node<Tool>
-		implements CircuitListener {
+	implements CircuitListener {
 	private Circuit circuit;
-	
+
 	public ProjectExplorerToolNode(ProjectExplorerModel model, Tool tool) {
 		super(model, tool);
 		if (tool instanceof AddTool) {
@@ -24,12 +24,14 @@ public class ProjectExplorerToolNode extends ProjectExplorerModel.Node<Tool>
 			}
 		}
 	}
-	
-	@Override ProjectExplorerToolNode create(Tool userObject) {
+
+	@Override
+	ProjectExplorerToolNode create(Tool userObject) {
 		return new ProjectExplorerToolNode(getModel(), userObject);
 	}
-	
-	@Override void decommission() {
+
+	@Override
+	void decommission() {
 		if (circuit != null) {
 			circuit.removeCircuitListener(this);
 		}

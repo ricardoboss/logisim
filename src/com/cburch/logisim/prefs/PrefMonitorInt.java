@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
 class PrefMonitorInt extends AbstractPrefMonitor<Integer> {
 	private int dflt;
 	private int value;
-	
+
 	PrefMonitorInt(String name, int dflt) {
 		super(name);
 		this.dflt = dflt;
@@ -18,11 +18,11 @@ class PrefMonitorInt extends AbstractPrefMonitor<Integer> {
 		set(Integer.valueOf(prefs.getInt(name, dflt)));
 		prefs.addPreferenceChangeListener(this);
 	}
-	
+
 	public Integer get() {
 		return Integer.valueOf(value);
 	}
-	
+
 	public void set(Integer newValue) {
 		int newVal = newValue.intValue();
 		if (value != newVal) {
@@ -40,7 +40,7 @@ class PrefMonitorInt extends AbstractPrefMonitor<Integer> {
 			if (newValue != oldValue) {
 				value = newValue;
 				AppPreferences.firePropertyChange(name,
-						Integer.valueOf(oldValue), Integer.valueOf(newValue));
+					Integer.valueOf(oldValue), Integer.valueOf(newValue));
 			}
 		}
 	}

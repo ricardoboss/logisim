@@ -3,15 +3,14 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.util.Map;
-
-import org.w3c.dom.Element;
-
 import com.cburch.draw.model.AbstractCanvasObject;
 import com.cburch.draw.shapes.SvgReader;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
+import org.w3c.dom.Element;
+
+import java.util.Map;
 
 public class AppearanceSvgReader {
 	public static AbstractCanvasObject createShape(Element elt, Map<Location, Instance> pins) {
@@ -28,7 +27,7 @@ public class AppearanceSvgReader {
 			Location loc = getLocation(elt);
 			String[] pinStr = elt.getAttribute("pin").split(",");
 			Location pinLoc = Location.create(Integer.parseInt(pinStr[0].trim()),
-					Integer.parseInt(pinStr[1].trim()));
+				Integer.parseInt(pinStr[1].trim()));
 			Instance pin = pins.get(pinLoc);
 			if (pin == null) {
 				return null;
@@ -39,7 +38,7 @@ public class AppearanceSvgReader {
 			return SvgReader.createShape(elt);
 		}
 	}
-	
+
 	private static Location getLocation(Element elt) {
 		double x = Double.parseDouble(elt.getAttribute("x"));
 		double y = Double.parseDouble(elt.getAttribute("y"));

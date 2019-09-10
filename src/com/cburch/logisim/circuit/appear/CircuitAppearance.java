@@ -3,15 +3,6 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import com.cburch.draw.model.CanvasModelEvent;
 import com.cburch.draw.model.CanvasModelListener;
 import com.cburch.draw.model.CanvasObject;
@@ -23,16 +14,11 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.util.EventSourceWeakSupport;
 
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
 public class CircuitAppearance extends Drawing {
-	private class MyListener implements CanvasModelListener {
-		public void modelChanged(CanvasModelEvent event) {
-			if (!suppressRecompute) {
-				setDefaultAppearance(false);
-				fireCircuitAppearanceChanged(CircuitAppearanceEvent.ALL_TYPES);
-			}
-		}
-	}
-	
 	private Circuit circuit;
 	private EventSourceWeakSupport<CircuitAppearanceListener> listeners;
 	private PortManager portManager;
@@ -40,7 +26,6 @@ public class CircuitAppearance extends Drawing {
 	private MyListener myListener;
 	private boolean isDefault;
 	private boolean suppressRecompute;
-	
 	public CircuitAppearance(Circuit circuit) {
 		this.circuit = circuit;
 		listeners = new EventSourceWeakSupport<CircuitAppearanceListener>();
@@ -51,19 +36,19 @@ public class CircuitAppearance extends Drawing {
 		addCanvasModelListener(myListener);
 		setDefaultAppearance(true);
 	}
-	
+
 	public CircuitPins getCircuitPins() {
 		return circuitPins;
 	}
-	
+
 	public void addCircuitAppearanceListener(CircuitAppearanceListener l) {
 		listeners.add(l);
 	}
-	
+
 	public void removeCircuitAppearanceListener(CircuitAppearanceListener l) {
 		listeners.remove(l);
 	}
-	
+
 	void fireCircuitAppearanceChanged(int affected) {
 		CircuitAppearanceEvent event;
 		event = new CircuitAppearanceEvent(circuit, affected);
@@ -71,9 +56,9 @@ public class CircuitAppearance extends Drawing {
 			listener.circuitAppearanceChanged(event);
 		}
 	}
-	
+
 	void replaceAutomatically(List<AppearancePort> removes,
-			List<AppearancePort> adds) {
+							  List<AppearancePort> adds) {
 		// this should be called only when substituting ports via PortManager
 		boolean oldSuppress = suppressRecompute;
 		try {
@@ -86,11 +71,11 @@ public class CircuitAppearance extends Drawing {
 		}
 		fireCircuitAppearanceChanged(CircuitAppearanceEvent.ALL_TYPES);
 	}
-	
+
 	public boolean isDefaultAppearance() {
 		return isDefault;
 	}
-	
+
 	public void setDefaultAppearance(boolean value) {
 		if (isDefault != value) {
 			isDefault = value;
@@ -99,7 +84,7 @@ public class CircuitAppearance extends Drawing {
 			}
 		}
 	}
-	
+
 	void recomputePorts() {
 		if (isDefault) {
 			recomputeDefaultAppearance();
@@ -107,7 +92,7 @@ public class CircuitAppearance extends Drawing {
 			fireCircuitAppearanceChanged(CircuitAppearanceEvent.ALL_TYPES);
 		}
 	}
-	
+
 	private void recomputeDefaultAppearance() {
 		if (isDefault) {
 			List<CanvasObject> shapes;
@@ -115,7 +100,7 @@ public class CircuitAppearance extends Drawing {
 			setObjectsForce(shapes);
 		}
 	}
-	
+
 	public Direction getFacing() {
 		AppearanceAnchor anchor = findAnchor();
 		if (anchor == null) {
@@ -124,7 +109,7 @@ public class CircuitAppearance extends Drawing {
 			return anchor.getFacing();
 		}
 	}
-	
+
 	public void setObjectsForce(List<? extends CanvasObject> shapesBase) {
 		// This shouldn't ever be an issue, but just to make doubly sure, we'll
 		// check that the anchor and all ports are in their proper places.
@@ -150,7 +135,7 @@ public class CircuitAppearance extends Drawing {
 				i--;
 			}
 		}
-		
+
 		try {
 			suppressRecompute = true;
 			super.removeObjects(new ArrayList<CanvasObject>(getObjectsFromBottom()));
@@ -182,7 +167,7 @@ public class CircuitAppearance extends Drawing {
 			((Graphics2D) g).rotate(-rotate);
 		}
 	}
-	
+
 	private Location findAnchorLocation() {
 		AppearanceAnchor anchor = findAnchor();
 		if (anchor == null) {
@@ -191,7 +176,7 @@ public class CircuitAppearance extends Drawing {
 			return anchor.getLocation();
 		}
 	}
-	
+
 	private AppearanceAnchor findAnchor() {
 		for (CanvasObject shape : getObjectsFromBottom()) {
 			if (shape instanceof AppearanceAnchor) {
@@ -200,15 +185,15 @@ public class CircuitAppearance extends Drawing {
 		}
 		return null;
 	}
-	
+
 	public Bounds getOffsetBounds() {
 		return getBounds(true);
 	}
-	
+
 	public Bounds getAbsoluteBounds() {
-		return getBounds(false); 
+		return getBounds(false);
 	}
-	
+
 	private Bounds getBounds(boolean relativeToAnchor) {
 		Bounds ret = null;
 		Location offset = null;
@@ -232,14 +217,14 @@ public class CircuitAppearance extends Drawing {
 			}
 		}
 		if (ret == null) {
-			return Bounds.EMPTY_BOUNDS; 
+			return Bounds.EMPTY_BOUNDS;
 		} else if (relativeToAnchor && offset != null) {
 			return ret.translate(-offset.getX(), -offset.getY());
 		} else {
 			return ret;
 		}
 	}
-	
+
 	public boolean contains(Location loc) {
 		Location query;
 		AppearanceAnchor anchor = findAnchor();
@@ -256,7 +241,7 @@ public class CircuitAppearance extends Drawing {
 		}
 		return false;
 	}
-	
+
 	public SortedMap<Location, Instance> getPortOffsets(Direction facing) {
 		Location anchor = null;
 		Direction defaultFacing = Direction.EAST;
@@ -284,37 +269,37 @@ public class CircuitAppearance extends Drawing {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public void addObjects(int index, Collection<? extends CanvasObject> shapes) {
 		super.addObjects(index, shapes);
 		checkToFirePortsChanged(shapes);
 	}
-	
+
 	@Override
 	public void addObjects(Map<? extends CanvasObject, Integer> shapes) {
 		super.addObjects(shapes);
 		checkToFirePortsChanged(shapes.keySet());
 	}
-	
+
 	@Override
 	public void removeObjects(Collection<? extends CanvasObject> shapes) {
 		super.removeObjects(shapes);
 		checkToFirePortsChanged(shapes);
 	}
-	
+
 	@Override
 	public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy) {
 		super.translateObjects(shapes, dx, dy);
 		checkToFirePortsChanged(shapes);
 	}
-	
+
 	private void checkToFirePortsChanged(Collection<? extends CanvasObject> shapes) {
 		if (affectsPorts(shapes)) {
 			recomputePorts();
 		}
 	}
-	
+
 	private boolean affectsPorts(Collection<? extends CanvasObject> shapes) {
 		for (CanvasObject o : shapes) {
 			if (o instanceof AppearanceElement) {
@@ -322,5 +307,14 @@ public class CircuitAppearance extends Drawing {
 			}
 		}
 		return false;
+	}
+
+	private class MyListener implements CanvasModelListener {
+		public void modelChanged(CanvasModelEvent event) {
+			if (!suppressRecompute) {
+				setDefaultAppearance(false);
+				fireCircuitAppearanceChanged(CircuitAppearanceEvent.ALL_TYPES);
+			}
+		}
 	}
 }

@@ -3,11 +3,11 @@
 
 package com.cburch.logisim.gui.prefs;
 
-import javax.swing.JPanel;
-
 import com.cburch.logisim.circuit.RadixOption;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.TableLayout;
+
+import javax.swing.*;
 
 class LayoutOptions extends OptionsPanel {
 	private PrefBoolean[] checks;
@@ -17,19 +17,19 @@ class LayoutOptions extends OptionsPanel {
 
 	public LayoutOptions(PreferencesFrame window) {
 		super(window);
-		
-		checks = new PrefBoolean[] {
-				new PrefBoolean(AppPreferences.PRINTER_VIEW,
-						Strings.getter("layoutPrinterView")),
-				new PrefBoolean(AppPreferences.ATTRIBUTE_HALO,
-						Strings.getter("layoutAttributeHalo")),
-				new PrefBoolean(AppPreferences.COMPONENT_TIPS,
-						Strings.getter("layoutShowTips")),
-				new PrefBoolean(AppPreferences.MOVE_KEEP_CONNECT,
-						Strings.getter("layoutMoveKeepConnect")),
-				new PrefBoolean(AppPreferences.ADD_SHOW_GHOSTS,
-						Strings.getter("layoutAddShowGhosts")),
-			};
+
+		checks = new PrefBoolean[]{
+			new PrefBoolean(AppPreferences.PRINTER_VIEW,
+				Strings.getter("layoutPrinterView")),
+			new PrefBoolean(AppPreferences.ATTRIBUTE_HALO,
+				Strings.getter("layoutAttributeHalo")),
+			new PrefBoolean(AppPreferences.COMPONENT_TIPS,
+				Strings.getter("layoutShowTips")),
+			new PrefBoolean(AppPreferences.MOVE_KEEP_CONNECT,
+				Strings.getter("layoutMoveKeepConnect")),
+			new PrefBoolean(AppPreferences.ADD_SHOW_GHOSTS,
+				Strings.getter("layoutAddShowGhosts")),
+		};
 
 		for (int i = 0; i < 2; i++) {
 			RadixOption[] opts = RadixOption.OPTIONS;
@@ -39,20 +39,20 @@ class LayoutOptions extends OptionsPanel {
 			}
 			if (i == 0) {
 				radix1 = new PrefOptionList(AppPreferences.POKE_WIRE_RADIX1,
-						Strings.getter("layoutRadix1"), items);
+					Strings.getter("layoutRadix1"), items);
 			} else {
 				radix2 = new PrefOptionList(AppPreferences.POKE_WIRE_RADIX2,
-						Strings.getter("layoutRadix2"), items);
+					Strings.getter("layoutRadix2"), items);
 			}
 		}
 		afterAdd = new PrefOptionList(AppPreferences.ADD_AFTER,
-				Strings.getter("layoutAddAfter"),
-				new PrefOption[] {
-					new PrefOption(AppPreferences.ADD_AFTER_UNCHANGED,
-							Strings.getter("layoutAddAfterUnchanged")),
-					new PrefOption(AppPreferences.ADD_AFTER_EDIT,
-							Strings.getter("layoutAddAfterEdit")) });
-		
+			Strings.getter("layoutAddAfter"),
+			new PrefOption[]{
+				new PrefOption(AppPreferences.ADD_AFTER_UNCHANGED,
+					Strings.getter("layoutAddAfterUnchanged")),
+				new PrefOption(AppPreferences.ADD_AFTER_EDIT,
+					Strings.getter("layoutAddAfterEdit"))});
+
 		JPanel panel = new JPanel(new TableLayout(2));
 		panel.add(afterAdd.getJLabel());
 		panel.add(afterAdd.getJComboBox());
@@ -77,7 +77,7 @@ class LayoutOptions extends OptionsPanel {
 	public String getHelpText() {
 		return Strings.get("layoutHelp");
 	}
-	
+
 	@Override
 	public void localeChanged() {
 		for (int i = 0; i < checks.length; i++) {

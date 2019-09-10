@@ -3,10 +3,6 @@
 
 package com.cburch.logisim.std;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.cburch.logisim.std.arith.Arithmetic;
 import com.cburch.logisim.std.base.Base;
 import com.cburch.logisim.std.gates.Gates;
@@ -17,11 +13,15 @@ import com.cburch.logisim.std.wiring.Wiring;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Builtin extends Library {
 	private List<Library> libraries = null;
 
 	public Builtin() {
-		libraries = Arrays.asList(new Library[] {
+		libraries = Arrays.asList(new Library[]{
 			new Base(),
 			new Gates(),
 			new Wiring(),
@@ -33,14 +33,20 @@ public class Builtin extends Library {
 	}
 
 	@Override
-	public String getName() { return "Builtin"; }
+	public String getName() {
+		return "Builtin";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("builtinLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("builtinLibrary");
+	}
 
 	@Override
-	public List<Tool> getTools() { return Collections.emptyList(); }
-	
+	public List<Tool> getTools() {
+		return Collections.emptyList();
+	}
+
 	@Override
 	public List<Library> getLibraries() {
 		return libraries;

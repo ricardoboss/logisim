@@ -3,18 +3,10 @@
 
 package com.cburch.logisim.std.base;
 
+import com.cburch.logisim.tools.*;
+
 import java.util.Arrays;
 import java.util.List;
-
-import com.cburch.logisim.tools.Library;
-import com.cburch.logisim.tools.MenuTool;
-import com.cburch.logisim.tools.PokeTool;
-import com.cburch.logisim.tools.SelectTool;
-import com.cburch.logisim.tools.TextTool;
-import com.cburch.logisim.tools.AddTool;
-import com.cburch.logisim.tools.EditTool;
-import com.cburch.logisim.tools.Tool;
-import com.cburch.logisim.tools.WiringTool;
 
 public class Base extends Library {
 	private List<Tool> tools = null;
@@ -22,8 +14,8 @@ public class Base extends Library {
 	public Base() {
 		SelectTool select = new SelectTool();
 		WiringTool wiring = new WiringTool();
-		
-		tools = Arrays.asList(new Tool[] {
+
+		tools = Arrays.asList(new Tool[]{
 			new PokeTool(),
 			new EditTool(select, wiring),
 			select,
@@ -35,10 +27,14 @@ public class Base extends Library {
 	}
 
 	@Override
-	public String getName() { return "Base"; }
+	public String getName() {
+		return "Base";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("baseLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("baseLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

@@ -19,48 +19,18 @@ class CircuitLocker {
 	private ReadWriteLock circuitLock;
 	private transient Thread mutatingThread;
 	private CircuitMutatorImpl mutatingMutator;
-	
+
 	CircuitLocker() {
 		serialNumber = NEXT_SERIAL_NUMBER.getAndIncrement();
 		circuitLock = new ReentrantReadWriteLock();
 		mutatingThread = null;
 		mutatingMutator = null;
 	}
-	
-	public boolean hasWriteLock() {
-		return mutatingThread == Thread.currentThread();
-	}
-	
-	CircuitMutatorImpl getMutator() {
-		return mutatingMutator;
-	}
-	
-	void checkForWritePermission(String operationName) {
-		if (mutatingThread != Thread.currentThread()) {
-			throw new IllegalStateException(operationName + " outside transaction");
-		}
-	}
-	
-	void execute(CircuitTransaction xn) {
-		if (mutatingThread == Thread.currentThread()) {
-			xn.run(mutatingMutator);
-		} else {
-			xn.execute();
-		}
-	}
-	
-	private static class CircuitComparator implements Comparator<Circuit> {
-		public int compare(Circuit a, Circuit b) {
-			int an = a.getLocker().serialNumber;
-			int bn = b.getLocker().serialNumber;
-			return an - bn;
-		}
-	}
-	
-	static Map<Circuit,Lock> acquireLocks(CircuitTransaction xn,
-			CircuitMutatorImpl mutator) {
-		Map<Circuit,Integer> requests = xn.getAccessedCircuits();
-		Map<Circuit,Lock> circuitLocks = new HashMap<Circuit,Lock>();
+
+	static Map<Circuit, Lock> acquireLocks(CircuitTransaction xn,
+										   CircuitMutatorImpl mutator) {
+		Map<Circuit, Integer> requests = xn.getAccessedCircuits();
+		Map<Circuit, Lock> circuitLocks = new HashMap<Circuit, Lock>();
 		// Acquire locks in serial-number order to avoid deadlock
 		Circuit[] lockOrder = requests.keySet().toArray(new Circuit[0]);
 		Arrays.sort(lockOrder, new CircuitComparator());
@@ -94,10 +64,10 @@ class CircuitLocker {
 		}
 		return circuitLocks;
 	}
-	
-	static void releaseLocks(Map<Circuit,Lock> locks) {
+
+	static void releaseLocks(Map<Circuit, Lock> locks) {
 		Thread curThread = Thread.currentThread();
-		for (Map.Entry<Circuit,Lock> entry : locks.entrySet()) {
+		for (Map.Entry<Circuit, Lock> entry : locks.entrySet()) {
 			Circuit circ = entry.getKey();
 			Lock lock = entry.getValue();
 			CircuitLocker locker = circ.getLocker();
@@ -106,6 +76,36 @@ class CircuitLocker {
 				locker.mutatingMutator = null;
 			}
 			lock.unlock();
+		}
+	}
+
+	public boolean hasWriteLock() {
+		return mutatingThread == Thread.currentThread();
+	}
+
+	CircuitMutatorImpl getMutator() {
+		return mutatingMutator;
+	}
+
+	void checkForWritePermission(String operationName) {
+		if (mutatingThread != Thread.currentThread()) {
+			throw new IllegalStateException(operationName + " outside transaction");
+		}
+	}
+
+	void execute(CircuitTransaction xn) {
+		if (mutatingThread == Thread.currentThread()) {
+			xn.run(mutatingMutator);
+		} else {
+			xn.execute();
+		}
+	}
+
+	private static class CircuitComparator implements Comparator<Circuit> {
+		public int compare(Circuit a, Circuit b) {
+			int an = a.getLocker().serialNumber;
+			int bn = b.getLocker().serialNumber;
+			return an - bn;
 		}
 	}
 }

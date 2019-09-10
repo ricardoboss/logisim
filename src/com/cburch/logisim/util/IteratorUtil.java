@@ -12,11 +12,42 @@ public class IteratorUtil {
 	public static <E> Iterator<E> emptyIterator() {
 		return new EmptyIterator<E>();
 	}
-	
+
+	public static <E> Iterator<E> createUnitIterator(E data) {
+		return new UnitIterator<E>(data);
+	}
+
+	public static <E> Iterator<E> createArrayIterator(E[] data) {
+		return new ArrayIterator<E>(data);
+	}
+
+	public static <E> Iterator<E> createJoinedIterator(Iterator<? extends E> i0,
+													   Iterator<? extends E> i1) {
+		if (!i0.hasNext()) {
+			@SuppressWarnings("unchecked")
+			Iterator<E> ret = (Iterator<E>) i1;
+			return ret;
+		} else if (!i1.hasNext()) {
+			@SuppressWarnings("unchecked")
+			Iterator<E> ret = (Iterator<E>) i0;
+			return ret;
+		} else {
+			return new IteratorUnion<E>(i0, i1);
+		}
+	}
+
 	private static class EmptyIterator<E> implements Iterator<E> {
-		private EmptyIterator() { }
-		public E next() { throw new NoSuchElementException(); }
-		public boolean hasNext() { return false; }
+		private EmptyIterator() {
+		}
+
+		public E next() {
+			throw new NoSuchElementException();
+		}
+
+		public boolean hasNext() {
+			return false;
+		}
+
 		public void remove() {
 			throw new UnsupportedOperationException("EmptyIterator.remove");
 		}
@@ -26,7 +57,9 @@ public class IteratorUtil {
 		private E data;
 		private boolean taken = false;
 
-		private UnitIterator(E data) { this.data = data; }
+		private UnitIterator(E data) {
+			this.data = data;
+		}
 
 		public E next() {
 			if (taken) throw new NoSuchElementException();
@@ -47,7 +80,9 @@ public class IteratorUtil {
 		private E[] data;
 		private int i = -1;
 
-		private ArrayIterator(E[] data) { this.data = data; }
+		private ArrayIterator(E[] data) {
+			this.data = data;
+		}
 
 		public E next() {
 			if (!hasNext()) throw new NoSuchElementException();
@@ -88,29 +123,6 @@ public class IteratorUtil {
 
 		public void remove() {
 			cur.remove();
-		}
-	}
-
-	public static <E> Iterator<E> createUnitIterator(E data) {
-		return new UnitIterator<E>(data);
-	}
-
-	public static <E> Iterator<E> createArrayIterator(E[] data) {
-		return new ArrayIterator<E>(data);
-	}
-
-	public static <E> Iterator<E> createJoinedIterator(Iterator<? extends E> i0,
-			Iterator<? extends E> i1) {
-		if (!i0.hasNext()) {
-			@SuppressWarnings("unchecked")
-			Iterator<E> ret = (Iterator<E>) i1;
-			return ret;
-		} else if (!i1.hasNext()) {
-			@SuppressWarnings("unchecked")
-			Iterator<E> ret = (Iterator<E>) i0;
-			return ret;
-		} else {
-			return new IteratorUnion<E>(i0, i1);
 		}
 	}
 

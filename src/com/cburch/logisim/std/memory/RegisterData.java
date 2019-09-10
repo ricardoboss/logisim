@@ -11,12 +11,12 @@ class RegisterData extends ClockState implements InstanceData {
 	public RegisterData() {
 		value = 0;
 	}
-	
-	public void setValue(int value) {
-		this.value = value;
-	}
-	
+
 	public int getValue() {
 		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
 	}
 }

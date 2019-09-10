@@ -14,12 +14,15 @@ class Strings {
 	public static String get(String key) {
 		return source.get(key);
 	}
+
 	public static String get(String key, String arg0) {
 		return StringUtil.format(source.get(key), arg0);
 	}
+
 	public static StringGetter getter(String key) {
 		return source.getter(key);
 	}
+
 	public static StringGetter getter(String key, String arg0) {
 		return source.getter(key, arg0);
 	}

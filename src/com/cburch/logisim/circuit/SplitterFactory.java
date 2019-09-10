@@ -3,14 +3,7 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.event.InputEvent;
-
-import javax.swing.Icon;
-
 import com.cburch.logisim.LogisimVersion;
-import com.cburch.logisim.circuit.Strings;
 import com.cburch.logisim.comp.AbstractComponentFactory;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
@@ -19,23 +12,26 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.tools.key.BitWidthConfigurator;
-import com.cburch.logisim.tools.key.IntegerConfigurator;
-import com.cburch.logisim.tools.key.JoinedConfigurator;
-import com.cburch.logisim.tools.key.KeyConfigurator;
-import com.cburch.logisim.tools.key.ParallelConfigurator;
+import com.cburch.logisim.tools.key.*;
 import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.StringGetter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.InputEvent;
 
 public class SplitterFactory extends AbstractComponentFactory {
 	public static final SplitterFactory instance = new SplitterFactory();
 
 	private static final Icon toolIcon = Icons.getIcon("splitter.gif");
 
-	private SplitterFactory() { }
+	private SplitterFactory() {
+	}
 
 	@Override
-	public String getName() { return "Splitter"; }
+	public String getName() {
+		return "Splitter";
+	}
 
 	@Override
 	public StringGetter getDisplayGetter() {
@@ -46,7 +42,7 @@ public class SplitterFactory extends AbstractComponentFactory {
 	public AttributeSet createAttributeSet() {
 		return new SplitterAttributes();
 	}
-	
+
 	@Override
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		if (attr == SplitterAttributes.ATTR_APPEARANCE) {
@@ -79,7 +75,7 @@ public class SplitterFactory extends AbstractComponentFactory {
 		Bounds bds = Bounds.create(0, 0, 1, 1);
 		bds = bds.add(xEnd0, yEnd0);
 		bds = bds.add(xEnd0 + (fanout - 1) * parms.getEndToEndDeltaX(),
-				yEnd0 + (fanout - 1) * parms.getEndToEndDeltaY());
+			yEnd0 + (fanout - 1) * parms.getEndToEndDeltaY());
 		return bds;
 	}
 
@@ -88,7 +84,7 @@ public class SplitterFactory extends AbstractComponentFactory {
 	//
 	@Override
 	public void drawGhost(ComponentDrawContext context,
-			Color color, int x, int y, AttributeSet attrsBase) {
+						  Color color, int x, int y, AttributeSet attrsBase) {
 		SplitterAttributes attrs = (SplitterAttributes) attrsBase;
 		context.getGraphics().setColor(color);
 		Location loc = Location.create(x, y);
@@ -101,7 +97,7 @@ public class SplitterFactory extends AbstractComponentFactory {
 
 	@Override
 	public void paintIcon(ComponentDrawContext c,
-			int x, int y, AttributeSet attrs) {
+						  int x, int y, AttributeSet attrs) {
 		Graphics g = c.getGraphics();
 		if (toolIcon != null) {
 			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
@@ -114,9 +110,9 @@ public class SplitterFactory extends AbstractComponentFactory {
 			return StdAttr.FACING;
 		} else if (key == KeyConfigurator.class) {
 			KeyConfigurator altConfig = ParallelConfigurator.create(
-					new BitWidthConfigurator(SplitterAttributes.ATTR_WIDTH),
-					new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT,
-							1, 32, InputEvent.ALT_DOWN_MASK));
+				new BitWidthConfigurator(SplitterAttributes.ATTR_WIDTH),
+				new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT,
+					1, 32, InputEvent.ALT_DOWN_MASK));
 			return JoinedConfigurator.create(
 				new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT, 1, 32, 0),
 				altConfig);

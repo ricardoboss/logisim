@@ -3,19 +3,27 @@
 
 package com.cburch.logisim.file;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cloneable {
+	private NodeList list;
+	private int index;
+
+	public XmlIterator(NodeList nodes) {
+		list = nodes;
+		index = 0;
+	}
+
 	public static XmlIterator<Node> forChildren(Element node) {
 		return new XmlIterator<Node>(node.getChildNodes());
 	}
-	
+
 	public static Iterable<Element> forChildElements(Element node) {
 		NodeList nodes = node.getChildNodes();
 		ArrayList<Element> ret = new ArrayList<Element>();
@@ -40,19 +48,11 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 		}
 		return ret;
 	}
-	
+
 	public static Iterable<Element> forDescendantElements(Element node, String tagName) {
 		return new XmlIterator<Element>(node.getElementsByTagName(tagName));
 	}
-	
-	private NodeList list;
-	private int index;
-	
-	public XmlIterator(NodeList nodes) {
-		list = nodes;
-		index = 0;
-	}
-	
+
 	@Override
 	public XmlIterator<E> clone() {
 		try {

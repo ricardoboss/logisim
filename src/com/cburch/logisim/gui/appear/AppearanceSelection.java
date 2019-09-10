@@ -3,11 +3,11 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.util.Collection;
-
 import com.cburch.draw.canvas.Selection;
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.circuit.appear.AppearanceElement;
+
+import java.util.Collection;
 
 public class AppearanceSelection extends Selection {
 	@Override
@@ -27,7 +27,7 @@ public class AppearanceSelection extends Selection {
 		}
 		super.setMovingDelta(dx, dy);
 	}
-	
+
 	private boolean shouldSnap(Collection<? extends CanvasObject> shapes) {
 		for (CanvasObject o : shapes) {
 			if (o instanceof AppearanceElement) {

@@ -3,8 +3,6 @@
 
 package com.cburch.logisim.file;
 
-import java.util.ArrayList;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
@@ -15,9 +13,12 @@ import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
+import java.util.ArrayList;
+
 
 public class LogisimFileActions {
-	private LogisimFileActions() { }
+	private LogisimFileActions() {
+	}
 
 	public static Action addCircuit(Circuit circuit) {
 		return new AddCircuit(circuit);
@@ -26,13 +27,13 @@ public class LogisimFileActions {
 	public static Action removeCircuit(Circuit circuit) {
 		return new RemoveCircuit(circuit);
 	}
-	
+
 	public static Action moveCircuit(AddTool tool, int toIndex) {
 		return new MoveCircuit(tool, toIndex);
 	}
 
 	public static Action loadLibrary(Library lib) {
-		return new LoadLibraries(new Library[] { lib });
+		return new LoadLibraries(new Library[]{lib});
 	}
 
 	public static Action loadLibraries(Library[] libs) {
@@ -40,7 +41,7 @@ public class LogisimFileActions {
 	}
 
 	public static Action unloadLibrary(Library lib) {
-		return new UnloadLibraries(new Library[] { lib });
+		return new UnloadLibraries(new Library[]{lib});
 	}
 
 	public static Action unloadLibraries(Library[] libs) {
@@ -128,13 +129,13 @@ public class LogisimFileActions {
 		public void undo(Project proj) {
 			proj.getLogisimFile().moveCircuit(tool, fromIndex);
 		}
-		
+
 		@Override
 		public boolean shouldAppendTo(Action other) {
 			return other instanceof MoveCircuit
 				&& ((MoveCircuit) other).tool == this.tool;
 		}
-		
+
 		@Override
 		public Action append(Action other) {
 			MoveCircuit ret = new MoveCircuit(tool, ((MoveCircuit) other).toIndex);
@@ -173,7 +174,7 @@ public class LogisimFileActions {
 			}
 		}
 	}
-	
+
 	private static class UnloadLibraries extends Action {
 		private Library[] libs;
 
@@ -229,19 +230,19 @@ public class LogisimFileActions {
 			proj.getLogisimFile().setMainCircuit(oldval);
 		}
 	}
-	
+
 	private static class RevertAttributeValue {
 		private AttributeSet attrs;
 		private Attribute<Object> attr;
 		private Object value;
-		
+
 		RevertAttributeValue(AttributeSet attrs, Attribute<Object> attr, Object value) {
 			this.attrs = attrs;
 			this.attr = attr;
 			this.value = value;
 		}
 	}
-	
+
 	private static class RevertDefaults extends Action {
 		private Options oldOpts;
 		private ArrayList<Library> libraries = null;
@@ -261,7 +262,7 @@ public class LogisimFileActions {
 		public void doIt(Project proj) {
 			LogisimFile src = ProjectActions.createNewFile(proj);
 			LogisimFile dst = proj.getLogisimFile();
-			
+
 			copyToolAttributes(src, dst);
 			for (Library srcLib : src.getLibraries()) {
 				Library dstLib = dst.getLibrary(srcLib.getName());
@@ -274,13 +275,13 @@ public class LogisimFileActions {
 				}
 				copyToolAttributes(srcLib, dstLib);
 			}
-			
+
 			Options newOpts = proj.getOptions();
 			oldOpts = new Options();
 			oldOpts.copyFrom(newOpts, dst);
 			newOpts.copyFrom(src.getOptions(), dst);
 		}
-		
+
 		private void copyToolAttributes(Library srcLib, Library dstLib) {
 			for (Tool srcTool : srcLib.getTools()) {
 				AttributeSet srcAttrs = srcTool.getAttributeSet();
@@ -304,7 +305,7 @@ public class LogisimFileActions {
 		@Override
 		public void undo(Project proj) {
 			proj.getOptions().copyFrom(oldOpts, proj.getLogisimFile());
-			
+
 			for (RevertAttributeValue attrValue : attrValues) {
 				attrValue.attrs.setValue(attrValue.attr, attrValue.value);
 			}

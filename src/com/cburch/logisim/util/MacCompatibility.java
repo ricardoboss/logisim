@@ -3,18 +3,15 @@
 
 package com.cburch.logisim.util;
 
+import net.roydesign.mac.MRJAdapter;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JMenuBar;
-
-import net.roydesign.mac.MRJAdapter;
-
 public class MacCompatibility {
-	private MacCompatibility() { }
-
 	public static final double mrjVersion;
-	
+
 	static {
 		double versionValue;
 		try {
@@ -24,7 +21,10 @@ public class MacCompatibility {
 		}
 		mrjVersion = versionValue;
 	}
-	
+
+	private MacCompatibility() {
+	}
+
 	public static boolean isAboutAutomaticallyPresent() {
 		try {
 			return MRJAdapter.isAboutAutomaticallyPresent();
@@ -32,7 +32,7 @@ public class MacCompatibility {
 			return false;
 		}
 	}
-	
+
 	public static boolean isPreferencesAutomaticallyPresent() {
 		try {
 			return MRJAdapter.isPreferencesAutomaticallyPresent();
@@ -40,7 +40,7 @@ public class MacCompatibility {
 			return false;
 		}
 	}
-	
+
 	public static boolean isQuitAutomaticallyPresent() {
 		try {
 			return MRJAdapter.isQuitAutomaticallyPresent();
@@ -48,7 +48,7 @@ public class MacCompatibility {
 			return false;
 		}
 	}
-	
+
 	public static boolean isSwingUsingScreenMenuBar() {
 		try {
 			return MRJAdapter.isSwingUsingScreenMenuBar();
@@ -56,15 +56,16 @@ public class MacCompatibility {
 			return false;
 		}
 	}
-	
+
 	public static void setFramelessJMenuBar(JMenuBar menubar) {
 		try {
 			MRJAdapter.setFramelessJMenuBar(menubar);
-		} catch (Throwable t) { }
+		} catch (Throwable t) {
+		}
 	}
-	
+
 	public static void setFileCreatorAndType(File dest, String app, String type)
-			throws IOException {
+		throws IOException {
 		IOException ioExcept = null;
 		try {
 			try {
@@ -72,7 +73,8 @@ public class MacCompatibility {
 			} catch (IOException e) {
 				ioExcept = e;
 			}
-		} catch (Throwable t) { }
+		} catch (Throwable t) {
+		}
 		if (ioExcept != null) throw ioExcept;
 	}
 

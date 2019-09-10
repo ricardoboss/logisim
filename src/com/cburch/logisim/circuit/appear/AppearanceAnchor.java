@@ -3,40 +3,34 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.model.Handle;
 import com.cburch.draw.model.HandleGesture;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
+import com.cburch.logisim.data.*;
 import com.cburch.logisim.util.UnmodifiableList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.awt.*;
+import java.util.List;
 
 public class AppearanceAnchor extends AppearanceElement {
 	public static final Attribute<Direction> FACING
 		= Attributes.forDirection("facing", Strings.getter("appearanceFacingAttr"));
 	static final List<Attribute<?>> ATTRIBUTES
-		= UnmodifiableList.create(new Attribute<?>[] { FACING });
-	
+		= UnmodifiableList.create(new Attribute<?>[]{FACING});
+
 	private static final int RADIUS = 3;
 	private static final int INDICATOR_LENGTH = 8;
 	private static final Color SYMBOL_COLOR = new Color(0, 128, 0);
-	
+
 	private Direction facing;
-	
+
 	public AppearanceAnchor(Location location) {
 		super(location);
 		facing = Direction.EAST;
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof AppearanceAnchor) {
@@ -56,7 +50,7 @@ public class AppearanceAnchor extends AppearanceElement {
 	public String getDisplayName() {
 		return Strings.get("circuitAnchor");
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		Location loc = getLocation();
@@ -72,12 +66,12 @@ public class AppearanceAnchor extends AppearanceElement {
 	public Direction getFacing() {
 		return facing;
 	}
-	
+
 	@Override
 	public List<Attribute<?>> getAttributes() {
 		return ATTRIBUTES;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
@@ -87,7 +81,7 @@ public class AppearanceAnchor extends AppearanceElement {
 			return super.getValue(attr);
 		}
 	}
-	
+
 	@Override
 	protected void updateValue(Attribute<?> attr, Object value) {
 		if (attr == FACING) {
@@ -108,7 +102,7 @@ public class AppearanceAnchor extends AppearanceElement {
 		Location e1 = location.translate(facing, RADIUS + INDICATOR_LENGTH);
 		g.drawLine(e0.getX(), e0.getY(), e1.getX(), e1.getY());
 	}
-	
+
 	@Override
 	public Bounds getBounds() {
 		Bounds bds = super.getBounds(RADIUS);
@@ -133,12 +127,12 @@ public class AppearanceAnchor extends AppearanceElement {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<Handle> getHandles(HandleGesture gesture) {
 		Location c = getLocation();
 		Location end = c.translate(facing, RADIUS + INDICATOR_LENGTH);
-		return UnmodifiableList.create(new Handle[] { new Handle(this, c),
-				new Handle(this, end) });
+		return UnmodifiableList.create(new Handle[]{new Handle(this, c),
+			new Handle(this, end)});
 	}
 }

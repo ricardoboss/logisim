@@ -3,17 +3,16 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.JList;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.file.LogisimFile;
 import com.cburch.logisim.proj.Project;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
 class CircuitJList extends JList {
 	public CircuitJList(Project proj, boolean includeEmpty) {
@@ -27,12 +26,12 @@ class CircuitJList extends JList {
 				options.add(circ);
 			}
 		}
-		
+
 		setListData(options);
 		if (currentFound) setSelectedValue(current, true);
 		setVisibleRowCount(Math.min(6, options.size()));
 	}
-	
+
 	public List<Circuit> getSelectedCircuits() {
 		Object[] selected = getSelectedValues();
 		if (selected != null && selected.length > 0) {

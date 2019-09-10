@@ -3,51 +3,17 @@
 
 package com.cburch.logisim.util;
 
-import java.util.Locale;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import com.cburch.logisim.prefs.AppPreferences;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.util.Locale;
+
 class LocaleSelector extends JList
-			implements LocaleListener, ListSelectionListener {
-	private static class LocaleOption implements Runnable {
-		private Locale locale;
-		private String text;
-		
-		LocaleOption(Locale locale) {
-			this.locale = locale;
-			update(locale);
-		}
-		
-		@Override
-		public String toString() {
-			return text;
-		}
-
-		void update(Locale current) {
-			if (current != null && current.equals(locale)) {
-				text = locale.getDisplayName(locale);
-			} else {
-				text = locale.getDisplayName(locale)
-					+ " / " + locale.getDisplayName(current);
-			}
-		}
-		
-		public void run() {
-			if (!LocaleManager.getLocale().equals(locale)) {
-				LocaleManager.setLocale(locale);
-				AppPreferences.LOCALE.set(locale.getLanguage());
-			}
-		}
-	}
-
+	implements LocaleListener, ListSelectionListener {
 	private LocaleOption[] items;
-	
+
 	LocaleSelector(Locale[] locales) {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		DefaultListModel model = new DefaultListModel();
@@ -62,7 +28,7 @@ class LocaleSelector extends JList
 		localeChanged();
 		addListSelectionListener(this);
 	}
-	
+
 	public void localeChanged() {
 		Locale current = LocaleManager.getLocale();
 		LocaleOption sel = null;
@@ -79,6 +45,37 @@ class LocaleSelector extends JList
 		LocaleOption opt = (LocaleOption) getSelectedValue();
 		if (opt != null) {
 			SwingUtilities.invokeLater(opt);
+		}
+	}
+
+	private static class LocaleOption implements Runnable {
+		private Locale locale;
+		private String text;
+
+		LocaleOption(Locale locale) {
+			this.locale = locale;
+			update(locale);
+		}
+
+		@Override
+		public String toString() {
+			return text;
+		}
+
+		void update(Locale current) {
+			if (current != null && current.equals(locale)) {
+				text = locale.getDisplayName(locale);
+			} else {
+				text = locale.getDisplayName(locale)
+					+ " / " + locale.getDisplayName(current);
+			}
+		}
+
+		public void run() {
+			if (!LocaleManager.getLocale().equals(locale)) {
+				LocaleManager.setLocale(locale);
+				AppPreferences.LOCALE.set(locale.getLanguage());
+			}
 		}
 	}
 }

@@ -3,29 +3,28 @@
 
 package com.cburch.logisim.std.wiring;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.cburch.logisim.comp.EndData;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.instance.StdAttr;
 
+import java.util.Arrays;
+import java.util.List;
+
 class PinAttributes extends ProbeAttributes {
-	public static PinAttributes instance = new PinAttributes();
-
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			StdAttr.FACING, Pin.ATTR_TYPE, StdAttr.WIDTH, Pin.ATTR_TRISTATE,
-			Pin.ATTR_PULL, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT
-		});
-
+		= Arrays.asList(new Attribute<?>[]{
+		StdAttr.FACING, Pin.ATTR_TYPE, StdAttr.WIDTH, Pin.ATTR_TRISTATE,
+		Pin.ATTR_PULL, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT
+	});
+	public static PinAttributes instance = new PinAttributes();
 	BitWidth width = BitWidth.ONE;
 	boolean threeState = true;
 	int type = EndData.INPUT_ONLY;
 	Object pull = Pin.PULL_NONE;
 
-	public PinAttributes() { }
+	public PinAttributes() {
+	}
 
 	@Override
 	public List<Attribute<?>> getAttributes() {
@@ -41,11 +40,11 @@ class PinAttributes extends ProbeAttributes {
 		if (attr == Pin.ATTR_PULL) return (V) pull;
 		return super.getValue(attr);
 	}
-	
+
 	boolean isOutput() {
 		return type != EndData.INPUT_ONLY;
 	}
-	
+
 	boolean isInput() {
 		return type != EndData.OUTPUT_ONLY;
 	}

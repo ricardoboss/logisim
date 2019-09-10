@@ -3,23 +3,29 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.util.Enumeration;
+import com.cburch.logisim.comp.ComponentFactory;
 
 import javax.swing.tree.TreeNode;
-
-import com.cburch.logisim.comp.ComponentFactory;
+import java.util.Enumeration;
 
 public abstract class SimulationTreeNode implements TreeNode {
 	public abstract ComponentFactory getComponentFactory();
+
 	public boolean isCurrentView(SimulationTreeModel model) {
 		return false;
 	}
 
 	public abstract Enumeration<? extends TreeNode> children();
+
 	public abstract boolean getAllowsChildren();
+
 	public abstract TreeNode getChildAt(int childIndex);
+
 	public abstract int getChildCount();
+
 	public abstract int getIndex(TreeNode node);
+
 	public abstract TreeNode getParent();
+
 	public abstract boolean isLeaf();
 }

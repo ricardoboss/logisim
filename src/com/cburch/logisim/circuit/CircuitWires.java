@@ -3,26 +3,10 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.comp.EndData;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeEvent;
-import com.cburch.logisim.data.AttributeListener;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
+import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.std.wiring.PullResistor;
@@ -31,131 +15,38 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.IteratorUtil;
 import com.cburch.logisim.util.SmallSet;
 
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
 class CircuitWires {
-	static class SplitterData {
-		WireBundle[] end_bundle; // PointData associated with each end
-
-		SplitterData(int fan_out) {
-			end_bundle = new WireBundle[fan_out + 1];
-		}
-	}
-
-	static class ThreadBundle {
-		int loc;
-		WireBundle b;
-		ThreadBundle(int loc, WireBundle b) {
-			this.loc = loc;
-			this.b = b;
-		}
-	}
-
-	static class State {
-		BundleMap bundleMap;
-		HashMap<WireThread,Value> thr_values = new HashMap<WireThread,Value>();
-
-		State(BundleMap bundleMap) {
-			this.bundleMap = bundleMap;
-		}
-		
-		@Override
-		public Object clone() {
-			State ret = new State(this.bundleMap);
-			ret.thr_values.putAll(this.thr_values);
-			return ret;
-		}
-	}
-	
-	private class TunnelListener implements AttributeListener {
-		public void attributeListChanged(AttributeEvent e) { }
-
-		public void attributeValueChanged(AttributeEvent e) {
-			Attribute<?> attr = e.getAttribute();
-			if (attr == StdAttr.LABEL || attr == PullResistor.ATTR_PULL_TYPE) {
-				voidBundleMap();
-			}
-		}
-	}
-
-	static class BundleMap {
-		boolean computed = false;
-		HashMap<Location,WireBundle> pointBundles = new HashMap<Location,WireBundle>();
-		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
-		boolean isValid = true;
-		// NOTE: It would make things more efficient if we also had
-		// a set of just the first bundle in each tree.
-		HashSet<WidthIncompatibilityData> incompatibilityData = null;
-
-		HashSet<WidthIncompatibilityData> getWidthIncompatibilityData() {
-			return incompatibilityData;
-		}
-
-		void addWidthIncompatibilityData(WidthIncompatibilityData e) {
-			if (incompatibilityData == null) {
-				incompatibilityData = new HashSet<WidthIncompatibilityData>();
-			}
-			incompatibilityData.add(e);
-		}
-
-		WireBundle getBundleAt(Location p) {
-			return pointBundles.get(p);
-		}
-
-		WireBundle createBundleAt(Location p) {
-			WireBundle ret = pointBundles.get(p);
-			if (ret == null) {
-				ret = new WireBundle();
-				pointBundles.put(p, ret);
-				ret.points.add(p);
-				bundles.add(ret);
-			}
-			return ret;
-		}
-
-		boolean isValid() {
-			return isValid;
-		}
-
-		void invalidate() {
-			isValid = false;
-		}
-
-		void setBundleAt(Location p, WireBundle b) {
-			pointBundles.put(p, b);
-		}
-
-		Set<Location> getBundlePoints() {
-			return pointBundles.keySet();
-		}
-
-		Set<WireBundle> getBundles() {
-			return bundles;
-		}
-
-		synchronized void markComputed() {
-			computed = true;
-			notifyAll();
-		}
-
-		synchronized void waitUntilComputed() {
-			while (!computed) {
-				try { wait(); } catch (InterruptedException e) { }
-			}
-		}
-	}
-
+	final CircuitPoints points = new CircuitPoints();
 	// user-given data
 	private HashSet<Wire> wires = new HashSet<Wire>();
 	private HashSet<Splitter> splitters = new HashSet<Splitter>();
 	private HashSet<Component> tunnels = new HashSet<Component>(); // of Components with Tunnel factory
 	private TunnelListener tunnelListener = new TunnelListener();
 	private HashSet<Component> pulls = new HashSet<Component>(); // of Components with PullResistor factory
-	final CircuitPoints points = new CircuitPoints();
-
 	// derived data
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;
 	private BundleMap bundleMap = null;
+	CircuitWires() {
+	}
 
-	CircuitWires() { }
+	private static Value pullValue(Value base, Value pullTo) {
+		if (base.isFullyDefined()) {
+			return base;
+		} else if (base.getWidth() == 1) {
+			if (base == Value.UNKNOWN) return pullTo;
+			else return base;
+		} else {
+			Value[] ret = base.getAll();
+			for (int i = 0; i < ret.length; i++) {
+				if (ret[i] == Value.UNKNOWN) ret[i] = pullTo;
+			}
+			return Value.create(ret);
+		}
+	}
 
 	//
 	// query methods
@@ -163,7 +54,7 @@ class CircuitWires {
 	boolean isMapVoided() {
 		return bundleMap == null;
 	}
-	
+
 	Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
 		return getBundleMap().getWidthIncompatibilityData();
 	}
@@ -210,12 +101,12 @@ class CircuitWires {
 		}
 		return bds;
 	}
-	
+
 	WireBundle getWireBundle(Location query) {
 		BundleMap bmap = getBundleMap();
 		return bmap.getBundleAt(query);
 	}
-	
+
 	WireSet getWireSet(Wire start) {
 		WireBundle bundle = getWireBundle(start.e0);
 		if (bundle == null) return WireSet.EMPTY;
@@ -272,17 +163,17 @@ class CircuitWires {
 		points.remove(comp);
 		voidBundleMap();
 	}
-	
+
 	void add(Component comp, EndData end) {
 		points.add(comp, end);
 		voidBundleMap();
 	}
-	
+
 	void remove(Component comp, EndData end) {
 		points.remove(comp, end);
 		voidBundleMap();
 	}
-	
+
 	void replace(Component comp, EndData oldEnd, EndData newEnd) {
 		points.remove(comp, oldEnd);
 		points.add(comp, newEnd);
@@ -384,7 +275,10 @@ class CircuitWires {
 				boolean tvs_valid = true;
 				for (int i = 0; i < tvs.length; i++) {
 					Value tv = s.thr_values.get(b.threads[i]);
-					if (tv == null) { tvs_valid = false; break; }
+					if (tv == null) {
+						tvs_valid = false;
+						break;
+					}
 					tvs[i] = tv;
 				}
 				if (tvs_valid) bv = Value.create(tvs);
@@ -417,7 +311,7 @@ class CircuitWires {
 					g.setColor(Value.WIDTH_ERROR_COLOR);
 				} else if (showState) {
 					if (!isValid) g.setColor(Value.NIL_COLOR);
-					else         g.setColor(state.getValue(s).getColor());
+					else g.setColor(state.getValue(s).getColor());
 				} else {
 					g.setColor(Color.BLACK);
 				}
@@ -438,7 +332,7 @@ class CircuitWires {
 							g.setColor(Value.WIDTH_ERROR_COLOR);
 						} else if (showState) {
 							if (!isValid) g.setColor(Value.NIL_COLOR);
-							else         g.setColor(state.getValue(loc).getColor());
+							else g.setColor(state.getValue(loc).getColor());
 						} else {
 							g.setColor(Color.BLACK);
 						}
@@ -460,7 +354,7 @@ class CircuitWires {
 						g.setColor(Value.WIDTH_ERROR_COLOR);
 					} else if (showState) {
 						if (!isValid) g.setColor(Value.NIL_COLOR);
-						else         g.setColor(state.getValue(s).getColor());
+						else g.setColor(state.getValue(s).getColor());
 					} else {
 						g.setColor(Color.BLACK);
 					}
@@ -490,7 +384,7 @@ class CircuitWires {
 								g.setColor(Value.WIDTH_ERROR_COLOR);
 							} else if (showState) {
 								if (!isValid) g.setColor(Value.NIL_COLOR);
-								else         g.setColor(state.getValue(loc).getColor());
+								else g.setColor(state.getValue(loc).getColor());
 							} else {
 								g.setColor(Color.BLACK);
 							}
@@ -605,13 +499,13 @@ class CircuitWires {
 
 		// unite threads going through splitters
 		for (Splitter spl : splitters) {
-			synchronized(spl) {
+			synchronized (spl) {
 				SplitterAttributes spl_attrs = (SplitterAttributes) spl.getAttributeSet();
 				byte[] bit_end = spl_attrs.bit_end;
 				SplitterData spl_data = spl.wire_data;
 				WireBundle from_bundle = spl_data.end_bundle[0];
 				if (from_bundle == null || !from_bundle.isValid()) continue;
-	
+
 				for (int i = 0; i < bit_end.length; i++) {
 					int j = bit_end[i];
 					if (j > 0) {
@@ -656,28 +550,30 @@ class CircuitWires {
 			if (e != null) ret.addWidthIncompatibilityData(e);
 		}
 	}
-	
+
 	private void connectWires(BundleMap ret) {
 		// make a WireBundle object for each tree of connected wires
 		for (Wire w : wires) {
 			WireBundle b0 = ret.getBundleAt(w.e0);
 			if (b0 == null) {
 				WireBundle b1 = ret.createBundleAt(w.e1);
-				b1.points.add(w.e0); ret.setBundleAt(w.e0, b1);
+				b1.points.add(w.e0);
+				ret.setBundleAt(w.e0, b1);
 			} else {
 				WireBundle b1 = ret.getBundleAt(w.e1);
 				if (b1 == null) { // t1 doesn't exist
-					b0.points.add(w.e1); ret.setBundleAt(w.e1, b0);
+					b0.points.add(w.e1);
+					ret.setBundleAt(w.e1, b0);
 				} else {
 					b1.unite(b0); // unite b0 and b1
 				}
 			}
 		}
 	}
-	
+
 	private void connectTunnels(BundleMap ret) {
 		// determine the sets of tunnels
-		HashMap<String,ArrayList<Location>> tunnelSets = new HashMap<String,ArrayList<Location>>();
+		HashMap<String, ArrayList<Location>> tunnelSets = new HashMap<String, ArrayList<Location>>();
 		for (Component comp : tunnels) {
 			String label = comp.getAttributeSet().getValue(StdAttr.LABEL);
 			label = label.trim();
@@ -690,7 +586,7 @@ class CircuitWires {
 				tunnelSet.add(comp.getLocation());
 			}
 		}
-		
+
 		// now connect the bundles that are tunnelled together
 		for (ArrayList<Location> tunnelSet : tunnelSets.values()) {
 			WireBundle foundBundle = null;
@@ -705,7 +601,7 @@ class CircuitWires {
 			}
 			if (foundBundle == null) {
 				foundLocation = tunnelSet.get(0);
-				foundBundle = ret.createBundleAt(foundLocation); 
+				foundBundle = ret.createBundleAt(foundLocation);
 			}
 			for (Location loc : tunnelSet) {
 				if (loc != foundLocation) {
@@ -720,7 +616,7 @@ class CircuitWires {
 			}
 		}
 	}
-	
+
 	private void connectPullResistors(BundleMap ret) {
 		for (Component comp : pulls) {
 			Location loc = comp.getEnd(0).getLocation();
@@ -753,21 +649,6 @@ class CircuitWires {
 		}
 		return ret;
 	}
-	
-	private static Value pullValue(Value base, Value pullTo) {
-		if (base.isFullyDefined()) {
-			return base;
-		} else if (base.getWidth() == 1) {
-			if (base == Value.UNKNOWN) return pullTo;
-			else return base;
-		} else {
-			Value[] ret = base.getAll();
-			for (int i = 0; i < ret.length; i++) {
-				if (ret[i] == Value.UNKNOWN) ret[i] = pullTo;
-			}
-			return Value.create(ret);
-		}
-	}
 
 	private Bounds recomputeBounds() {
 		Iterator<Wire> it = wires.iterator();
@@ -783,14 +664,134 @@ class CircuitWires {
 		int ymax = w.e1.getY();
 		while (it.hasNext()) {
 			w = it.next();
-			int x0 = w.e0.getX(); if (x0 < xmin) xmin = x0;
-			int x1 = w.e1.getX(); if (x1 > xmax) xmax = x1;
-			int y0 = w.e0.getY(); if (y0 < ymin) ymin = y0;
-			int y1 = w.e1.getY(); if (y1 > ymax) ymax = y1;
+			int x0 = w.e0.getX();
+			if (x0 < xmin) xmin = x0;
+			int x1 = w.e1.getX();
+			if (x1 > xmax) xmax = x1;
+			int y0 = w.e0.getY();
+			if (y0 < ymin) ymin = y0;
+			int y1 = w.e1.getY();
+			if (y1 > ymax) ymax = y1;
 		}
 		Bounds bds = Bounds.create(xmin, ymin,
 			xmax - xmin + 1, ymax - ymin + 1);
 		bounds = bds;
 		return bds;
+	}
+
+	static class SplitterData {
+		WireBundle[] end_bundle; // PointData associated with each end
+
+		SplitterData(int fan_out) {
+			end_bundle = new WireBundle[fan_out + 1];
+		}
+	}
+
+	static class ThreadBundle {
+		int loc;
+		WireBundle b;
+
+		ThreadBundle(int loc, WireBundle b) {
+			this.loc = loc;
+			this.b = b;
+		}
+	}
+
+	static class State {
+		BundleMap bundleMap;
+		HashMap<WireThread, Value> thr_values = new HashMap<WireThread, Value>();
+
+		State(BundleMap bundleMap) {
+			this.bundleMap = bundleMap;
+		}
+
+		@Override
+		public Object clone() {
+			State ret = new State(this.bundleMap);
+			ret.thr_values.putAll(this.thr_values);
+			return ret;
+		}
+	}
+
+	static class BundleMap {
+		boolean computed = false;
+		HashMap<Location, WireBundle> pointBundles = new HashMap<Location, WireBundle>();
+		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
+		boolean isValid = true;
+		// NOTE: It would make things more efficient if we also had
+		// a set of just the first bundle in each tree.
+		HashSet<WidthIncompatibilityData> incompatibilityData = null;
+
+		HashSet<WidthIncompatibilityData> getWidthIncompatibilityData() {
+			return incompatibilityData;
+		}
+
+		void addWidthIncompatibilityData(WidthIncompatibilityData e) {
+			if (incompatibilityData == null) {
+				incompatibilityData = new HashSet<WidthIncompatibilityData>();
+			}
+			incompatibilityData.add(e);
+		}
+
+		WireBundle getBundleAt(Location p) {
+			return pointBundles.get(p);
+		}
+
+		WireBundle createBundleAt(Location p) {
+			WireBundle ret = pointBundles.get(p);
+			if (ret == null) {
+				ret = new WireBundle();
+				pointBundles.put(p, ret);
+				ret.points.add(p);
+				bundles.add(ret);
+			}
+			return ret;
+		}
+
+		boolean isValid() {
+			return isValid;
+		}
+
+		void invalidate() {
+			isValid = false;
+		}
+
+		void setBundleAt(Location p, WireBundle b) {
+			pointBundles.put(p, b);
+		}
+
+		Set<Location> getBundlePoints() {
+			return pointBundles.keySet();
+		}
+
+		Set<WireBundle> getBundles() {
+			return bundles;
+		}
+
+		synchronized void markComputed() {
+			computed = true;
+			notifyAll();
+		}
+
+		synchronized void waitUntilComputed() {
+			while (!computed) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
+
+	private class TunnelListener implements AttributeListener {
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		public void attributeValueChanged(AttributeEvent e) {
+			Attribute<?> attr = e.getAttribute();
+			if (attr == StdAttr.LABEL || attr == PullResistor.ATTR_PULL_TYPE) {
+				voidBundleMap();
+			}
+		}
 	}
 }

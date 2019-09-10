@@ -3,16 +3,16 @@
 
 package com.cburch.logisim.tools;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.Icon;
-
 import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.StringGetter;
 
-/** This class allows an object to be created holding all the information
+import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * This class allows an object to be created holding all the information
  * essential to showing a ComponentFactory in the explorer window, but without
  * actually loading the ComponentFactory unless a program genuinely gets around
  * to needing to use it. Note that for this to work, the relevant
@@ -21,15 +21,6 @@ import com.cburch.logisim.util.StringGetter;
  * no-arguments constructor.
  */
 public class FactoryDescription {
-	public static List<Tool> getTools(Class<? extends Library> base,
-			FactoryDescription[] descriptions) {
-		Tool[] tools = new Tool[descriptions.length];
-		for (int i = 0; i < tools.length; i++) {
-			tools[i] = new AddTool(base, descriptions[i]);
-		}
-		return Arrays.asList(tools);
-	}
-	
 	private String name;
 	private StringGetter displayName;
 	private String iconName;
@@ -39,25 +30,24 @@ public class FactoryDescription {
 	private boolean factoryLoadAttempted;
 	private ComponentFactory factory;
 	private StringGetter toolTip;
-	
 	public FactoryDescription(String name, StringGetter displayName,
-			String iconName, String factoryClassName) {
+							  String iconName, String factoryClassName) {
 		this(name, displayName, factoryClassName);
 		this.iconName = iconName;
 		this.iconLoadAttempted = false;
 		this.icon = null;
 	}
-	
+
 	public FactoryDescription(String name, StringGetter displayName,
-			Icon icon, String factoryClassName) {
+							  Icon icon, String factoryClassName) {
 		this(name, displayName, factoryClassName);
 		this.iconName = "???";
 		this.iconLoadAttempted = true;
 		this.icon = icon;
 	}
-	
+
 	public FactoryDescription(String name, StringGetter displayName,
-			String factoryClassName) {
+							  String factoryClassName) {
 		this.name = name;
 		this.displayName = displayName;
 		this.iconName = "???";
@@ -68,19 +58,28 @@ public class FactoryDescription {
 		this.factory = null;
 		this.toolTip = null;
 	}
-	
+
+	public static List<Tool> getTools(Class<? extends Library> base,
+									  FactoryDescription[] descriptions) {
+		Tool[] tools = new Tool[descriptions.length];
+		for (int i = 0; i < tools.length; i++) {
+			tools[i] = new AddTool(base, descriptions[i]);
+		}
+		return Arrays.asList(tools);
+	}
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getDisplayName() {
 		return displayName.get();
 	}
-	
+
 	public boolean isFactoryLoaded() {
 		return factoryLoadAttempted;
 	}
-	
+
 	public Icon getIcon() {
 		Icon ret = icon;
 		if (ret != null || iconLoadAttempted) {
@@ -92,7 +91,7 @@ public class FactoryDescription {
 			return ret;
 		}
 	}
-	
+
 	public ComponentFactory getFactory(Class<? extends Library> libraryClass) {
 		ComponentFactory ret = factory;
 		if (factory != null || factoryLoadAttempted) {
@@ -133,14 +132,14 @@ public class FactoryDescription {
 			return null;
 		}
 	}
-	
-	public FactoryDescription setToolTip(StringGetter getter) {
-		toolTip = getter;
-		return this;
-	}
-	
+
 	public String getToolTip() {
 		StringGetter getter = toolTip;
 		return getter == null ? null : getter.get();
+	}
+
+	public FactoryDescription setToolTip(StringGetter getter) {
+		toolTip = getter;
+		return this;
 	}
 }

@@ -1,18 +1,18 @@
 // retrieved from http://ouroborus.org/java/2.1/TableSorter.java
 package com.cburch.logisim.util;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.List;
-
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
-
-import java.lang.reflect.Method;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.*;
 
 /**
  * TableSorter is a decorator for TableModels; adding sorting
@@ -71,20 +71,15 @@ import java.lang.reflect.InvocationTargetException;
  */
 
 public class TableSorter extends AbstractTableModel {
-	protected TableModel tableModel;
-
 	public static final int DESCENDING = -1;
 	public static final int NOT_SORTED = 0;
 	public static final int ASCENDING = 1;
-
-	private static Directive EMPTY_DIRECTIVE = new Directive(-1, NOT_SORTED);
-
 	public static final Comparator<Object> COMPARABLE_COMPARATOR = new Comparator<Object>() {
 		public int compare(Object o1, Object o2) {
 			Method m;
 			try {
 				// See if o1 is capable of comparing itself to o2
-				m = o1.getClass().getDeclaredMethod("compareTo",o2.getClass());
+				m = o1.getClass().getDeclaredMethod("compareTo", o2.getClass());
 			} catch (NoSuchMethodException e) {
 				throw new ClassCastException();
 			}
@@ -92,7 +87,7 @@ public class TableSorter extends AbstractTableModel {
 			Object retVal;
 			try {
 				// make the comparison
-				retVal = m.invoke(o1,o2);
+				retVal = m.invoke(o1, o2);
 			} catch (IllegalAccessException e) {
 				throw new ClassCastException();
 			} catch (InvocationTargetException e) {
@@ -111,20 +106,20 @@ public class TableSorter extends AbstractTableModel {
 			return i.getClass().cast(retVal).intValue();
 		}
 	};
-
 	public static final Comparator<Object> LEXICAL_COMPARATOR = new Comparator<Object>() {
 		public int compare(Object o1, Object o2) {
 			return o1.toString().compareTo(o2.toString());
 		}
 	};
-
+	private static Directive EMPTY_DIRECTIVE = new Directive(-1, NOT_SORTED);
+	protected TableModel tableModel;
 	private Row[] viewToModel;
 	private int[] modelToView;
 
 	private JTableHeader tableHeader;
 	private MouseListener mouseListener;
 	private TableModelListener tableModelListener;
-	private Map<Class<?>,Comparator<Object>> columnComparators = new HashMap<Class<?>,Comparator<Object>>();
+	private Map<Class<?>, Comparator<Object>> columnComparators = new HashMap<Class<?>, Comparator<Object>>();
 	private List<Directive> sortingColumns = new ArrayList<Directive>();
 
 	public TableSorter() {
@@ -182,7 +177,7 @@ public class TableSorter extends AbstractTableModel {
 		if (this.tableHeader != null) {
 			this.tableHeader.addMouseListener(mouseListener);
 			this.tableHeader.setDefaultRenderer(
-					new SortableHeaderRenderer(this.tableHeader.getDefaultRenderer()));
+				new SortableHeaderRenderer(this.tableHeader.getDefaultRenderer()));
 		}
 	}
 
@@ -320,6 +315,69 @@ public class TableSorter extends AbstractTableModel {
 
 	// Helper classes
 
+	private static class Arrow implements Icon {
+		private boolean descending;
+		private int size;
+		private int priority;
+
+		public Arrow(boolean descending, int size, int priority) {
+			this.descending = descending;
+			this.size = size;
+			this.priority = priority;
+		}
+
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			Color color = c == null ? Color.GRAY : c.getBackground();
+			// In a compound sort, make each succesive triangle 20%
+			// smaller than the previous one.
+			int dx = (int) (size / 2 * Math.pow(0.8, priority));
+			int dy = descending ? dx : -dx;
+			// Align icon (roughly) with font baseline.
+			y = y + 5 * size / 6 + (descending ? -dy : 0);
+			int shift = descending ? 1 : -1;
+			g.translate(x, y);
+
+			// Right diagonal.
+			g.setColor(color.darker());
+			g.drawLine(dx / 2, dy, 0, 0);
+			g.drawLine(dx / 2, dy + shift, 0, shift);
+
+			// Left diagonal.
+			g.setColor(color.brighter());
+			g.drawLine(dx / 2, dy, dx, 0);
+			g.drawLine(dx / 2, dy + shift, dx, shift);
+
+			// Horizontal line.
+			if (descending) {
+				g.setColor(color.darker().darker());
+			} else {
+				g.setColor(color.brighter().brighter());
+			}
+			g.drawLine(dx, 0, 0, 0);
+
+			g.setColor(color);
+			g.translate(-x, -y);
+		}
+
+		public int getIconWidth() {
+			return size;
+		}
+
+		public int getIconHeight() {
+			return size;
+		}
+	}
+
+	private static class Directive {
+		private int column;
+		private int direction;
+
+		public Directive(int column, int direction) {
+			this.column = column;
+			this.direction = direction;
+		}
+	}
+
 	private class Row implements Comparable<Row> {
 		private int modelIndex;
 
@@ -331,7 +389,7 @@ public class TableSorter extends AbstractTableModel {
 			int row1 = modelIndex;
 			int row2 = o.modelIndex;
 
-			for (Iterator<Directive> it = sortingColumns.iterator(); it.hasNext();) {
+			for (Iterator<Directive> it = sortingColumns.iterator(); it.hasNext(); ) {
 				Directive directive = it.next();
 				int column = directive.column;
 
@@ -395,13 +453,13 @@ public class TableSorter extends AbstractTableModel {
 			// clause avoids this problem.
 			int column = e.getColumn();
 			if (e.getFirstRow() == e.getLastRow()
-					&& column != TableModelEvent.ALL_COLUMNS
-					&& getSortingStatus(column) == NOT_SORTED
-					&& modelToView != null) {
+				&& column != TableModelEvent.ALL_COLUMNS
+				&& getSortingStatus(column) == NOT_SORTED
+				&& modelToView != null) {
 				int viewIndex = getModelToView()[e.getFirstRow()];
 				fireTableChanged(new TableModelEvent(TableSorter.this,
-													 viewIndex, viewIndex,
-													 column, e.getType()));
+					viewIndex, viewIndex,
+					column, e.getType()));
 				return;
 			}
 
@@ -432,59 +490,6 @@ public class TableSorter extends AbstractTableModel {
 		}
 	}
 
-	private static class Arrow implements Icon {
-		private boolean descending;
-		private int size;
-		private int priority;
-
-		public Arrow(boolean descending, int size, int priority) {
-			this.descending = descending;
-			this.size = size;
-			this.priority = priority;
-		}
-
-		public void paintIcon(Component c, Graphics g, int x, int y) {
-			Color color = c == null ? Color.GRAY : c.getBackground();
-			// In a compound sort, make each succesive triangle 20%
-			// smaller than the previous one.
-			int dx = (int)(size/2*Math.pow(0.8, priority));
-			int dy = descending ? dx : -dx;
-			// Align icon (roughly) with font baseline.
-			y = y + 5*size/6 + (descending ? -dy : 0);
-			int shift = descending ? 1 : -1;
-			g.translate(x, y);
-
-			// Right diagonal.
-			g.setColor(color.darker());
-			g.drawLine(dx / 2, dy, 0, 0);
-			g.drawLine(dx / 2, dy + shift, 0, shift);
-
-			// Left diagonal.
-			g.setColor(color.brighter());
-			g.drawLine(dx / 2, dy, dx, 0);
-			g.drawLine(dx / 2, dy + shift, dx, shift);
-
-			// Horizontal line.
-			if (descending) {
-				g.setColor(color.darker().darker());
-			} else {
-				g.setColor(color.brighter().brighter());
-			}
-			g.drawLine(dx, 0, 0, 0);
-
-			g.setColor(color);
-			g.translate(-x, -y);
-		}
-
-		public int getIconWidth() {
-			return size;
-		}
-
-		public int getIconHeight() {
-			return size;
-		}
-	}
-
 	private class SortableHeaderRenderer implements TableCellRenderer {
 		private TableCellRenderer tableCellRenderer;
 
@@ -499,7 +504,7 @@ public class TableSorter extends AbstractTableModel {
 													   int row,
 													   int column) {
 			Component c = tableCellRenderer.getTableCellRendererComponent(table,
-					value, isSelected, hasFocus, row, column);
+				value, isSelected, hasFocus, row, column);
 			if (c instanceof JLabel) {
 				JLabel l = (JLabel) c;
 				l.setHorizontalTextPosition(JLabel.LEFT);
@@ -507,16 +512,6 @@ public class TableSorter extends AbstractTableModel {
 				l.setIcon(getHeaderRendererIcon(modelColumn, l.getFont().getSize()));
 			}
 			return c;
-		}
-	}
-
-	private static class Directive {
-		private int column;
-		private int direction;
-
-		public Directive(int column, int direction) {
-			this.column = column;
-			this.direction = direction;
 		}
 	}
 }

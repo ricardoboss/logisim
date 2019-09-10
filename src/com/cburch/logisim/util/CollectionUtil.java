@@ -3,13 +3,22 @@
 
 package com.cburch.logisim.util;
 
-import java.util.AbstractList;
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CollectionUtil {
+	private CollectionUtil() {
+	}
+
+	public static <E> Set<E> createUnmodifiableSetUnion(Set<? extends E> a,
+														Set<? extends E> b) {
+		return new UnionSet<E>(a, b);
+	}
+
+	public static <E> List<E> createUnmodifiableListUnion(List<? extends E> a,
+														  List<? extends E> b) {
+		return new UnionList<E>(a, b);
+	}
+
 	private static class UnionSet<E> extends AbstractSet<E> {
 		private Set<? extends E> a;
 		private Set<? extends E> b;
@@ -54,17 +63,5 @@ public class CollectionUtil {
 			}
 			return ret;
 		}
-	}
-
-	private CollectionUtil() { }
-
-	public static <E> Set<E> createUnmodifiableSetUnion(Set<? extends E> a,
-			Set<? extends E> b) {
-		return new UnionSet<E>(a, b);
-	}
-
-	public static <E> List<E> createUnmodifiableListUnion(List<? extends E> a,
-			List<? extends E> b) {
-		return new UnionList<E>(a, b);
 	}
 }

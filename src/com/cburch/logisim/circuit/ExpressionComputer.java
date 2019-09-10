@@ -3,10 +3,10 @@
 
 package com.cburch.logisim.circuit;
 
-import java.util.Map;
-
 import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.data.Location;
+
+import java.util.Map;
 
 public interface ExpressionComputer {
 	/**
@@ -16,9 +16,9 @@ public interface ExpressionComputer {
 	 * determine the expressions coming into the component,
 	 * and it should place any output expressions into
 	 * the component.
-	 * 
+	 * <p>
 	 * If, in fact, no valid expression exists for the component,
 	 * it throws <code>UnsupportedOperationException</code>.
 	 */
-	public void computeExpression(Map<Location,Expression> expressionMap);
+	public void computeExpression(Map<Location, Expression> expressionMap);
 }

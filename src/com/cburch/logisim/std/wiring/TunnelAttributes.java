@@ -3,23 +3,19 @@
 
 package com.cburch.logisim.std.wiring;
 
-import java.awt.Font;
+import com.cburch.logisim.comp.TextField;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.StdAttr;
+
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-import com.cburch.logisim.comp.TextField;
-import com.cburch.logisim.data.AbstractAttributeSet;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.instance.StdAttr;
-
 class TunnelAttributes extends AbstractAttributeSet {
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT
-		});
+		= Arrays.asList(new Attribute<?>[]{
+		StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT
+	});
 
 	private Direction facing;
 	private BitWidth width;
@@ -30,7 +26,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	private int labelY;
 	private int labelHAlign;
 	private int labelVAlign;
-	
+
 	public TunnelAttributes() {
 		facing = Direction.WEST;
 		width = BitWidth.ONE;
@@ -43,24 +39,35 @@ class TunnelAttributes extends AbstractAttributeSet {
 	Direction getFacing() {
 		return facing;
 	}
-	
+
 	String getLabel() {
 		return label;
 	}
-	
+
 	Font getFont() {
 		return labelFont;
 	}
-	
+
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
-	
-	int getLabelX() { return labelX; }
-	int getLabelY() { return labelY; }
-	int getLabelHAlign() { return labelHAlign; }
-	int getLabelVAlign() { return labelVAlign; }
-	
+
+	int getLabelX() {
+		return labelX;
+	}
+
+	int getLabelY() {
+		return labelY;
+	}
+
+	int getLabelHAlign() {
+		return labelHAlign;
+	}
+
+	int getLabelVAlign() {
+		return labelVAlign;
+	}
+
 	boolean setOffsetBounds(Bounds value) {
 		Bounds old = offsetBounds;
 		boolean same = old == null ? value == null : old.equals(value);

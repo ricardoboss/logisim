@@ -3,14 +3,18 @@
 
 package com.cburch.logisim.gui.generic;
 
-import javax.swing.JPopupMenu;
-
 import com.cburch.logisim.tools.AddTool;
+
+import javax.swing.*;
 
 public interface ProjectExplorerListener {
 	public void selectionChanged(ProjectExplorerEvent event);
+
 	public void doubleClicked(ProjectExplorerEvent event);
+
 	public void moveRequested(ProjectExplorerEvent event, AddTool dragged, AddTool target);
+
 	public void deleteRequested(ProjectExplorerEvent event);
+
 	public JPopupMenu menuRequested(ProjectExplorerEvent event);
 }

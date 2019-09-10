@@ -10,24 +10,22 @@ import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.gui.generic.AttrTableSetException;
 import com.cburch.logisim.gui.generic.AttributeSetTableModel;
-import com.cburch.logisim.gui.main.AttrTableCircuitModel;
-import com.cburch.logisim.gui.main.Selection;
 import com.cburch.logisim.gui.main.Selection.Event;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.SetAttributeAction;
 
 class AttrTableSelectionModel extends AttributeSetTableModel
-		implements Selection.Listener {
+	implements Selection.Listener {
 	private Project project;
 	private Frame frame;
-	
+
 	public AttrTableSelectionModel(Project project, Frame frame) {
 		super(frame.getCanvas().getSelection().getAttributeSet());
 		this.project = project;
 		this.frame = frame;
 		frame.getCanvas().getSelection().addListener(this);
 	}
-	
+
 	@Override
 	public String getTitle() {
 		ComponentFactory wireFactory = null;
@@ -35,7 +33,7 @@ class AttrTableSelectionModel extends AttributeSetTableModel
 		int factoryCount = 0;
 		int totalCount = 0;
 		boolean variousFound = false;
-		
+
 		Selection selection = frame.getCanvas().getSelection();
 		for (Component comp : selection.getComponents()) {
 			ComponentFactory fact = comp.getFactory();
@@ -56,7 +54,7 @@ class AttrTableSelectionModel extends AttributeSetTableModel
 				totalCount++;
 			}
 		}
-		
+
 		if (factory == null) {
 			factory = wireFactory;
 		}
@@ -70,13 +68,13 @@ class AttrTableSelectionModel extends AttributeSetTableModel
 			return Strings.get("selectionOne", factory.getDisplayName());
 		} else {
 			return Strings.get("selectionMultiple", factory.getDisplayName(),
-					"" + factoryCount);
+				"" + factoryCount);
 		}
 	}
 
 	@Override
 	public void setValueRequested(Attribute<Object> attr, Object value)
-			throws AttrTableSetException {
+		throws AttrTableSetException {
 		Selection selection = frame.getCanvas().getSelection();
 		Circuit circuit = frame.getCanvas().getCircuit();
 		if (selection.isEmpty() && circuit != null) {
@@ -84,7 +82,7 @@ class AttrTableSelectionModel extends AttributeSetTableModel
 			circuitModel.setValueRequested(attr, value);
 		} else {
 			SetAttributeAction act = new SetAttributeAction(circuit,
-					Strings.getter("selectionAttributeAction"));
+				Strings.getter("selectionAttributeAction"));
 			for (Component comp : selection.getComponents()) {
 				if (!(comp instanceof Wire)) {
 					act.set(comp, attr, value);

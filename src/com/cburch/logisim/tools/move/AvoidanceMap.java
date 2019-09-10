@@ -3,39 +3,35 @@
 
 package com.cburch.logisim.tools.move;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-
 import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 
+import java.io.PrintStream;
+import java.util.*;
+
 class AvoidanceMap {
+	private final HashMap<Location, String> avoid;
+
+	private AvoidanceMap(HashMap<Location, String> map) {
+		avoid = map;
+	}
+
 	static AvoidanceMap create(Collection<Component> elements, int dx, int dy) {
-		AvoidanceMap ret = new AvoidanceMap(new HashMap<Location,String>());
+		AvoidanceMap ret = new AvoidanceMap(new HashMap<Location, String>());
 		ret.markAll(elements, dx, dy);
 		return ret;
 	}
 
-	private final HashMap<Location,String> avoid;
-	
-	private AvoidanceMap(HashMap<Location,String> map) {
-		avoid = map;
-	}
-	
 	public AvoidanceMap cloneMap() {
-		return new AvoidanceMap(new HashMap<Location,String>(avoid));
+		return new AvoidanceMap(new HashMap<Location, String>(avoid));
 	}
-	
+
 	public Object get(Location loc) {
 		return avoid.get(loc);
 	}
-	
+
 	public void markAll(Collection<Component> elements, int dx, int dy) {
 		// first we go through the components, saying that we should not
 		// intersect with any point that lies within a component
@@ -47,9 +43,9 @@ class AvoidanceMap {
 			}
 		}
 	}
-	
+
 	public void markComponent(Component comp, int dx, int dy) {
-		HashMap<Location,String> avoid = this.avoid;
+		HashMap<Location, String> avoid = this.avoid;
 		boolean translated = dx != 0 || dy != 0;
 		Bounds bds = comp.getBounds();
 		int x0 = bds.getX() + dx;
@@ -78,9 +74,9 @@ class AvoidanceMap {
 			}
 		}
 	}
-	
+
 	public void markWire(Wire w, int dx, int dy) {
-		HashMap<Location,String> avoid = this.avoid;
+		HashMap<Location, String> avoid = this.avoid;
 		boolean translated = dx != 0 || dy != 0;
 		Location loc0 = w.getEnd0();
 		Location loc1 = w.getEnd1();
@@ -112,11 +108,11 @@ class AvoidanceMap {
 			throw new RuntimeException("diagonal wires not supported");
 		}
 	}
-	
+
 	public void unmarkLocation(Location loc) {
 		avoid.remove(loc);
 	}
-	
+
 	public void unmarkWire(Wire w, Location deletedEnd, Set<Location> unmarkable) {
 		Location loc0 = w.getEnd0();
 		Location loc1 = w.getEnd1();
@@ -149,7 +145,7 @@ class AvoidanceMap {
 			throw new RuntimeException("diagonal wires not supported");
 		}
 	}
-	
+
 	public void print(PrintStream stream) {
 		ArrayList<Location> list = new ArrayList<Location>(avoid.keySet());
 		Collections.sort(list);

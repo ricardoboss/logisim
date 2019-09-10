@@ -13,9 +13,11 @@ class Strings {
 	public static String get(String key) {
 		return source.get(key);
 	}
+
 	public static StringGetter getter(String key) {
 		return source.getter(key);
 	}
+
 	public static StringGetter getter(String key, StringGetter arg) {
 		return source.getter(key, arg);
 	}

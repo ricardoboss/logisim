@@ -23,11 +23,12 @@ import java.io.Reader;
 /**
  * Adapts a <code>Reader</code> as an <code>InputStream</code>.
  * Adapted from <CODE>StringInputStream</CODE>.
- *
  */
 public class ReaderInputStream extends InputStream {
 
-	/** Source Reader */
+	/**
+	 * Source Reader
+	 */
 	private Reader in;
 
 	private String encoding = System.getProperty("file.encoding");
@@ -40,7 +41,7 @@ public class ReaderInputStream extends InputStream {
 	 * Construct a <CODE>ReaderInputStream</CODE>
 	 * for the specified <CODE>Reader</CODE>.
 	 *
-	 * @param reader   <CODE>Reader</CODE>.  Must not be <code>null</code>.
+	 * @param reader <CODE>Reader</CODE>.  Must not be <code>null</code>.
 	 */
 	public ReaderInputStream(Reader reader) {
 		in = reader;
@@ -51,8 +52,8 @@ public class ReaderInputStream extends InputStream {
 	 * for the specified <CODE>Reader</CODE>,
 	 * with the specified encoding.
 	 *
-	 * @param reader     non-null <CODE>Reader</CODE>.
-	 * @param encoding   non-null <CODE>String</CODE> encoding.
+	 * @param reader   non-null <CODE>Reader</CODE>.
+	 * @param encoding non-null <CODE>String</CODE> encoding.
 	 */
 	public ReaderInputStream(Reader reader, String encoding) {
 		this(reader);
@@ -67,8 +68,7 @@ public class ReaderInputStream extends InputStream {
 	 * Reads from the <CODE>Reader</CODE>, returning the same value.
 	 *
 	 * @return the value of the next character in the <CODE>Reader</CODE>.
-	 *
-	 * @exception IOException if the original <code>Reader</code> fails to be read
+	 * @throws IOException if the original <code>Reader</code> fails to be read
 	 */
 	@Override
 	public synchronized int read() throws IOException {
@@ -100,12 +100,12 @@ public class ReaderInputStream extends InputStream {
 	/**
 	 * Reads from the <code>Reader</code> into a byte array
 	 *
-	 * @param b  the byte array to read into
+	 * @param b   the byte array to read into
 	 * @param off the offset in the byte array
 	 * @param len the length in the byte array to fill
 	 * @return the actual number read into the byte array, -1 at
-	 *         the end of the stream
-	 * @exception IOException if an error occurs
+	 * the end of the stream
+	 * @throws IOException if an error occurs
 	 */
 	@Override
 	public synchronized int read(byte[] b, int off, int len)
@@ -156,8 +156,8 @@ public class ReaderInputStream extends InputStream {
 
 
 	/**
-	 * @return   the current number of bytes ready for reading
-	 * @exception IOException if an error occurs
+	 * @return the current number of bytes ready for reading
+	 * @throws IOException if an error occurs
 	 */
 	@Override
 	public synchronized int available() throws IOException {
@@ -178,14 +178,14 @@ public class ReaderInputStream extends InputStream {
 	 * @return false - mark is not supported
 	 */
 	@Override
-	public boolean markSupported () {
+	public boolean markSupported() {
 		return false;   // would be imprecise
 	}
 
 	/**
 	 * Resets the StringReader.
 	 *
-	 * @exception IOException if the StringReader fails to be reset
+	 * @throws IOException if the StringReader fails to be reset
 	 */
 	@Override
 	public synchronized void reset() throws IOException {
@@ -199,7 +199,7 @@ public class ReaderInputStream extends InputStream {
 	/**
 	 * Closes the Stringreader.
 	 *
-	 * @exception IOException if the original StringReader fails to be closed
+	 * @throws IOException if the original StringReader fails to be closed
 	 */
 	@Override
 	public synchronized void close() throws IOException {

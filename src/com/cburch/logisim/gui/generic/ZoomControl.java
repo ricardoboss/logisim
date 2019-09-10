@@ -3,23 +3,55 @@
 
 package com.cburch.logisim.gui.generic;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractSpinnerModel;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-
 public class ZoomControl extends JPanel {
+	private ZoomModel model;
+	private JSpinner spinner;
+	private SpinnerModel spinnerModel;
+	private GridIcon grid;
+	public ZoomControl(ZoomModel model) {
+		super(new BorderLayout());
+		this.model = model;
+
+		spinnerModel = new SpinnerModel();
+		spinner = new JSpinner();
+		spinner.setModel(spinnerModel);
+		this.add(spinner, BorderLayout.CENTER);
+
+		grid = new GridIcon();
+		this.add(grid, BorderLayout.EAST);
+		grid.update();
+
+		model.addPropertyChangeListener(ZoomModel.SHOW_GRID, grid);
+		model.addPropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
+	}
+
+	public void setZoomModel(ZoomModel value) {
+		ZoomModel oldModel = model;
+		if (oldModel != value) {
+			if (oldModel != null) {
+				oldModel.removePropertyChangeListener(ZoomModel.SHOW_GRID, grid);
+				oldModel.removePropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
+			}
+			model = value;
+			spinnerModel = new SpinnerModel();
+			spinner.setModel(spinnerModel);
+			grid.update();
+			if (value != null) {
+				value.addPropertyChangeListener(ZoomModel.SHOW_GRID, grid);
+				value.addPropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
+			}
+		}
+	}
+
 	private class SpinnerModel extends AbstractSpinnerModel
-			implements PropertyChangeListener {
+		implements PropertyChangeListener {
 		public Object getNextValue() {
 			double zoom = model.getZoomFactor();
 			double[] choices = model.getZoomOptions();
@@ -44,7 +76,20 @@ public class ZoomControl extends JPanel {
 			double zoom = model.getZoomFactor();
 			return toString(zoom * 100.0);
 		}
-		
+
+		public void setValue(Object value) {
+			if (value instanceof String) {
+				String s = (String) value;
+				if (s.endsWith("%")) s = s.substring(0, s.length() - 1);
+				s = s.trim();
+				try {
+					double zoom = Double.parseDouble(s) / 100.0;
+					model.setZoomFactor(zoom);
+				} catch (NumberFormatException e) {
+				}
+			}
+		}
+
 		private String toString(double factor) {
 			if (factor > 10) {
 				return (int) (factor + 0.5) + "%";
@@ -55,34 +100,22 @@ public class ZoomControl extends JPanel {
 			}
 		}
 
-		public void setValue(Object value) {
-			if (value instanceof String) {
-				String s = (String) value;
-				if (s.endsWith("%")) s = s.substring(0, s.length() - 1);
-				s = s.trim();
-				try {
-					double zoom = Double.parseDouble(s) / 100.0;
-					model.setZoomFactor(zoom);
-				} catch (NumberFormatException e) { }
-			}
-		}
-
 		public void propertyChange(PropertyChangeEvent evt) {
 			fireStateChanged();
 		}
 	}
-	
+
 	private class GridIcon extends JComponent
-			implements MouseListener, PropertyChangeListener {
+		implements MouseListener, PropertyChangeListener {
 		boolean state = true;
-		
+
 		public GridIcon() {
 			addMouseListener(this);
 			setPreferredSize(new Dimension(15, 15));
 			setToolTipText("");
 			setFocusable(true);
 		}
-		
+
 		@Override
 		public String getToolTipText(MouseEvent e) {
 			return Strings.get("zoomShowGrid");
@@ -95,7 +128,7 @@ public class ZoomControl extends JPanel {
 				repaint();
 			}
 		}
-		
+
 		@Override
 		protected void paintComponent(Graphics g) {
 			int width = getWidth();
@@ -111,10 +144,17 @@ public class ZoomControl extends JPanel {
 			}
 		}
 
-		public void mouseClicked(MouseEvent e) { }
-		public void mouseEntered(MouseEvent e) { }
-		public void mouseExited(MouseEvent e) { }
-		public void mouseReleased(MouseEvent e) { }
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		}
 
 		public void mousePressed(MouseEvent e) {
 			model.setShowGrid(!state);
@@ -122,46 +162,6 @@ public class ZoomControl extends JPanel {
 
 		public void propertyChange(PropertyChangeEvent evt) {
 			update();
-		}
-	}
-	
-	private ZoomModel model;
-	private JSpinner spinner;
-	private SpinnerModel spinnerModel;
-	private GridIcon grid;
-	
-	public ZoomControl(ZoomModel model) {
-		super(new BorderLayout());
-		this.model = model;
-		
-		spinnerModel = new SpinnerModel();
-		spinner = new JSpinner();
-		spinner.setModel(spinnerModel);
-		this.add(spinner, BorderLayout.CENTER);
-		
-		grid = new GridIcon();
-		this.add(grid, BorderLayout.EAST);
-		grid.update();
-		
-		model.addPropertyChangeListener(ZoomModel.SHOW_GRID, grid);
-		model.addPropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
-	}
-	
-	public void setZoomModel(ZoomModel value) {
-		ZoomModel oldModel = model;
-		if (oldModel != value) {
-			if (oldModel != null) {
-				oldModel.removePropertyChangeListener(ZoomModel.SHOW_GRID, grid);
-				oldModel.removePropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
-			}
-			model = value;
-			spinnerModel = new SpinnerModel();
-			spinner.setModel(spinnerModel);
-			grid.update();
-			if (value != null) {
-				value.addPropertyChangeListener(ZoomModel.SHOW_GRID, grid);
-				value.addPropertyChangeListener(ZoomModel.ZOOM, spinnerModel);
-			}
 		}
 	}
 }

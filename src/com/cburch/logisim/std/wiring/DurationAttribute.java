@@ -3,16 +3,16 @@
 
 package com.cburch.logisim.std.wiring;
 
-import javax.swing.JTextField;
-
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 
+import javax.swing.*;
+
 public class DurationAttribute extends Attribute<Integer> {
 	private int min;
 	private int max;
-	
+
 	public DurationAttribute(String name, StringGetter disp, int min, int max) {
 		super(name, disp);
 		this.min = min;
@@ -40,7 +40,7 @@ public class DurationAttribute extends Attribute<Integer> {
 			return Strings.get("clockDurationOneValue");
 		} else {
 			return StringUtil.format(Strings.get("clockDurationValue"),
-					value.toString());
+				value.toString());
 		}
 	}
 

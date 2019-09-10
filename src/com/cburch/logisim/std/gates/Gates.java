@@ -3,18 +3,18 @@
 
 package com.cburch.logisim.std.gates;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Gates extends Library {
 	private List<Tool> tools = null;
 
 	public Gates() {
-		tools = Arrays.asList(new Tool[] {
+		tools = Arrays.asList(new Tool[]{
 			new AddTool(NotGate.FACTORY),
 			new AddTool(Buffer.FACTORY),
 			new AddTool(AndGate.FACTORY),
@@ -31,10 +31,14 @@ public class Gates extends Library {
 	}
 
 	@Override
-	public String getName() { return "Gates"; }
+	public String getName() {
+		return "Gates";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("gatesLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("gatesLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

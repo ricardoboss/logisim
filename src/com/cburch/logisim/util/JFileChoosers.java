@@ -3,49 +3,24 @@
 
 package com.cburch.logisim.util;
 
+import com.cburch.logisim.prefs.AppPreferences;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
-
-import com.cburch.logisim.prefs.AppPreferences;
-
 public class JFileChoosers {
-	/* A user reported that JFileChooser's constructor sometimes resulted in
-	 * IOExceptions when Logisim is installed under a system administrator
-	 * account and then is attempted to run as a regular user. This class is
-	 * an attempt to be a bit more robust about which directory the JFileChooser
-	 * opens up under. (23 Feb 2010) */
-	private static class LogisimFileChooser extends JFileChooser {
-		LogisimFileChooser() {
-			super();
-		}
-		
-		LogisimFileChooser(File initSelected) {
-			super(initSelected);
-		}
-		
-		@Override
-		public File getSelectedFile() {
-			File dir = getCurrentDirectory();
-			if (dir != null) {
-				JFileChoosers.currentDirectory = dir.toString();
-			}
-			return super.getSelectedFile();
-		}
+	private static final String[] PROP_NAMES = {
+		null, "user.home", "user.dir", "java.home", "java.io.tmpdir"};
+	private static String currentDirectory = "";
+
+	private JFileChoosers() {
 	}
 
-	private static final String[] PROP_NAMES = {
-		null, "user.home", "user.dir", "java.home", "java.io.tmpdir" };
-	
-	private static String currentDirectory = "";
-	
-	private JFileChoosers() { }
-	
 	public static String getCurrentDirectory() {
 		return currentDirectory;
 	}
-	
+
 	public static JFileChooser create() {
 		RuntimeException first = null;
 		for (int i = 0; i < PROP_NAMES.length; i++) {
@@ -76,7 +51,7 @@ public class JFileChoosers {
 		}
 		throw first;
 	}
-	
+
 	public static JFileChooser createAt(File openDirectory) {
 		if (openDirectory == null) {
 			return create();
@@ -85,14 +60,16 @@ public class JFileChoosers {
 				return new LogisimFileChooser(openDirectory);
 			} catch (RuntimeException t) {
 				if (t.getCause() instanceof IOException) {
-					try { return create(); }
-					catch (RuntimeException u) {}
+					try {
+						return create();
+					} catch (RuntimeException u) {
+					}
 				}
 				throw t;
 			}
 		}
 	}
-	
+
 	public static JFileChooser createSelected(File selected) {
 		if (selected == null) {
 			return create();
@@ -100,6 +77,30 @@ public class JFileChoosers {
 			JFileChooser ret = createAt(selected.getParentFile());
 			ret.setSelectedFile(selected);
 			return ret;
+		}
+	}
+
+	/* A user reported that JFileChooser's constructor sometimes resulted in
+	 * IOExceptions when Logisim is installed under a system administrator
+	 * account and then is attempted to run as a regular user. This class is
+	 * an attempt to be a bit more robust about which directory the JFileChooser
+	 * opens up under. (23 Feb 2010) */
+	private static class LogisimFileChooser extends JFileChooser {
+		LogisimFileChooser() {
+			super();
+		}
+
+		LogisimFileChooser(File initSelected) {
+			super(initSelected);
+		}
+
+		@Override
+		public File getSelectedFile() {
+			File dir = getCurrentDirectory();
+			if (dir != null) {
+				JFileChoosers.currentDirectory = dir.toString();
+			}
+			return super.getSelectedFile();
 		}
 	}
 }

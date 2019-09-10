@@ -3,34 +3,18 @@
 
 package com.cburch.logisim.std.gates;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.Icon;
-
 import com.cburch.logisim.comp.ComponentFactory;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
+import com.cburch.logisim.data.*;
 import com.cburch.logisim.file.Options;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.WireRepair;
 import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
+
+import javax.swing.*;
+import java.awt.*;
 
 class ControlledBuffer extends InstanceFactory {
 	private static final AttributeOption RIGHT_HANDED
@@ -39,34 +23,31 @@ class ControlledBuffer extends InstanceFactory {
 		= new AttributeOption("left", Strings.getter("controlledLeftHanded"));
 	private static final Attribute<AttributeOption> ATTR_CONTROL
 		= Attributes.forOption("control", Strings.getter("controlledControlOption"),
-				new AttributeOption[] { RIGHT_HANDED, LEFT_HANDED });
-			
-	public static ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
-	public static ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
-	
+		new AttributeOption[]{RIGHT_HANDED, LEFT_HANDED});
 	private static final Icon ICON_BUFFER = Icons.getIcon("controlledBuffer.gif");
 	private static final Icon ICON_INVERTER = Icons.getIcon("controlledInverter.gif");
-
+	public static ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
+	public static ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
 	private boolean isInverter;
 
 	private ControlledBuffer(boolean isInverter) {
 		super(isInverter ? "Controlled Inverter" : "Controlled Buffer",
 			isInverter ? Strings.getter("controlledInverterComponent")
-					: Strings.getter("controlledBufferComponent"));
+				: Strings.getter("controlledBufferComponent"));
 		this.isInverter = isInverter;
 		if (isInverter) {
-			setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.WIDTH,
+			setAttributes(new Attribute[]{StdAttr.FACING, StdAttr.WIDTH,
 					NotGate.ATTR_SIZE, ATTR_CONTROL,
-					StdAttr.LABEL, StdAttr.LABEL_FONT },
-				new Object[] { Direction.EAST, BitWidth.ONE,
+					StdAttr.LABEL, StdAttr.LABEL_FONT},
+				new Object[]{Direction.EAST, BitWidth.ONE,
 					NotGate.SIZE_WIDE, RIGHT_HANDED,
-					"", StdAttr.DEFAULT_LABEL_FONT });
+					"", StdAttr.DEFAULT_LABEL_FONT});
 		} else {
-			setAttributes(new Attribute[] {
+			setAttributes(new Attribute[]{
 					StdAttr.FACING, StdAttr.WIDTH, ATTR_CONTROL,
-					StdAttr.LABEL, StdAttr.LABEL_FONT },
-				new Object[] { Direction.EAST, BitWidth.ONE, RIGHT_HANDED,
-					"", StdAttr.DEFAULT_LABEL_FONT });
+					StdAttr.LABEL, StdAttr.LABEL_FONT},
+				new Object[]{Direction.EAST, BitWidth.ONE, RIGHT_HANDED,
+					"", StdAttr.DEFAULT_LABEL_FONT});
 		}
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
@@ -76,16 +57,16 @@ class ControlledBuffer extends InstanceFactory {
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		int w = 20;
 		if (isInverter &&
-				!NotGate.SIZE_NARROW.equals(attrs.getValue(NotGate.ATTR_SIZE))) {
+			!NotGate.SIZE_NARROW.equals(attrs.getValue(NotGate.ATTR_SIZE))) {
 			w = 30;
 		}
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		if (facing == Direction.NORTH) return Bounds.create(-10,  0, 20, w);
+		if (facing == Direction.NORTH) return Bounds.create(-10, 0, 20, w);
 		if (facing == Direction.SOUTH) return Bounds.create(-10, -w, 20, w);
 		if (facing == Direction.WEST) return Bounds.create(0, -10, w, 20);
 		return Bounds.create(-w, -10, w, 20);
 	}
-	
+
 	//
 	// graphics methods
 	//
@@ -103,8 +84,8 @@ class ControlledBuffer extends InstanceFactory {
 		} else {
 			int x = isInverter ? 0 : 2;
 			g.setColor(Color.BLACK);
-			int[] xp = new int[] { x + 15, x + 1, x + 1, x + 15 };
-			int[] yp = new int[] { 10,     3,     17,    10 };
+			int[] xp = new int[]{x + 15, x + 1, x + 1, x + 15};
+			int[] yp = new int[]{10, 3, 17, 10};
 			g.drawPolyline(xp, yp, 4);
 			if (isInverter) g.drawOval(x + 13, 8, 4, 4);
 			g.setColor(Value.FALSE_COLOR);
@@ -143,7 +124,7 @@ class ControlledBuffer extends InstanceFactory {
 		}
 		painter.drawLabel();
 	}
-	
+
 	private void paintShape(InstancePainter painter) {
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
 		Location loc = painter.getLocation();
@@ -162,12 +143,12 @@ class ControlledBuffer extends InstanceFactory {
 		} else {
 			GraphicsUtil.switchToWidth(g, 2);
 			int d = isInverter ? 10 : 0;
-			int[] xp = new int[] { -d, -19 - d, -19 - d, -d };
-			int[] yp = new int[] {  0,  -7,       7,      0 };
+			int[] xp = new int[]{-d, -19 - d, -19 - d, -d};
+			int[] yp = new int[]{0, -7, 7, 0};
 			g.drawPolyline(xp, yp, 4);
 			// if (isInverter) g.drawOval(-9, -4, 9, 9);
 		}
-		
+
 		if (rotate != 0.0) {
 			((Graphics2D) g).rotate(-rotate);
 		}
@@ -183,7 +164,7 @@ class ControlledBuffer extends InstanceFactory {
 		configurePorts(instance);
 		NotGate.configureLabel(instance, false, instance.getPortLocation(2));
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING || attr == NotGate.ATTR_SIZE) {
@@ -230,7 +211,7 @@ class ControlledBuffer extends InstanceFactory {
 			if (control == Value.UNKNOWN || control == Value.NIL) {
 				AttributeSet opts = state.getProject().getOptions().getAttributeSet();
 				if (opts.getValue(Options.ATTR_GATE_UNDEFINED)
-						.equals(Options.GATE_UNDEFINED_ERROR)) {
+					.equals(Options.GATE_UNDEFINED_ERROR)) {
 					out = Value.createError(width);
 				} else {
 					out = Value.createUnknown(width);
@@ -241,7 +222,7 @@ class ControlledBuffer extends InstanceFactory {
 			state.setPort(0, out, GateAttributes.DELAY);
 		}
 	}
-	
+
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == WireRepair.class) {

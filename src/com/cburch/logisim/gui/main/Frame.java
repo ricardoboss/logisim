@@ -3,28 +3,6 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.IllegalComponentStateException;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import com.cburch.draw.toolbar.Toolbar;
 import com.cburch.draw.toolbar.ToolbarModel;
 import com.cburch.logisim.circuit.Circuit;
@@ -37,28 +15,21 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.file.LibraryEvent;
 import com.cburch.logisim.file.LibraryListener;
 import com.cburch.logisim.gui.appear.AppearanceView;
-import com.cburch.logisim.gui.generic.AttrTable;
-import com.cburch.logisim.gui.generic.AttrTableModel;
-import com.cburch.logisim.gui.generic.BasicZoomModel;
-import com.cburch.logisim.gui.generic.CanvasPane;
-import com.cburch.logisim.gui.generic.CardPanel;
-import com.cburch.logisim.gui.generic.LFrame;
-import com.cburch.logisim.gui.generic.ZoomControl;
-import com.cburch.logisim.gui.generic.ZoomModel;
+import com.cburch.logisim.gui.generic.*;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.prefs.AppPreferences;
-import com.cburch.logisim.proj.Project;
-import com.cburch.logisim.proj.ProjectActions;
-import com.cburch.logisim.proj.ProjectEvent;
-import com.cburch.logisim.proj.ProjectListener;
-import com.cburch.logisim.proj.Projects;
+import com.cburch.logisim.proj.*;
 import com.cburch.logisim.tools.Tool;
-import com.cburch.logisim.util.HorizontalSplitPane;
-import com.cburch.logisim.util.JFileChoosers;
-import com.cburch.logisim.util.LocaleListener;
-import com.cburch.logisim.util.LocaleManager;
-import com.cburch.logisim.util.StringUtil;
-import com.cburch.logisim.util.VerticalSplitPane;
+import com.cburch.logisim.util.*;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class Frame extends LFrame implements LocaleListener {
 	public static final String EDITOR_VIEW = "editorView";
@@ -68,117 +39,32 @@ public class Frame extends LFrame implements LocaleListener {
 	public static final String VIEW_TOOLBOX = "toolbox";
 	public static final String VIEW_SIMULATION = "simulation";
 
-	private static final double[] ZOOM_OPTIONS = { 20, 50, 75, 100, 133, 150, 200, 250, 300, 400 };
-	
-	class MyProjectListener
-			implements ProjectListener, LibraryListener, CircuitListener,
-				PropertyChangeListener, ChangeListener {
-		public void projectChanged(ProjectEvent event) {
-			int action = event.getAction();
-
-			if (action == ProjectEvent.ACTION_SET_FILE) {
-				computeTitle();
-				proj.setTool(proj.getOptions().getToolbarData().getFirstTool());
-				placeToolbar();
-			} else if (action == ProjectEvent.ACTION_SET_CURRENT) {
-				setEditorView(EDIT_LAYOUT);
-				if (appearance != null) {
-					appearance.setCircuit(proj, proj.getCircuitState());
-				}
-				viewAttributes(proj.getTool());
-				computeTitle();
-			} else if (action == ProjectEvent.ACTION_SET_TOOL) {
-				if (attrTable == null) return; // for startup
-				Tool oldTool = (Tool) event.getOldData();
-				Tool newTool = (Tool) event.getData();
-				if (getEditorView().equals(EDIT_LAYOUT)) {
-					viewAttributes(oldTool, newTool, false);
-				}
-			}
-		}
-
-		public void libraryChanged(LibraryEvent e) {
-			if (e.getAction() == LibraryEvent.SET_NAME) {
-				computeTitle();
-			} else if (e.getAction() == LibraryEvent.DIRTY_STATE) {
-				enableSave();
-			}
-		}
-
-		public void circuitChanged(CircuitEvent event) {
-			if (event.getAction() == CircuitEvent.ACTION_SET_NAME) {
-				computeTitle();
-			}
-		}
-
-		private void enableSave() {
-			Project proj = getProject();
-			boolean ok = proj.isFileDirty();
-			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
-		}
-
-		public void attributeListChanged(AttributeEvent e) { }
-
-		public void propertyChange(PropertyChangeEvent event) {
-			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
-				placeToolbar();
-			}
-		}
-		
-		public void stateChanged(ChangeEvent event) {
-			Object source = event.getSource();
-			if (source == explorerPane) {
-				firePropertyChange(EXPLORER_VIEW, "???", getExplorerView());
-			} else if (source == mainPanel) {
-				firePropertyChange(EDITOR_VIEW, "???", getEditorView());
-			}
-		}
-	}
-
-	class MyWindowListener extends WindowAdapter {
-		@Override
-		public void windowClosing(WindowEvent e) {
-			if (confirmClose(Strings.get("confirmCloseTitle"))) {
-				layoutCanvas.closeCanvas();
-				Frame.this.dispose();
-			}
-		}
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-			layoutCanvas.computeSize(true);
-		}
-	}
-
-	private Project         proj;
+	private static final double[] ZOOM_OPTIONS = {20, 50, 75, 100, 133, 150, 200, 250, 300, 400};
+	private Project proj;
 	private MyProjectListener myProjectListener = new MyProjectListener();
-
 	// GUI elements shared between views
-	private LogisimMenuBar  menubar;
-	private MenuListener    menuListener;
-	private Toolbar         toolbar;
+	private LogisimMenuBar menubar;
+	private MenuListener menuListener;
+	private Toolbar toolbar;
 	private HorizontalSplitPane leftRegion;
 	private VerticalSplitPane mainRegion;
-	private JPanel          mainPanelSuper;
-	private CardPanel       mainPanel;
+	private JPanel mainPanelSuper;
+	private CardPanel mainPanel;
 	// left-side elements
-	private Toolbar         projectToolbar;
-	private CardPanel       explorerPane;
-	private Toolbox         toolbox;
+	private Toolbar projectToolbar;
+	private CardPanel explorerPane;
+	private Toolbox toolbox;
 	private SimulationExplorer simExplorer;
-	private AttrTable       attrTable;
-	private ZoomControl     zoom;
-	
+	private AttrTable attrTable;
+	private ZoomControl zoom;
 	// for the Layout view
 	private LayoutToolbarModel layoutToolbarModel;
-	private Canvas          layoutCanvas;
-	private ZoomModel       layoutZoomModel;
+	private Canvas layoutCanvas;
+	private ZoomModel layoutZoomModel;
 	private LayoutEditHandler layoutEditHandler;
 	private AttrTableSelectionModel attrTableSelectionModel;
-	
 	// for the Appearance view
 	private AppearanceView appearance;
-
 	public Frame(Project proj) {
 		this.proj = proj;
 
@@ -190,12 +76,12 @@ public class Frame extends LFrame implements LocaleListener {
 		proj.addLibraryListener(myProjectListener);
 		proj.addCircuitListener(myProjectListener);
 		computeTitle();
-		
+
 		// set up elements for the Layout view
 		layoutToolbarModel = new LayoutToolbarModel(this, proj);
 		layoutCanvas = new Canvas(proj);
 		layoutZoomModel = new BasicZoomModel(AppPreferences.LAYOUT_SHOW_GRID,
-				AppPreferences.LAYOUT_ZOOM, ZOOM_OPTIONS);
+			AppPreferences.LAYOUT_ZOOM, ZOOM_OPTIONS);
 
 		layoutCanvas.getGridPainter().setZoomModel(layoutZoomModel);
 		layoutEditHandler = new LayoutEditHandler(this);
@@ -240,22 +126,22 @@ public class Frame extends LFrame implements LocaleListener {
 		attrPanel.add(zoom, BorderLayout.SOUTH);
 
 		leftRegion = new HorizontalSplitPane(explPanel, attrPanel,
-				AppPreferences.WINDOW_LEFT_SPLIT.get().doubleValue());
+			AppPreferences.WINDOW_LEFT_SPLIT.get().doubleValue());
 		mainRegion = new VerticalSplitPane(leftRegion, mainPanelSuper,
-				AppPreferences.WINDOW_MAIN_SPLIT.get().doubleValue());
+			AppPreferences.WINDOW_MAIN_SPLIT.get().doubleValue());
 
 		getContentPane().add(mainRegion, BorderLayout.CENTER);
 
 		computeTitle();
 
 		this.setSize(AppPreferences.WINDOW_WIDTH.get().intValue(),
-				AppPreferences.WINDOW_HEIGHT.get().intValue());
+			AppPreferences.WINDOW_HEIGHT.get().intValue());
 		Point prefPoint = getInitialLocation();
 		if (prefPoint != null) {
 			this.setLocation(prefPoint);
 		}
 		this.setExtendedState(AppPreferences.WINDOW_STATE.get().intValue());
-		
+
 		menuListener.register(mainPanel);
 		KeyboardToolSelection.register(toolbar);
 
@@ -271,7 +157,65 @@ public class Frame extends LFrame implements LocaleListener {
 
 		LocaleManager.addLocaleListener(this);
 	}
-	
+
+	private static Point getInitialLocation() {
+		String s = AppPreferences.WINDOW_LOCATION.get();
+		if (s == null) return null;
+		int comma = s.indexOf(',');
+		if (comma < 0) return null;
+		try {
+			int x = Integer.parseInt(s.substring(0, comma));
+			int y = Integer.parseInt(s.substring(comma + 1));
+			while (isProjectFrameAt(x, y)) {
+				x += 20;
+				y += 20;
+			}
+			Rectangle desired = new Rectangle(x, y, 50, 50);
+
+			int gcBestSize = 0;
+			Point gcBestPoint = null;
+			GraphicsEnvironment ge;
+			ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			for (GraphicsDevice gd : ge.getScreenDevices()) {
+				for (GraphicsConfiguration gc : gd.getConfigurations()) {
+					Rectangle gcBounds = gc.getBounds();
+					if (gcBounds.intersects(desired)) {
+						Rectangle inter = gcBounds.intersection(desired);
+						int size = inter.width * inter.height;
+						if (size > gcBestSize) {
+							gcBestSize = size;
+							int x2 = Math.max(gcBounds.x, Math.min(inter.x,
+								inter.x + inter.width - 50));
+							int y2 = Math.max(gcBounds.y, Math.min(inter.y,
+								inter.y + inter.height - 50));
+							gcBestPoint = new Point(x2, y2);
+						}
+					}
+				}
+			}
+			if (gcBestPoint != null) {
+				if (isProjectFrameAt(gcBestPoint.x, gcBestPoint.y)) {
+					gcBestPoint = null;
+				}
+			}
+			return gcBestPoint;
+		} catch (Throwable t) {
+			return null;
+		}
+	}
+
+	private static boolean isProjectFrameAt(int x, int y) {
+		for (Project current : Projects.getOpenProjects()) {
+			Frame frame = current.getFrame();
+			if (frame != null) {
+				Point loc = frame.getLocationOnScreen();
+				int d = Math.abs(loc.x - x) + Math.abs(loc.y - y);
+				if (d <= 3) return true;
+			}
+		}
+		return false;
+	}
+
 	private void placeToolbar() {
 		String loc = AppPreferences.TOOLBAR_PLACEMENT.get();
 		Container contents = getContentPane();
@@ -286,10 +230,10 @@ public class Frame extends LFrame implements LocaleListener {
 			Object value = BorderLayout.NORTH;
 			for (Direction dir : Direction.cardinals) {
 				if (dir.toString().equals(loc)) {
-					if (dir == Direction.EAST)       value = BorderLayout.EAST;
+					if (dir == Direction.EAST) value = BorderLayout.EAST;
 					else if (dir == Direction.SOUTH) value = BorderLayout.SOUTH;
-					else if (dir == Direction.WEST)  value = BorderLayout.WEST;
-					else                             value = BorderLayout.NORTH;
+					else if (dir == Direction.WEST) value = BorderLayout.WEST;
+					else value = BorderLayout.NORTH;
 				}
 			}
 
@@ -299,7 +243,7 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 		contents.validate();
 	}
-	
+
 	public Project getProject() {
 		return proj;
 	}
@@ -311,7 +255,7 @@ public class Frame extends LFrame implements LocaleListener {
 			setAttrTableModel(new AttrTableComponentModel(proj, circ, comp));
 		}
 	}
-	
+
 	void setAttrTableModel(AttrTableModel value) {
 		attrTable.setAttrTableModel(value);
 		if (value instanceof AttrTableToolModel) {
@@ -330,19 +274,23 @@ public class Frame extends LFrame implements LocaleListener {
 			layoutCanvas.setHaloedComponent(null, null);
 		}
 	}
-	
-	public void setExplorerView(String view) {
-		explorerPane.setView(view);
-	}
-	
+
 	public String getExplorerView() {
 		return explorerPane.getView();
 	}
-	
+
+	public void setExplorerView(String view) {
+		explorerPane.setView(view);
+	}
+
+	public String getEditorView() {
+		return mainPanel.getView();
+	}
+
 	public void setEditorView(String view) {
 		String curView = mainPanel.getView();
 		if (curView.equals(view)) return;
-		
+
 		if (view.equals(EDIT_APPEARANCE)) { // appearance view
 			AppearanceView app = appearance;
 			if (app == null) {
@@ -367,10 +315,6 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 	}
 
-	public String getEditorView() {
-		return mainPanel.getView();
-	}
-
 	public Canvas getCanvas() {
 		return layoutCanvas;
 	}
@@ -388,11 +332,11 @@ public class Frame extends LFrame implements LocaleListener {
 		this.setTitle(s);
 		myProjectListener.enableSave();
 	}
-	
+
 	void viewAttributes(Tool newTool) {
 		viewAttributes(null, newTool, false);
 	}
-	
+
 	private void viewAttributes(Tool newTool, boolean force) {
 		viewAttributes(null, newTool, force);
 	}
@@ -430,7 +374,7 @@ public class Frame extends LFrame implements LocaleListener {
 	public void localeChanged() {
 		computeTitle();
 	}
-	
+
 	public void savePreferences() {
 		AppPreferences.TICK_FREQUENCY.set(Double.valueOf(proj.getSimulator().getTickFrequency()));
 		AppPreferences.LAYOUT_SHOW_GRID.setBoolean(layoutZoomModel.getShowGrid());
@@ -458,22 +402,22 @@ public class Frame extends LFrame implements LocaleListener {
 		AppPreferences.WINDOW_MAIN_SPLIT.set(Double.valueOf(mainRegion.getFraction()));
 		AppPreferences.DIALOG_DIRECTORY.set(JFileChoosers.getCurrentDirectory());
 	}
-	
+
 	public boolean confirmClose() {
 		return confirmClose(Strings.get("confirmCloseTitle"));
 	}
-	
+
 	// returns true if user is OK with proceeding
 	public boolean confirmClose(String title) {
 		String message = StringUtil.format(Strings.get("confirmDiscardMessage"),
-				proj.getLogisimFile().getName());
-		
+			proj.getLogisimFile().getName());
+
 		if (!proj.isFileDirty()) return true;
 		toFront();
-		String[] options = { Strings.get("saveOption"), Strings.get("discardOption"), Strings.get("cancelOption") };
+		String[] options = {Strings.get("saveOption"), Strings.get("discardOption"), Strings.get("cancelOption")};
 		int result = JOptionPane.showOptionDialog(this,
-				message, title, 0, JOptionPane.QUESTION_MESSAGE, null,
-				options, options[0]);
+			message, title, 0, JOptionPane.QUESTION_MESSAGE, null,
+			options, options[0]);
 		boolean ret;
 		if (result == 0) {
 			ret = ProjectActions.doSave(proj);
@@ -487,62 +431,85 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 		return ret;
 	}
-	
-	private static Point getInitialLocation() {
-		String s = AppPreferences.WINDOW_LOCATION.get();
-		if (s == null) return null;
-		int comma = s.indexOf(',');
-		if (comma < 0) return null;
-		try {
-			int x = Integer.parseInt(s.substring(0, comma));
-			int y = Integer.parseInt(s.substring(comma + 1));
-			while (isProjectFrameAt(x, y)) {
-				x += 20;
-				y += 20;
-			}
-			Rectangle desired = new Rectangle(x, y, 50, 50);
-		
-			int gcBestSize = 0;
-			Point gcBestPoint = null;
-			GraphicsEnvironment ge;
-			ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			for (GraphicsDevice gd : ge.getScreenDevices()) {
-				for (GraphicsConfiguration gc : gd.getConfigurations()) {
-					Rectangle gcBounds = gc.getBounds();
-					if (gcBounds.intersects(desired)) {
-						Rectangle inter = gcBounds.intersection(desired);
-						int size = inter.width * inter.height;
-						if (size > gcBestSize) {
-							gcBestSize = size;
-							int x2 = Math.max(gcBounds.x, Math.min(inter.x,
-									inter.x + inter.width - 50));
-							int y2 = Math.max(gcBounds.y, Math.min(inter.y,
-									inter.y + inter.height - 50));
-							gcBestPoint = new Point(x2, y2);
-						}
-					}
+
+	class MyProjectListener
+		implements ProjectListener, LibraryListener, CircuitListener,
+		PropertyChangeListener, ChangeListener {
+		public void projectChanged(ProjectEvent event) {
+			int action = event.getAction();
+
+			if (action == ProjectEvent.ACTION_SET_FILE) {
+				computeTitle();
+				proj.setTool(proj.getOptions().getToolbarData().getFirstTool());
+				placeToolbar();
+			} else if (action == ProjectEvent.ACTION_SET_CURRENT) {
+				setEditorView(EDIT_LAYOUT);
+				if (appearance != null) {
+					appearance.setCircuit(proj, proj.getCircuitState());
+				}
+				viewAttributes(proj.getTool());
+				computeTitle();
+			} else if (action == ProjectEvent.ACTION_SET_TOOL) {
+				if (attrTable == null) return; // for startup
+				Tool oldTool = (Tool) event.getOldData();
+				Tool newTool = (Tool) event.getData();
+				if (getEditorView().equals(EDIT_LAYOUT)) {
+					viewAttributes(oldTool, newTool, false);
 				}
 			}
-			if (gcBestPoint != null) {
-				if (isProjectFrameAt(gcBestPoint.x, gcBestPoint.y)) {
-					gcBestPoint = null;
-				}
+		}
+
+		public void libraryChanged(LibraryEvent e) {
+			if (e.getAction() == LibraryEvent.SET_NAME) {
+				computeTitle();
+			} else if (e.getAction() == LibraryEvent.DIRTY_STATE) {
+				enableSave();
 			}
-			return gcBestPoint;
-		} catch (Throwable t) {
-			return null;
+		}
+
+		public void circuitChanged(CircuitEvent event) {
+			if (event.getAction() == CircuitEvent.ACTION_SET_NAME) {
+				computeTitle();
+			}
+		}
+
+		private void enableSave() {
+			Project proj = getProject();
+			boolean ok = proj.isFileDirty();
+			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
+		}
+
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		public void propertyChange(PropertyChangeEvent event) {
+			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
+				placeToolbar();
+			}
+		}
+
+		public void stateChanged(ChangeEvent event) {
+			Object source = event.getSource();
+			if (source == explorerPane) {
+				firePropertyChange(EXPLORER_VIEW, "???", getExplorerView());
+			} else if (source == mainPanel) {
+				firePropertyChange(EDITOR_VIEW, "???", getEditorView());
+			}
 		}
 	}
 
-	private static boolean isProjectFrameAt(int x, int y) {
-		for (Project current : Projects.getOpenProjects()) {
-			Frame frame = current.getFrame();
-			if (frame != null) {
-				Point loc = frame.getLocationOnScreen();
-				int d = Math.abs(loc.x - x) + Math.abs(loc.y - y);
-				if (d <= 3) return true;
+	class MyWindowListener extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent e) {
+			if (confirmClose(Strings.get("confirmCloseTitle"))) {
+				layoutCanvas.closeCanvas();
+				Frame.this.dispose();
 			}
 		}
-		return false;
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+			layoutCanvas.computeSize(true);
+		}
 	}
 }

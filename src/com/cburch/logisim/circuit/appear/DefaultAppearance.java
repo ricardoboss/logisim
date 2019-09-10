@@ -3,15 +3,6 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.shapes.Curve;
 import com.cburch.draw.shapes.DrawAttr;
@@ -21,36 +12,14 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
 
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
 class DefaultAppearance {
 	private static final int OFFS = 50;
-	
-	private DefaultAppearance() { }
-	
-	private static class CompareLocations implements Comparator<Instance> {
-		private boolean byX;
-		
-		CompareLocations(boolean byX) {
-			this.byX = byX;
-		}
-		
-		public int compare(Instance a, Instance b) {
-			Location aloc = a.getLocation();
-			Location bloc = b.getLocation();
-			if (byX) {
-				int ax = aloc.getX();
-				int bx = bloc.getX();
-				if (ax != bx) {
-					return ax < bx ? -1 : 1;
-				}
-			} else {
-				int ay = aloc.getY();
-				int by = bloc.getY();
-				if (ay != by) {
-					return ay < by ? -1 : 1;
-				}
-			}
-			return aloc.compareTo(bloc);
-		}
+
+	private DefaultAppearance() {
 	}
 
 	static void sortPinList(List<Instance> pins, Direction facing) {
@@ -63,10 +32,9 @@ class DefaultAppearance {
 		}
 	}
 
-	
 	public static List<CanvasObject> build(Collection<Instance> pins) {
-		Map<Direction,List<Instance>> edge;
-		edge = new HashMap<Direction,List<Instance>>();
+		Map<Direction, List<Instance>> edge;
+		edge = new HashMap<Direction, List<Instance>>();
 		edge.put(Direction.NORTH, new ArrayList<Instance>());
 		edge.put(Direction.SOUTH, new ArrayList<Instance>());
 		edge.put(Direction.EAST, new ArrayList<Instance>());
@@ -77,7 +45,7 @@ class DefaultAppearance {
 			List<Instance> e = edge.get(pinEdge);
 			e.add(pin);
 		}
-		
+
 		for (Map.Entry<Direction, List<Instance>> entry : edge.entrySet()) {
 			sortPinList(entry.getValue(), entry.getKey());
 		}
@@ -93,7 +61,7 @@ class DefaultAppearance {
 		int offsSouth = computeOffset(numSouth, numNorth, maxHorz);
 		int offsEast = computeOffset(numEast, numWest, maxVert);
 		int offsWest = computeOffset(numWest, numEast, maxVert);
-		
+
 		int width = computeDimension(maxVert, maxHorz);
 		int height = computeDimension(maxHorz, maxVert);
 
@@ -116,11 +84,11 @@ class DefaultAppearance {
 			ax = 0;
 			ay = 0;
 		}
-		
+
 		// place rectangle so anchor is on the grid
 		int rx = OFFS + (9 - (ax + 9) % 10);
 		int ry = OFFS + (9 - (ay + 9) % 10);
-		
+
 		Location e0 = Location.create(rx + (width - 8) / 2, ry + 1);
 		Location e1 = Location.create(rx + (width + 8) / 2, ry + 1);
 		Location ct = Location.create(rx + width / 2, ry + 11);
@@ -134,17 +102,17 @@ class DefaultAppearance {
 		ret.add(notch);
 		ret.add(rect);
 		placePins(ret, edge.get(Direction.WEST),
-				rx,             ry + offsWest,  0, 10);
+			rx, ry + offsWest, 0, 10);
 		placePins(ret, edge.get(Direction.EAST),
-				rx + width,     ry + offsEast,  0, 10);
+			rx + width, ry + offsEast, 0, 10);
 		placePins(ret, edge.get(Direction.NORTH),
-				rx + offsNorth, ry,            10,  0);
+			rx + offsNorth, ry, 10, 0);
 		placePins(ret, edge.get(Direction.SOUTH),
-				rx + offsSouth, ry + height,   10,  0);
+			rx + offsSouth, ry + height, 10, 0);
 		ret.add(new AppearanceAnchor(Location.create(rx + ax, ry + ay)));
 		return ret;
 	}
-	
+
 	private static int computeDimension(int maxThis, int maxOthers) {
 		if (maxThis < 3) {
 			return 30;
@@ -159,25 +127,52 @@ class DefaultAppearance {
 		int maxThis = Math.max(numFacing, numOpposite);
 		int maxOffs;
 		switch (maxThis) {
-		case 0:
-		case 1:
-			maxOffs = (maxOthers == 0 ? 15 : 10);
-			break;
-		case 2:
-			maxOffs = 10;
-			break;
-		default:
-			maxOffs = (maxOthers == 0 ? 5 : 10);
+			case 0:
+			case 1:
+				maxOffs = (maxOthers == 0 ? 15 : 10);
+				break;
+			case 2:
+				maxOffs = 10;
+				break;
+			default:
+				maxOffs = (maxOthers == 0 ? 5 : 10);
 		}
 		return maxOffs + 10 * ((maxThis - numFacing) / 2);
 	}
-	
+
 	private static void placePins(List<CanvasObject> dest, List<Instance> pins,
-			int x, int y, int dx, int dy) {
+								  int x, int y, int dx, int dy) {
 		for (Instance pin : pins) {
 			dest.add(new AppearancePort(Location.create(x, y), pin));
 			x += dx;
 			y += dy;
+		}
+	}
+
+	private static class CompareLocations implements Comparator<Instance> {
+		private boolean byX;
+
+		CompareLocations(boolean byX) {
+			this.byX = byX;
+		}
+
+		public int compare(Instance a, Instance b) {
+			Location aloc = a.getLocation();
+			Location bloc = b.getLocation();
+			if (byX) {
+				int ax = aloc.getX();
+				int bx = bloc.getX();
+				if (ax != bx) {
+					return ax < bx ? -1 : 1;
+				}
+			} else {
+				int ay = aloc.getY();
+				int by = bloc.getY();
+				if (ay != by) {
+					return ay < by ? -1 : 1;
+				}
+			}
+			return aloc.compareTo(bloc);
 		}
 	}
 }

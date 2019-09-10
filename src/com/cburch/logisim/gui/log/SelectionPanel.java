@@ -3,29 +3,117 @@
 
 package com.cburch.logisim.gui.log;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
-
 class SelectionPanel extends LogPanel {
+	private Listener listener = new Listener();
+	private ComponentSelector selector;
+	private JButton addTool;
+	private JButton changeBase;
+	private JButton moveUp;
+	private JButton moveDown;
+	private JButton remove;
+	private SelectionList list;
+	public SelectionPanel(LogFrame window) {
+		super(window);
+		selector = new ComponentSelector(getModel());
+		addTool = new JButton();
+		changeBase = new JButton();
+		moveUp = new JButton();
+		moveDown = new JButton();
+		remove = new JButton();
+		list = new SelectionList();
+		list.setSelection(getSelection());
+
+		JPanel buttons = new JPanel(new GridLayout(5, 1));
+		buttons.add(addTool);
+		buttons.add(changeBase);
+		buttons.add(moveUp);
+		buttons.add(moveDown);
+		buttons.add(remove);
+
+		addTool.addActionListener(listener);
+		changeBase.addActionListener(listener);
+		moveUp.addActionListener(listener);
+		moveDown.addActionListener(listener);
+		remove.addActionListener(listener);
+		selector.addMouseListener(listener);
+		selector.addTreeSelectionListener(listener);
+		list.addListSelectionListener(listener);
+		listener.computeEnabled();
+
+		GridBagLayout gridbag = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+		setLayout(gridbag);
+		JScrollPane explorerPane = new JScrollPane(selector,
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane listPane = new JScrollPane(list,
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gridbag.setConstraints(explorerPane, gbc);
+		add(explorerPane);
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.weightx = 0.0;
+		gridbag.setConstraints(buttons, gbc);
+		add(buttons);
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gridbag.setConstraints(listPane, gbc);
+		add(listPane);
+	}
+
+	@Override
+	public String getTitle() {
+		return Strings.get("selectionTab");
+	}
+
+	@Override
+	public String getHelpText() {
+		return Strings.get("selectionHelp");
+	}
+
+	@Override
+	public void localeChanged() {
+		addTool.setText(Strings.get("selectionAdd"));
+		changeBase.setText(Strings.get("selectionChangeBase"));
+		moveUp.setText(Strings.get("selectionMoveUp"));
+		moveDown.setText(Strings.get("selectionMoveDown"));
+		remove.setText(Strings.get("selectionRemove"));
+		selector.localeChanged();
+		list.localeChanged();
+	}
+
+	@Override
+	public void modelChanged(Model oldModel, Model newModel) {
+		if (getModel() == null) {
+			selector.setLogModel(newModel);
+			list.setSelection(null);
+		} else {
+			selector.setLogModel(newModel);
+			list.setSelection(getSelection());
+		}
+		listener.computeEnabled();
+	}
+
 	private class Listener extends MouseAdapter
-			implements ActionListener, TreeSelectionListener,
-				ListSelectionListener {
+		implements ActionListener, TreeSelectionListener,
+		ListSelectionListener {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() == 2) {
@@ -45,9 +133,14 @@ class SelectionPanel extends LogPanel {
 				if (sel != null) {
 					int radix = sel.getRadix();
 					switch (radix) {
-					case 2:  sel.setRadix(10); break;
-					case 10: sel.setRadix(16); break;
-					default: sel.setRadix(2);
+						case 2:
+							sel.setRadix(10);
+							break;
+						case 10:
+							sel.setRadix(16);
+							break;
+						default:
+							sel.setRadix(2);
 					}
 				}
 			} else if (src == moveUp) {
@@ -78,7 +171,7 @@ class SelectionPanel extends LogPanel {
 		public void valueChanged(ListSelectionEvent event) {
 			computeEnabled();
 		}
-		
+
 		private void computeEnabled() {
 			int index = list.getSelectedIndex();
 			addTool.setEnabled(selector.hasSelectedItems());
@@ -87,7 +180,7 @@ class SelectionPanel extends LogPanel {
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
 		}
-		
+
 		private void doAdd(List<SelectionItem> selectedItems) {
 			if (selectedItems != null && selectedItems.size() > 0) {
 				SelectionItem last = null;
@@ -98,7 +191,7 @@ class SelectionPanel extends LogPanel {
 				list.setSelectedValue(last, true);
 			}
 		}
-		
+
 		private void doMove(int delta) {
 			Selection sel = getSelection();
 			int oldIndex = list.getSelectedIndex();
@@ -108,98 +201,5 @@ class SelectionPanel extends LogPanel {
 				list.setSelectedIndex(newIndex);
 			}
 		}
-	}
-	
-	private Listener listener = new Listener();
-	
-	private ComponentSelector selector;
-	private JButton addTool;
-	private JButton changeBase;
-	private JButton moveUp;
-	private JButton moveDown;
-	private JButton remove;
-	private SelectionList list;
-	
-	public SelectionPanel(LogFrame window) {
-		super(window);
-		selector = new ComponentSelector(getModel());
-		addTool = new JButton();
-		changeBase = new JButton();
-		moveUp = new JButton();
-		moveDown = new JButton();
-		remove = new JButton();
-		list = new SelectionList();
-		list.setSelection(getSelection());
-		
-		JPanel buttons = new JPanel(new GridLayout(5, 1));
-		buttons.add(addTool);
-		buttons.add(changeBase);
-		buttons.add(moveUp);
-		buttons.add(moveDown);
-		buttons.add(remove);
-		
-		addTool.addActionListener(listener);
-		changeBase.addActionListener(listener);
-		moveUp.addActionListener(listener);
-		moveDown.addActionListener(listener);
-		remove.addActionListener(listener);
-		selector.addMouseListener(listener);
-		selector.addTreeSelectionListener(listener);
-		list.addListSelectionListener(listener);
-		listener.computeEnabled();
-		
-		GridBagLayout gridbag = new GridBagLayout();
-		GridBagConstraints gbc = new GridBagConstraints();
-		setLayout(gridbag);
-		JScrollPane explorerPane = new JScrollPane(selector,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		JScrollPane listPane = new JScrollPane(list,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gridbag.setConstraints(explorerPane, gbc); add(explorerPane);
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.anchor = GridBagConstraints.NORTH;
-		gbc.weightx = 0.0;
-		gridbag.setConstraints(buttons, gbc); add(buttons);
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gridbag.setConstraints(listPane, gbc); add(listPane);
-	}
-
-	@Override
-	public String getTitle() {
-		return Strings.get("selectionTab");
-	}
-
-	@Override
-	public String getHelpText() {
-		return Strings.get("selectionHelp");
-	}
-	
-	@Override
-	public void localeChanged() {
-		addTool.setText(Strings.get("selectionAdd"));
-		changeBase.setText(Strings.get("selectionChangeBase"));
-		moveUp.setText(Strings.get("selectionMoveUp"));
-		moveDown.setText(Strings.get("selectionMoveDown"));
-		remove.setText(Strings.get("selectionRemove"));
-		selector.localeChanged();
-		list.localeChanged();
-	}
-
-	@Override
-	public void modelChanged(Model oldModel, Model newModel) {
-		if (getModel() == null) {
-			selector.setLogModel(newModel);
-			list.setSelection(null);
-		} else {
-			selector.setLogModel(newModel);
-			list.setSelection(getSelection());
-		}
-		listener.computeEnabled();
 	}
 }

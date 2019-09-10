@@ -3,13 +3,6 @@
 
 package com.cburch.logisim.file;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.w3c.dom.Element;
-
 import com.cburch.draw.model.AbstractCanvasObject;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitMutator;
@@ -22,20 +15,69 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
+import org.w3c.dom.Element;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XmlCircuitReader extends CircuitTransaction {
 	private XmlReader.ReadContext reader;
 	private List<XmlReader.CircuitData> circuitsData;
-	
+
 	public XmlCircuitReader(XmlReader.ReadContext reader,
-			List<XmlReader.CircuitData> circDatas) {
+							List<XmlReader.CircuitData> circDatas) {
 		this.reader = reader;
 		this.circuitsData = circDatas;
 	}
 
+	static Component getComponent(Element elt, XmlReader.ReadContext reader)
+		throws XmlReaderException {
+		// Determine the factory that creates this element
+		String name = elt.getAttribute("name");
+		if (name == null || name.equals("")) {
+			throw new XmlReaderException(Strings.get("compNameMissingError"));
+		}
+
+		String libName = elt.getAttribute("lib");
+		Library lib = reader.findLibrary(libName);
+		if (lib == null) {
+			throw new XmlReaderException(Strings.get("compUnknownError", "no-lib"));
+		}
+
+		Tool tool = lib.getTool(name);
+		if (tool == null || !(tool instanceof AddTool)) {
+			if (libName == null || libName.equals("")) {
+				throw new XmlReaderException(Strings.get("compUnknownError", name));
+			} else {
+				throw new XmlReaderException(Strings.get("compAbsentError", name, libName));
+			}
+		}
+		ComponentFactory source = ((AddTool) tool).getFactory();
+
+		// Determine attributes
+		String loc_str = elt.getAttribute("loc");
+		AttributeSet attrs = source.createAttributeSet();
+		reader.initAttributeSet(elt, attrs, source);
+
+		// Create component if location known
+		if (loc_str == null || loc_str.equals("")) {
+			throw new XmlReaderException(Strings.get("compLocMissingError", source.getName()));
+		} else {
+			try {
+				Location loc = Location.parse(loc_str);
+				return source.createComponent(loc, attrs);
+			} catch (NumberFormatException e) {
+				throw new XmlReaderException(Strings.get("compLocInvalidError",
+					source.getName(), loc_str));
+			}
+		}
+	}
+
 	@Override
 	protected Map<Circuit, Integer> getAccessedCircuits() {
-		HashMap<Circuit, Integer> access = new HashMap<Circuit,Integer>();
+		HashMap<Circuit, Integer> access = new HashMap<Circuit, Integer>();
 		for (XmlReader.CircuitData data : circuitsData) {
 			access.put(data.circuit, READ_WRITE);
 		}
@@ -80,20 +122,20 @@ public class XmlCircuitReader extends CircuitTransaction {
 				}
 			}
 		}
-		
+
 		List<AbstractCanvasObject> appearance = circData.appearance;
 		if (appearance != null && !appearance.isEmpty()) {
 			dest.getAppearance().setObjectsForce(appearance);
 			dest.getAppearance().setDefaultAppearance(false);
 		}
 	}
-	
+
 	private String toComponentString(Element elt) {
 		String name = elt.getAttribute("name");
 		String loc = elt.getAttribute("loc");
 		return name + "(" + loc + ")";
 	}
-	
+
 	private String toWireString(Element elt) {
 		String from = elt.getAttribute("from");
 		String to = elt.getAttribute("to");
@@ -101,7 +143,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 	}
 
 	void addWire(Circuit dest, CircuitMutator mutator, Element elt)
-			throws XmlReaderException {
+		throws XmlReaderException {
 		Location pt0;
 		try {
 			String str = elt.getAttribute("from");
@@ -125,48 +167,5 @@ public class XmlCircuitReader extends CircuitTransaction {
 		}
 
 		mutator.add(dest, Wire.create(pt0, pt1));
-	}
-	
-	static Component getComponent(Element elt, XmlReader.ReadContext reader)
-			throws XmlReaderException {
-		// Determine the factory that creates this element
-		String name = elt.getAttribute("name");
-		if (name == null || name.equals("")) {
-			throw new XmlReaderException(Strings.get("compNameMissingError"));
-		}
-
-		String libName = elt.getAttribute("lib");
-		Library lib = reader.findLibrary(libName);
-		if (lib == null) {
-			throw new XmlReaderException(Strings.get("compUnknownError", "no-lib"));
-		}
-
-		Tool tool = lib.getTool(name);
-		if (tool == null || !(tool instanceof AddTool)) {
-			if (libName == null || libName.equals("")) {
-				throw new XmlReaderException(Strings.get("compUnknownError", name));
-			} else {
-				throw new XmlReaderException(Strings.get("compAbsentError", name, libName));
-			}
-		}
-		ComponentFactory source = ((AddTool) tool).getFactory();
-
-		// Determine attributes
-		String loc_str = elt.getAttribute("loc");
-		AttributeSet attrs = source.createAttributeSet();
-		reader.initAttributeSet(elt, attrs, source);
-
-		// Create component if location known
-		if (loc_str == null || loc_str.equals("")) {
-			throw new XmlReaderException(Strings.get("compLocMissingError", source.getName()));
-		} else {
-			try {
-				Location loc = Location.parse(loc_str);
-				return source.createComponent(loc, attrs);
-			} catch (NumberFormatException e) {
-				throw new XmlReaderException(Strings.get("compLocInvalidError",
-					source.getName(), loc_str));
-			}
-		}
 	}
 }

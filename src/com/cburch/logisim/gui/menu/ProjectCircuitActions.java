@@ -3,21 +3,6 @@
 
 package com.cburch.logisim.gui.menu;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.util.ArrayList;
-import java.util.Map;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.cburch.logisim.analyze.gui.Analyzer;
 import com.cburch.logisim.analyze.gui.AnalyzerManager;
 import com.cburch.logisim.analyze.model.AnalyzerModel;
@@ -33,9 +18,17 @@ import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.util.ArrayList;
+import java.util.Map;
+
 public class ProjectCircuitActions {
-	private ProjectCircuitActions() { }
-	
+	private ProjectCircuitActions() {
+	}
+
 	public static void doAddCircuit(Project proj) {
 		String name = promptForCircuitName(proj.getFrame(), proj.getLogisimFile(), "");
 		if (name != null) {
@@ -46,7 +39,7 @@ public class ProjectCircuitActions {
 	}
 
 	private static String promptForCircuitName(JFrame frame,
-			Library lib, String initialValue) {
+											   Library lib, String initialValue) {
 		JLabel label = new JLabel(Strings.get("circuitNamePrompt"));
 		final JTextField field = new JTextField(15);
 		field.setText(initialValue);
@@ -61,12 +54,16 @@ public class ProjectCircuitActions {
 		gc.weightx = 1.0;
 		gc.fill = GridBagConstraints.NONE;
 		gc.anchor = GridBagConstraints.LINE_START;
-		gb.setConstraints(label, gc); panel.add(label);
-		gb.setConstraints(field, gc); panel.add(field);
-		gb.setConstraints(error, gc); panel.add(error);
-		gb.setConstraints(strut, gc); panel.add(strut);
+		gb.setConstraints(label, gc);
+		panel.add(label);
+		gb.setConstraints(field, gc);
+		panel.add(field);
+		gb.setConstraints(error, gc);
+		panel.add(error);
+		gb.setConstraints(strut, gc);
+		panel.add(strut);
 		JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE,
-				JOptionPane.OK_CANCEL_OPTION);
+			JOptionPane.OK_CANCEL_OPTION);
 		pane.setInitialValue(field);
 		JDialog dlog = pane.createDialog(frame, Strings.get("circuitNameDialogTitle"));
 		dlog.addWindowFocusListener(new WindowFocusListener() {
@@ -74,9 +71,10 @@ public class ProjectCircuitActions {
 				field.requestFocus();
 			}
 
-			public void windowLostFocus(WindowEvent arg0) { }
+			public void windowLostFocus(WindowEvent arg0) {
+			}
 		});
-		
+
 		while (true) {
 			field.selectAll();
 			dlog.pack();
@@ -84,7 +82,7 @@ public class ProjectCircuitActions {
 			field.requestFocusInWindow();
 			Object action = pane.getValue();
 			if (action == null || !(action instanceof Integer)
-					|| ((Integer) action).intValue() != JOptionPane.OK_OPTION) {
+				|| ((Integer) action).intValue() != JOptionPane.OK_OPTION) {
 				return null;
 			}
 
@@ -120,9 +118,9 @@ public class ProjectCircuitActions {
 	public static void doRemoveCircuit(Project proj, Circuit circuit) {
 		if (proj.getLogisimFile().getTools().size() == 1) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
-					Strings.get("circuitRemoveLastError"),
-					Strings.get("circuitRemoveErrorTitle"),
-					JOptionPane.ERROR_MESSAGE);
+				Strings.get("circuitRemoveLastError"),
+				Strings.get("circuitRemoveErrorTitle"),
+				JOptionPane.ERROR_MESSAGE);
 		} else if (!proj.getDependencies().canRemove(circuit)) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
 				Strings.get("circuitRemoveUsedError"),
@@ -132,7 +130,7 @@ public class ProjectCircuitActions {
 			proj.doAction(LogisimFileActions.removeCircuit(circuit));
 		}
 	}
-	
+
 	public static void doAnalyze(Project proj, Circuit circuit) {
 		Map<Instance, String> pinNames = Analyze.getPinLabels(circuit);
 		ArrayList<String> inputNames = new ArrayList<String>();
@@ -156,39 +154,39 @@ public class ProjectCircuitActions {
 		}
 		if (inputNames.size() > AnalyzerModel.MAX_INPUTS) {
 			analyzeError(proj, StringUtil.format(Strings.get("analyzeTooManyInputsError"),
-					"" + AnalyzerModel.MAX_INPUTS));
+				"" + AnalyzerModel.MAX_INPUTS));
 			return;
 		}
 		if (outputNames.size() > AnalyzerModel.MAX_OUTPUTS) {
 			analyzeError(proj, StringUtil.format(Strings.get("analyzeTooManyOutputsError"),
-					"" + AnalyzerModel.MAX_OUTPUTS));
+				"" + AnalyzerModel.MAX_OUTPUTS));
 			return;
 		}
-		
+
 		Analyzer analyzer = AnalyzerManager.getAnalyzer();
 		analyzer.getModel().setCurrentCircuit(proj, circuit);
 		configureAnalyzer(proj, circuit, analyzer, pinNames, inputNames, outputNames);
 		analyzer.setVisible(true);
 		analyzer.toFront();
 	}
-	
+
 	private static void configureAnalyzer(Project proj, Circuit circuit,
-			Analyzer analyzer, Map<Instance, String> pinNames,
-			ArrayList<String> inputNames, ArrayList<String> outputNames) {
+										  Analyzer analyzer, Map<Instance, String> pinNames,
+										  ArrayList<String> inputNames, ArrayList<String> outputNames) {
 		analyzer.getModel().setVariables(inputNames, outputNames);
-		
+
 		// If there are no inputs, we stop with that tab selected
 		if (inputNames.size() == 0) {
 			analyzer.setSelectedTab(Analyzer.INPUTS_TAB);
 			return;
 		}
-		
+
 		// If there are no outputs, we stop with that tab selected
 		if (outputNames.size() == 0) {
 			analyzer.setSelectedTab(Analyzer.OUTPUTS_TAB);
 			return;
 		}
-		
+
 		// Attempt to show the corresponding expression
 		try {
 			Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
@@ -196,15 +194,15 @@ public class ProjectCircuitActions {
 			return;
 		} catch (AnalyzeException ex) {
 			JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(),
-					Strings.get("analyzeNoExpressionTitle"),
-					JOptionPane.INFORMATION_MESSAGE);
+				Strings.get("analyzeNoExpressionTitle"),
+				JOptionPane.INFORMATION_MESSAGE);
 		}
-		
+
 		// As a backup measure, we compute a truth table.
 		Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
 		analyzer.setSelectedTab(Analyzer.TABLE_TAB);
 	}
-		
+
 	private static void analyzeError(Project proj, String message) {
 		JOptionPane.showMessageDialog(proj.getFrame(), message,
 			Strings.get("analyzeErrorTitle"),

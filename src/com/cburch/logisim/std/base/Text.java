@@ -3,31 +3,24 @@
 
 package com.cburch.logisim.std.base;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Font;
-import java.awt.Rectangle;
-
 import com.cburch.logisim.comp.TextField;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Location;
+import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.util.GraphicsUtil;
 
+import java.awt.*;
+
 public class Text extends InstanceFactory {
+	public static final Text FACTORY = new Text();
 	public static Attribute<String> ATTR_TEXT = Attributes.forString("text",
-			Strings.getter("textTextAttr"));
+		Strings.getter("textTextAttr"));
 	public static Attribute<Font> ATTR_FONT = Attributes.forFont("font",
 		Strings.getter("textFontAttr"));
 	public static Attribute<AttributeOption> ATTR_HALIGN = Attributes.forOption("halign",
-		Strings.getter("textHorzAlignAttr"), new AttributeOption[] {
+		Strings.getter("textHorzAlignAttr"), new AttributeOption[]{
 			new AttributeOption(Integer.valueOf(TextField.H_LEFT),
 				"left", Strings.getter("textHorzAlignLeftOpt")),
 			new AttributeOption(Integer.valueOf(TextField.H_RIGHT),
@@ -36,7 +29,7 @@ public class Text extends InstanceFactory {
 				"center", Strings.getter("textHorzAlignCenterOpt")),
 		});
 	public static Attribute<AttributeOption> ATTR_VALIGN = Attributes.forOption("valign",
-		Strings.getter("textVertAlignAttr"), new AttributeOption[] {
+		Strings.getter("textVertAlignAttr"), new AttributeOption[]{
 			new AttributeOption(Integer.valueOf(TextField.V_TOP),
 				"top", Strings.getter("textVertAlignTopOpt")),
 			new AttributeOption(Integer.valueOf(TextField.V_BASELINE),
@@ -47,14 +40,12 @@ public class Text extends InstanceFactory {
 				"center", Strings.getter("textVertAlignCenterOpt")),
 		});
 
-	public static final Text FACTORY = new Text();
-
 	private Text() {
 		super("Text", Strings.getter("textComponent"));
 		setIconName("text.gif");
 		setShouldSnap(false);
 	}
-	
+
 	@Override
 	public AttributeSet createAttributeSet() {
 		return new TextAttributes();
@@ -79,7 +70,7 @@ public class Text extends InstanceFactory {
 	private Bounds estimateBounds(TextAttributes attrs) {
 		// TODO - you can imagine being more clever here
 		String text = attrs.getText();
-		if (text == null || text.length() == 0) return Bounds.EMPTY_BOUNDS; 
+		if (text == null || text.length() == 0) return Bounds.EMPTY_BOUNDS;
 		int size = attrs.getFont().getSize();
 		int h = size;
 		int w = size * text.length() / 2;
@@ -112,28 +103,28 @@ public class Text extends InstanceFactory {
 		TextAttributes attrs = (TextAttributes) painter.getAttributeSet();
 		String text = attrs.getText();
 		if (text == null || text.equals("")) return;
-		
+
 		int halign = attrs.getHorizontalAlign();
 		int valign = attrs.getVerticalAlign();
 		Graphics g = painter.getGraphics();
 		Font old = g.getFont();
 		g.setFont(attrs.getFont());
 		GraphicsUtil.drawText(g, text, 0, 0, halign, valign);
-		
+
 		String textTrim = text.endsWith(" ") ? text.substring(0, text.length() - 1) : text;
 		Bounds newBds;
 		if (textTrim.equals("")) {
 			newBds = Bounds.EMPTY_BOUNDS;
 		} else {
 			Rectangle bdsOut = GraphicsUtil.getTextBounds(g, textTrim, 0, 0,
-					halign, valign);
+				halign, valign);
 			newBds = Bounds.create(bdsOut).expand(4);
 		}
 		if (attrs.setOffsetBounds(newBds)) {
 			Instance instance = painter.getInstance();
 			if (instance != null) instance.recomputeBounds();
 		}
-				
+
 		g.setFont(old);
 	}
 
@@ -157,21 +148,22 @@ public class Text extends InstanceFactory {
 		configureLabel(instance);
 		instance.addAttributeListener();
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN) {
 			configureLabel(instance);
 		}
 	}
-	
+
 	private void configureLabel(Instance instance) {
 		TextAttributes attrs = (TextAttributes) instance.getAttributeSet();
 		Location loc = instance.getLocation();
 		instance.setTextField(ATTR_TEXT, ATTR_FONT, loc.getX(), loc.getY(),
-				attrs.getHorizontalAlign(), attrs.getVerticalAlign());
-	}      
+			attrs.getHorizontalAlign(), attrs.getVerticalAlign());
+	}
 
 	@Override
-	public void propagate(InstanceState state) { }
+	public void propagate(InstanceState state) {
+	}
 }

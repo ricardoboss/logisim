@@ -3,9 +3,6 @@
 
 package com.cburch.logisim.std.wiring;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cburch.logisim.circuit.SplitterFactory;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
@@ -15,6 +12,9 @@ import com.cburch.logisim.tools.FactoryDescription;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Wiring extends Library {
 
 	static final AttributeOption GATE_TOP_LEFT
@@ -22,8 +22,8 @@ public class Wiring extends Library {
 	static final AttributeOption GATE_BOTTOM_RIGHT
 		= new AttributeOption("br", Strings.getter("wiringGateBottomRightOption"));
 	static final Attribute<AttributeOption> ATTR_GATE = Attributes.forOption("gate",
-			Strings.getter("wiringGateAttr"),
-			new AttributeOption[] { GATE_TOP_LEFT, GATE_BOTTOM_RIGHT });
+		Strings.getter("wiringGateAttr"),
+		new AttributeOption[]{GATE_TOP_LEFT, GATE_BOTTOM_RIGHT});
 
 	private static Tool[] ADD_TOOLS = {
 		new AddTool(SplitterFactory.instance),
@@ -34,29 +34,34 @@ public class Wiring extends Library {
 		new AddTool(Clock.FACTORY),
 		new AddTool(Constant.FACTORY),
 	};
-	
+
 	private static FactoryDescription[] DESCRIPTIONS = {
 		new FactoryDescription("Power", Strings.getter("powerComponent"),
-				"power.gif", "Power"),
+			"power.gif", "Power"),
 		new FactoryDescription("Ground", Strings.getter("groundComponent"),
-				"ground.gif", "Ground"),
+			"ground.gif", "Ground"),
 		new FactoryDescription("Transistor", Strings.getter("transistorComponent"),
-				"trans0.gif", "Transistor"),
+			"trans0.gif", "Transistor"),
 		new FactoryDescription("Transmission Gate", Strings.getter("transmissionGateComponent"),
-				"transmis.gif", "TransmissionGate"),
+			"transmis.gif", "TransmissionGate"),
 		new FactoryDescription("Bit Extender", Strings.getter("extenderComponent"),
-				"extender.gif", "BitExtender"),
+			"extender.gif", "BitExtender"),
 	};
 
 	private List<Tool> tools = null;
 
-	public Wiring() { }
+	public Wiring() {
+	}
 
 	@Override
-	public String getName() { return "Wiring"; }
+	public String getName() {
+		return "Wiring";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("wiringLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("wiringLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

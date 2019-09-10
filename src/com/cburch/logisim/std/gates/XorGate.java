@@ -3,8 +3,6 @@
 
 package com.cburch.logisim.std.gates;
 
-import java.awt.Graphics;
-
 import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.Expressions;
 import com.cburch.logisim.data.AttributeSet;
@@ -15,6 +13,8 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.util.GraphicsUtil;
 
+import java.awt.*;
+
 class XorGate extends AbstractGate {
 	public static XorGate FACTORY = new XorGate();
 
@@ -23,6 +23,17 @@ class XorGate extends AbstractGate {
 		setAdditionalWidth(10);
 		setIconNames("xorGate.gif", "xorGateRect.gif", "dinXorGate.gif");
 		setPaintInputLines(true);
+	}
+
+	protected static Expression xorExpression(Expression[] inputs, int numInputs) {
+		if (numInputs > 2) {
+			throw new UnsupportedOperationException("XorGate");
+		}
+		Expression ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = Expressions.xor(ret, inputs[i]);
+		}
+		return ret;
 	}
 
 	@Override
@@ -42,10 +53,10 @@ class XorGate extends AbstractGate {
 	@Override
 	public void paintIconShaped(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		GraphicsUtil.drawCenteredArc(g,   2, -5, 22, -90,  53);
-		GraphicsUtil.drawCenteredArc(g,   2, 23, 22,  90, -53);
-		GraphicsUtil.drawCenteredArc(g, -10,  9, 16, -30, 60);
-		GraphicsUtil.drawCenteredArc(g, -12,  9, 16, -30, 60);
+		GraphicsUtil.drawCenteredArc(g, 2, -5, 22, -90, 53);
+		GraphicsUtil.drawCenteredArc(g, 2, 23, 22, 90, -53);
+		GraphicsUtil.drawCenteredArc(g, -10, 9, 16, -30, 60);
+		GraphicsUtil.drawCenteredArc(g, -12, 9, 16, -30, 60);
 	}
 
 	@Override
@@ -55,13 +66,13 @@ class XorGate extends AbstractGate {
 
 	@Override
 	protected void paintDinShape(InstancePainter painter, int width, int height,
-			int inputs) {
+								 int inputs) {
 		PainterDin.paintXor(painter, width, height, false);
 	}
 
 	@Override
 	protected Value computeOutput(Value[] inputs, int numInputs,
-			InstanceState state) {
+								  InstanceState state) {
 		Object behavior = state.getAttributeValue(GateAttributes.ATTR_XOR);
 		if (behavior == GateAttributes.XOR_ODD) {
 			return GateFunctions.computeOddParity(inputs, numInputs);
@@ -81,16 +92,7 @@ class XorGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.FALSE; }
-	
-	protected static Expression xorExpression(Expression[] inputs, int numInputs) {
-		if (numInputs > 2) {
-			throw new UnsupportedOperationException("XorGate");
-		}
-		Expression ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = Expressions.xor(ret, inputs[i]);
-		}
-		return ret;
+	protected Value getIdentity() {
+		return Value.FALSE;
 	}
 }

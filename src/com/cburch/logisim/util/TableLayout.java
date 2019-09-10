@@ -3,10 +3,7 @@
 
 package com.cburch.logisim.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.LayoutManager2;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class TableLayout implements LayoutManager2 {
@@ -18,14 +15,14 @@ public class TableLayout implements LayoutManager2 {
 	private int[] prefRow;
 	private int[] prefCol;
 	private double[] rowWeight;
-	
+
 	public TableLayout(int colCount) {
 		this.colCount = colCount;
 		this.contents = new ArrayList<Component[]>();
 		this.curRow = 0;
 		this.curCol = 0;
 	}
-	
+
 	public void setRowWeight(int rowIndex, double weight) {
 		if (weight < 0) {
 			throw new IllegalArgumentException("weight must be nonnegative");
@@ -80,7 +77,7 @@ public class TableLayout implements LayoutManager2 {
 	public Dimension preferredLayoutSize(Container parent) {
 		if (prefs == null) {
 			int[] prefCol = new int[colCount];
-			int[] prefRow = new int[contents.size()]; 
+			int[] prefRow = new int[contents.size()];
 			int height = 0;
 			for (int i = 0; i < prefRow.length; i++) {
 				Component[] row = contents.get(i);
@@ -127,7 +124,7 @@ public class TableLayout implements LayoutManager2 {
 		int[] prefRow = this.prefRow;
 		int[] prefCol = this.prefCol;
 		Dimension size = parent.getSize();
-		
+
 		double y0;
 		int yRemaining = size.height - pref.height;
 		double rowWeightTotal = 0.0;
@@ -141,7 +138,7 @@ public class TableLayout implements LayoutManager2 {
 		} else {
 			y0 = 0;
 		}
-		
+
 		int x0 = (size.width - pref.width) / 2;
 		if (x0 < 0) x0 = 0;
 		double y = y0;
@@ -162,10 +159,10 @@ public class TableLayout implements LayoutManager2 {
 				y += yRemaining * rowWeight[i] / rowWeightTotal;
 			}
 		}
-		
-		
+
+
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void invalidateLayout(Container parent) {

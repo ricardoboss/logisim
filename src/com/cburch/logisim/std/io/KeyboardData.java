@@ -3,10 +3,10 @@
 
 package com.cburch.logisim.std.io;
 
-import java.awt.FontMetrics;
-
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstanceData;
+
+import java.awt.*;
 
 class KeyboardData implements InstanceData, Cloneable {
 	private Value lastClock;
@@ -17,13 +17,13 @@ class KeyboardData implements InstanceData, Cloneable {
 	private boolean dispValid;
 	private int dispStart;
 	private int dispEnd;
-	
+
 	public KeyboardData(int capacity) {
 		lastClock = Value.UNKNOWN;
 		buffer = new char[capacity];
 		clear();
 	}
-	
+
 	@Override
 	public Object clone() {
 		try {
@@ -34,31 +34,31 @@ class KeyboardData implements InstanceData, Cloneable {
 			return null;
 		}
 	}
-	
+
 	public Value setLastClock(Value newClock) {
 		Value ret = lastClock;
 		lastClock = newClock;
 		return ret;
 	}
-	
+
 	public boolean isDisplayValid() {
 		return dispValid;
 	}
-	
+
 	public int getDisplayStart() {
 		return dispStart;
 	}
-	
+
 	public int getDisplayEnd() {
 		return dispEnd;
 	}
-	
+
 	public int getCursorPosition() {
 		return cursorPos;
 	}
-	
+
 	public void updateBufferLength(int len) {
-		synchronized(this) {
+		synchronized (this) {
 			char[] buf = buffer;
 			int oldLen = buf.length;
 			if (oldLen != len) {
@@ -74,7 +74,7 @@ class KeyboardData implements InstanceData, Cloneable {
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		String s = str;
@@ -89,11 +89,11 @@ class KeyboardData implements InstanceData, Cloneable {
 		str = build.toString();
 		return str;
 	}
-	
+
 	public char getChar(int pos) {
 		return pos >= 0 && pos < bufferLength ? buffer[pos] : '\0';
 	}
-	
+
 	public int getNextSpecial(int pos) {
 		char[] buf = buffer;
 		int len = bufferLength;
@@ -103,7 +103,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		}
 		return -1;
 	}
-	
+
 	public void clear() {
 		bufferLength = 0;
 		cursorPos = 0;
@@ -112,7 +112,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispStart = 0;
 		dispEnd = 0;
 	}
-	
+
 	public char dequeue() {
 		char[] buf = buffer;
 		int len = bufferLength;
@@ -126,7 +126,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispValid = false;
 		return ret;
 	}
-	
+
 	public boolean insert(char value) {
 		char[] buf = buffer;
 		int len = bufferLength;
@@ -140,7 +140,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispValid = false;
 		return true;
 	}
-	
+
 	public boolean delete() {
 		char[] buf = buffer;
 		int len = bufferLength;
@@ -152,7 +152,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispValid = false;
 		return true;
 	}
-	
+
 	public boolean moveCursorBy(int delta) {
 		int len = bufferLength;
 		int pos = cursorPos;
@@ -162,7 +162,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispValid = false;
 		return true;
 	}
-	
+
 	public boolean setCursor(int value) {
 		int len = bufferLength;
 		if (value > len) value = len;
@@ -172,7 +172,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispValid = false;
 		return true;
 	}
-	
+
 	public void updateDisplay(FontMetrics fm) {
 		if (dispValid) return;
 		int pos = cursorPos;
@@ -181,7 +181,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		String str = toString();
 		int len = str.length();
 		int max = Keyboard.WIDTH - 8 - 4;
-		if (str.equals("") || fm.stringWidth(str) <= max) { 
+		if (str.equals("") || fm.stringWidth(str) <= max) {
 			i0 = 0;
 			i1 = len;
 		} else {
@@ -189,20 +189,32 @@ class KeyboardData implements InstanceData, Cloneable {
 			int w0 = fm.stringWidth(str.charAt(0) + "m");
 			int w1 = fm.stringWidth("m");
 			int w = i0 == 0 ? fm.stringWidth(str)
-					: w0 + fm.stringWidth(str.substring(i0));
+				: w0 + fm.stringWidth(str.substring(i0));
 			if (w <= max) i1 = len;
-			
+
 			// rearrange start/end so as to include cursor
 			if (pos <= i0) {
-				if (pos < i0) { i1 += pos - i0; i0 = pos; }
-				if (pos == i0 && i0 > 0) { i0--; i1--; }
+				if (pos < i0) {
+					i1 += pos - i0;
+					i0 = pos;
+				}
+				if (pos == i0 && i0 > 0) {
+					i0--;
+					i1--;
+				}
 			}
 			if (pos >= i1) {
-				if (pos > i1) { i0 += pos - i1; i1 = pos; }
-				if (pos == i1 && i1 < len) { i0++; i1++; }
+				if (pos > i1) {
+					i0 += pos - i1;
+					i1 = pos;
+				}
+				if (pos == i1 && i1 < len) {
+					i0++;
+					i1++;
+				}
 			}
 			if (i0 <= 2) i0 = 0;
-			
+
 			// resize segment to fit
 			if (fits(fm, str, w0, w1, i0, i1, max)) { // maybe should grow
 				while (fits(fm, str, w0, w1, i0, i1 + 1, max)) i1++;
@@ -215,7 +227,7 @@ class KeyboardData implements InstanceData, Cloneable {
 					i0++;
 					while (!fits(fm, str, w0, w1, i0, i1, max)) i0++;
 				}
-				
+
 			}
 			if (i0 == 1) i0 = 0;
 		}
@@ -223,9 +235,9 @@ class KeyboardData implements InstanceData, Cloneable {
 		dispEnd = i1;
 		dispValid = true;
 	}
-	
+
 	private boolean fits(FontMetrics fm, String str, int w0, int w1,
-			int i0, int i1, int max) {
+						 int i0, int i1, int max) {
 		if (i0 >= i1) return true;
 		int len = str.length();
 		if (i0 < 0 || i1 > len) return false;

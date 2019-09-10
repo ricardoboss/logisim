@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Carl Burch.
- * 
+ *
  * This file is part of the Logisim source code. The latest
  * version is available at http://www.cburch.com/logisim/.
  *

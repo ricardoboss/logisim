@@ -3,39 +3,15 @@
 
 package com.cburch.logisim.gui.menu;
 
+import com.cburch.logisim.proj.Project;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
-import com.cburch.logisim.proj.Project;
-
 class MenuProject extends Menu {
-	private class MyListener
-			implements ActionListener {
-		public void actionPerformed(ActionEvent event) {
-			Object src = event.getSource();
-			Project proj = menubar.getProject();
-			if (src == loadBuiltin) {
-				ProjectLibraryActions.doLoadBuiltinLibrary(proj);
-			} else if (src == loadLogisim) {
-				ProjectLibraryActions.doLoadLogisimLibrary(proj);
-			} else if (src == loadJar) {
-				ProjectLibraryActions.doLoadJarLibrary(proj);
-			} else if (src == unload) {
-				ProjectLibraryActions.doUnloadLibraries(proj);
-			} else if (src == options) {
-				JFrame frame = proj.getOptionsFrame(true);
-				frame.setVisible(true);
-			}
-		}
-	}
-	
 	private LogisimMenuBar menubar;
 	private MyListener myListener = new MyListener();
-	
 	private MenuItemImpl addCircuit = new MenuItemImpl(this, LogisimMenuBar.ADD_CIRCUIT);
 	private JMenu loadLibrary = new JMenu();
 	private JMenuItem loadBuiltin = new JMenuItem();
@@ -54,7 +30,6 @@ class MenuProject extends Menu {
 	private MenuItemImpl analyze = new MenuItemImpl(this, LogisimMenuBar.ANALYZE_CIRCUIT);
 	private MenuItemImpl stats = new MenuItemImpl(this, LogisimMenuBar.CIRCUIT_STATS);
 	private JMenuItem options = new JMenuItem();
-
 	MenuProject(LogisimMenuBar menubar) {
 		this.menubar = menubar;
 
@@ -75,11 +50,11 @@ class MenuProject extends Menu {
 		menubar.registerItem(LogisimMenuBar.ANALYZE_CIRCUIT, analyze);
 		menubar.registerItem(LogisimMenuBar.CIRCUIT_STATS, stats);
 		options.addActionListener(myListener);
-		
+
 		loadLibrary.add(loadBuiltin);
 		loadLibrary.add(loadLogisim);
 		loadLibrary.add(loadJar);
-		
+
 		add(addCircuit);
 		add(loadLibrary);
 		add(unload);
@@ -109,7 +84,7 @@ class MenuProject extends Menu {
 		options.setEnabled(known);
 		computeEnabled();
 	}
-	
+
 	public void localeChanged() {
 		setText(Strings.get("projectMenu"));
 		addCircuit.setText(Strings.get("projectAddCircuitItem"));
@@ -131,22 +106,42 @@ class MenuProject extends Menu {
 		stats.setText(Strings.get("projectGetCircuitStatisticsItem"));
 		options.setText(Strings.get("projectOptionsItem"));
 	}
-	
+
 	@Override
 	void computeEnabled() {
 		setEnabled(menubar.getProject() != null
-				|| addCircuit.hasListeners()
-				|| moveUp.hasListeners()
-				|| moveDown.hasListeners()
-				|| setAsMain.hasListeners()
-				|| remove.hasListeners()
-				|| layout.hasListeners()
-				|| revertAppearance.hasListeners()
-				|| appearance.hasListeners()
-				|| viewToolbox.hasListeners()
-				|| viewSimulation.hasListeners()
-				|| analyze.hasListeners()
-				|| stats.hasListeners());
+			|| addCircuit.hasListeners()
+			|| moveUp.hasListeners()
+			|| moveDown.hasListeners()
+			|| setAsMain.hasListeners()
+			|| remove.hasListeners()
+			|| layout.hasListeners()
+			|| revertAppearance.hasListeners()
+			|| appearance.hasListeners()
+			|| viewToolbox.hasListeners()
+			|| viewSimulation.hasListeners()
+			|| analyze.hasListeners()
+			|| stats.hasListeners());
 		menubar.fireEnableChanged();
+	}
+
+	private class MyListener
+		implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			Object src = event.getSource();
+			Project proj = menubar.getProject();
+			if (src == loadBuiltin) {
+				ProjectLibraryActions.doLoadBuiltinLibrary(proj);
+			} else if (src == loadLogisim) {
+				ProjectLibraryActions.doLoadLogisimLibrary(proj);
+			} else if (src == loadJar) {
+				ProjectLibraryActions.doLoadJarLibrary(proj);
+			} else if (src == unload) {
+				ProjectLibraryActions.doUnloadLibraries(proj);
+			} else if (src == options) {
+				JFrame frame = proj.getOptionsFrame(true);
+				frame.setVisible(true);
+			}
+		}
 	}
 }

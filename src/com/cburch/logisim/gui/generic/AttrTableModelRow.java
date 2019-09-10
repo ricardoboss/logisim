@@ -3,13 +3,16 @@
 
 package com.cburch.logisim.gui.generic;
 
-import java.awt.Component;
-import java.awt.Window;
+import java.awt.*;
 
 public interface AttrTableModelRow {
 	public String getLabel();
+
 	public String getValue();
-	public boolean isValueEditable();
-	public Component getEditor(Window parent);
+
 	public void setValue(Object value) throws AttrTableSetException;
+
+	public boolean isValueEditable();
+
+	public Component getEditor(Window parent);
 }

@@ -3,28 +3,12 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPopupMenu;
-
 import com.cburch.draw.actions.ModelAddAction;
 import com.cburch.draw.actions.ModelReorderAction;
 import com.cburch.draw.canvas.ActionDispatcher;
 import com.cburch.draw.canvas.Canvas;
 import com.cburch.draw.canvas.CanvasTool;
-import com.cburch.draw.model.CanvasModel;
-import com.cburch.draw.model.CanvasModelEvent;
-import com.cburch.draw.model.CanvasModelListener;
-import com.cburch.draw.model.CanvasObject;
-import com.cburch.draw.model.ReorderRequest;
+import com.cburch.draw.model.*;
 import com.cburch.draw.undo.Action;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitState;
@@ -35,30 +19,20 @@ import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
 import com.cburch.logisim.proj.Project;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+
 public class AppearanceCanvas extends Canvas
-		implements CanvasPaneContents, ActionDispatcher {
+	implements CanvasPaneContents, ActionDispatcher {
 	private static final int BOUNDS_BUFFER = 70;
-		// pixels shown in canvas beyond outermost boundaries
+	// pixels shown in canvas beyond outermost boundaries
 	private static final int THRESH_SIZE_UPDATE = 10;
-		// don't bother to update the size if it hasn't changed more than this
-	
-	private class Listener
-			implements CanvasModelListener, PropertyChangeListener {
-		public void modelChanged(CanvasModelEvent event) {
-			computeSize(false);
-		}
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			String prop = evt.getPropertyName();
-			if (prop.equals(GridPainter.ZOOM_PROPERTY)) {
-				CanvasTool t = getTool();
-				if (t != null) {
-					t.zoomFactorChanged(AppearanceCanvas.this);
-				}
-			}
-		}
-	}
-
+	// don't bother to update the size if it hasn't changed more than this
 	private CanvasTool selectTool;
 	private Project proj;
 	private CircuitState circuitState;
@@ -67,7 +41,6 @@ public class AppearanceCanvas extends Canvas
 	private CanvasPane canvasPane;
 	private Bounds oldPreferredSize;
 	private LayoutPopupManager popupManager;
-	
 	public AppearanceCanvas(CanvasTool selectTool) {
 		this.selectTool = selectTool;
 		this.grid = new GridPainter(this);
@@ -80,13 +53,23 @@ public class AppearanceCanvas extends Canvas
 		if (model != null) model.addCanvasModelListener(listener);
 		grid.addPropertyChangeListener(GridPainter.ZOOM_PROPERTY, listener);
 	}
-	
+
+	static int getMaxIndex(CanvasModel model) {
+		List<CanvasObject> objects = model.getObjectsFromBottom();
+		for (int i = objects.size() - 1; i >= 0; i--) {
+			if (!(objects.get(i) instanceof AppearanceElement)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	@Override
 	public void setTool(CanvasTool value) {
 		hidePopup();
 		super.setTool(value);
 	}
-	
+
 	@Override
 	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
 		if (tool == getTool() && tool != selectTool) {
@@ -97,7 +80,7 @@ public class AppearanceCanvas extends Canvas
 			}
 		}
 	}
-	
+
 	@Override
 	public void setModel(CanvasModel value, ActionDispatcher dispatcher) {
 		CanvasModel oldModel = super.getModel();
@@ -109,37 +92,37 @@ public class AppearanceCanvas extends Canvas
 			value.addCanvasModelListener(listener);
 		}
 	}
-	
+
 	public void setCircuit(Project proj, CircuitState circuitState) {
 		this.proj = proj;
 		this.circuitState = circuitState;
 		Circuit circuit = circuitState.getCircuit();
 		setModel(circuit.getAppearance(), this);
 	}
-	
+
 	Project getProject() {
 		return proj;
 	}
-	
+
 	Circuit getCircuit() {
 		return circuitState.getCircuit();
 	}
-	
+
 	CircuitState getCircuitState() {
 		return circuitState;
 	}
-	
+
 	GridPainter getGridPainter() {
 		return grid;
 	}
-	
+
 	@Override
 	public void doAction(Action canvasAction) {
 		Circuit circuit = circuitState.getCircuit();
 		if (!proj.getLogisimFile().contains(circuit)) {
 			return;
 		}
-		
+
 		if (canvasAction instanceof ModelReorderAction) {
 			int max = getMaxIndex(getModel());
 			ModelReorderAction reorder = (ModelReorderAction) canvasAction;
@@ -174,25 +157,25 @@ public class AppearanceCanvas extends Canvas
 				canvasAction = new ModelReorderAction(getModel(), mod);
 			}
 		}
-		
+
 		if (canvasAction instanceof ModelAddAction) {
 			ModelAddAction addAction = (ModelAddAction) canvasAction;
 			int cur = addAction.getDestinationIndex();
 			int max = getMaxIndex(getModel());
 			if (cur > max) {
 				canvasAction = new ModelAddAction(getModel(),
-						addAction.getObjects(), max + 1);
+					addAction.getObjects(), max + 1);
 			}
 		}
-			
+
 		proj.doAction(new CanvasActionAdapter(circuit, canvasAction));
 	}
-	
+
 	@Override
 	public double getZoomFactor() {
 		return grid.getZoomFactor();
 	}
-	
+
 	@Override
 	public int snapX(int x) {
 		if (x < 0) {
@@ -201,7 +184,7 @@ public class AppearanceCanvas extends Canvas
 			return (x + 5) / 10 * 10;
 		}
 	}
-	
+
 	@Override
 	public int snapY(int y) {
 		if (y < 0) {
@@ -210,13 +193,13 @@ public class AppearanceCanvas extends Canvas
 			return (y + 5) / 10 * 10;
 		}
 	}
-	
+
 	@Override
 	protected void paintBackground(Graphics g) {
 		super.paintBackground(g);
 		grid.paintGrid(g);
 	}
-	
+
 	@Override
 	protected void paintForeground(Graphics g) {
 		double zoom = grid.getZoomFactor();
@@ -227,7 +210,7 @@ public class AppearanceCanvas extends Canvas
 		super.paintForeground(gScaled);
 		gScaled.dispose();
 	}
-	
+
 	@Override
 	public void repaintCanvasCoords(int x, int y, int width, int height) {
 		double zoom = grid.getZoomFactor();
@@ -264,14 +247,14 @@ public class AppearanceCanvas extends Canvas
 		repairEvent(e, grid.getZoomFactor());
 		super.processMouseMotionEvent(e);
 	}
-	
+
 	private void hidePopup() {
 		LayoutPopupManager man = popupManager;
 		if (man != null) {
 			man.hideCurrentPopup();
 		}
 	}
-	
+
 	private void repairEvent(MouseEvent e, double zoom) {
 		if (zoom != 1.0) {
 			int oldx = e.getX();
@@ -302,8 +285,8 @@ public class AppearanceCanvas extends Canvas
 		if (!immediate) {
 			Bounds old = oldPreferredSize;
 			if (old != null
-					&& Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
-					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
+				&& Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
+				&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
 				return;
 			}
 		}
@@ -331,7 +314,7 @@ public class AppearanceCanvas extends Canvas
 	}
 
 	public int getScrollableBlockIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
+										   int orientation, int direction) {
 		return canvasPane.supportScrollableBlockIncrement(visibleRect, orientation, direction);
 	}
 
@@ -344,17 +327,24 @@ public class AppearanceCanvas extends Canvas
 	}
 
 	public int getScrollableUnitIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
+										  int orientation, int direction) {
 		return canvasPane.supportScrollableUnitIncrement(visibleRect, orientation, direction);
 	}
-	
-	static int getMaxIndex(CanvasModel model) {
-		List<CanvasObject> objects = model.getObjectsFromBottom();
-		for (int i = objects.size() - 1; i >= 0; i--) {
-			if (!(objects.get(i) instanceof AppearanceElement)) {
-				return i;
+
+	private class Listener
+		implements CanvasModelListener, PropertyChangeListener {
+		public void modelChanged(CanvasModelEvent event) {
+			computeSize(false);
+		}
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			String prop = evt.getPropertyName();
+			if (prop.equals(GridPainter.ZOOM_PROPERTY)) {
+				CanvasTool t = getTool();
+				if (t != null) {
+					t.zoomFactorChanged(AppearanceCanvas.this);
+				}
 			}
 		}
-		return -1;
 	}
 }

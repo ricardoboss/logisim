@@ -3,51 +3,38 @@
 
 package com.cburch.logisim.std.memory;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringUtil;
 
+import java.awt.*;
+
 public class Counter extends InstanceFactory {
 	static final AttributeOption ON_GOAL_WRAP = new AttributeOption("wrap",
-			"wrap", Strings.getter("counterGoalWrap"));
+		"wrap", Strings.getter("counterGoalWrap"));
 	static final AttributeOption ON_GOAL_STAY = new AttributeOption("stay",
-			"stay", Strings.getter("counterGoalStay"));
+		"stay", Strings.getter("counterGoalStay"));
 	static final AttributeOption ON_GOAL_CONT = new AttributeOption("continue",
-			"continue", Strings.getter("counterGoalContinue"));
+		"continue", Strings.getter("counterGoalContinue"));
 	static final AttributeOption ON_GOAL_LOAD = new AttributeOption("load",
-			"load", Strings.getter("counterGoalLoad"));
+		"load", Strings.getter("counterGoalLoad"));
 
 	static final Attribute<Integer> ATTR_MAX = Attributes.forHexInteger("max",
-			Strings.getter("counterMaxAttr"));
+		Strings.getter("counterMaxAttr"));
 	static final Attribute<AttributeOption> ATTR_ON_GOAL = Attributes.forOption("ongoal",
-			Strings.getter("counterGoalAttr"),
-			new AttributeOption[] { ON_GOAL_WRAP, ON_GOAL_STAY, ON_GOAL_CONT,
-				ON_GOAL_LOAD });
+		Strings.getter("counterGoalAttr"),
+		new AttributeOption[]{ON_GOAL_WRAP, ON_GOAL_STAY, ON_GOAL_CONT,
+			ON_GOAL_LOAD});
 
 	private static final int DELAY = 8;
 	private static final int OUT = 0;
-	private static final int IN  = 1;
-	private static final int CK  = 2;
+	private static final int IN = 1;
+	private static final int CK = 2;
 	private static final int CLR = 3;
-	private static final int LD  = 4;
-	private static final int CT  = 5;
+	private static final int LD = 4;
+	private static final int CT = 5;
 	private static final int CARRY = 6;
 
 	public Counter() {
@@ -57,15 +44,15 @@ public class Counter extends InstanceFactory {
 		setInstancePoker(RegisterPoker.class);
 		setInstanceLogger(RegisterLogger.class);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-		
+
 		Port[] ps = new Port[7];
-		ps[OUT] = new Port(  0,   0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[IN]  = new Port(-30,   0, Port.INPUT, StdAttr.WIDTH);
-		ps[CK]  = new Port(-20,  20, Port.INPUT, 1);
-		ps[CLR] = new Port(-10,  20, Port.INPUT, 1);
-		ps[LD]  = new Port(-30, -10, Port.INPUT, 1);
-		ps[CT]  = new Port(-30,  10, Port.INPUT, 1);
-		ps[CARRY] = new Port(0,  10, Port.OUTPUT, 1);
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
+		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
+		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
+		ps[LD] = new Port(-30, -10, Port.INPUT, 1);
+		ps[CT] = new Port(-30, 10, Port.INPUT, 1);
+		ps[CARRY] = new Port(0, 10, Port.OUTPUT, 1);
 		ps[OUT].setToolTip(Strings.getter("counterQTip"));
 		ps[IN].setToolTip(Strings.getter("counterDataTip"));
 		ps[CK].setToolTip(Strings.getter("counterClockTip"));
@@ -75,18 +62,18 @@ public class Counter extends InstanceFactory {
 		ps[CARRY].setToolTip(Strings.getter("counterCarryTip"));
 		setPorts(ps);
 	}
-	
+
 	@Override
 	public AttributeSet createAttributeSet() {
 		return new CounterAttributes();
 	}
-	
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		Bounds bds = instance.getBounds();
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT,
-				bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+			bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
+			GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
 	@Override
@@ -138,7 +125,7 @@ public class Counter extends InstanceFactory {
 				}
 			} else if (ld) { // trigger, enable = 0, load = 1: should load
 				Value in = state.getPort(IN);
-				newVal = in.isFullyDefined() ? in.toIntValue() : 0; 
+				newVal = in.isFullyDefined() ? in.toIntValue() : 0;
 				if (newVal > max) newVal &= max;
 			} else { // trigger, enable = 0, load = 0: no change
 				newVal = oldVal;
@@ -158,7 +145,7 @@ public class Counter extends InstanceFactory {
 			}
 			*/
 		}
-		
+
 		data.value = newValue.toIntValue();
 		state.setPort(OUT, newValue, DELAY);
 		state.setPort(CARRY, carry ? Value.TRUE : Value.FALSE, DELAY);
@@ -196,7 +183,7 @@ public class Counter extends InstanceFactory {
 
 		// draw input and output ports
 		if (b == null) {
-			painter.drawPort(IN,  "D", Direction.EAST);
+			painter.drawPort(IN, "D", Direction.EAST);
 			painter.drawPort(OUT, "Q", Direction.WEST);
 		} else {
 			painter.drawPort(IN);
@@ -213,12 +200,12 @@ public class Counter extends InstanceFactory {
 		// draw contents
 		if (b == null) {
 			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 4,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		} else {
 			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
 	}
 }

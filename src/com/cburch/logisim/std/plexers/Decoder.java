@@ -3,41 +3,29 @@
 
 package com.cburch.logisim.std.plexers;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
 import com.cburch.logisim.LogisimVersion;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
+
+import java.awt.*;
 
 public class Decoder extends InstanceFactory {
 	public Decoder() {
 		super("Decoder", Strings.getter("decoderComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, Plexers.ATTR_SELECT_LOC, Plexers.ATTR_SELECT,
-				Plexers.ATTR_TRISTATE, Plexers.ATTR_DISABLED, Plexers.ATTR_ENABLE
-			}, new Object[] {
-				Direction.EAST, Plexers.SELECT_BOTTOM_LEFT, Plexers.DEFAULT_SELECT,
-				Plexers.DEFAULT_TRISTATE, Plexers.DISABLED_FLOATING, Boolean.TRUE
-			});
+		setAttributes(new Attribute[]{
+			StdAttr.FACING, Plexers.ATTR_SELECT_LOC, Plexers.ATTR_SELECT,
+			Plexers.ATTR_TRISTATE, Plexers.ATTR_DISABLED, Plexers.ATTR_ENABLE
+		}, new Object[]{
+			Direction.EAST, Plexers.SELECT_BOTTOM_LEFT, Plexers.DEFAULT_SELECT,
+			Plexers.DEFAULT_TRISTATE, Plexers.DISABLED_FLOATING, Boolean.TRUE
+		});
 		setKeyConfigurator(new BitWidthConfigurator(Plexers.ATTR_SELECT, 1, 5, 0));
 		setIconName("decoder.gif");
 		setFacingAttribute(StdAttr.FACING);
 	}
-	
+
 	@Override
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		if (attr == Plexers.ATTR_ENABLE) {
@@ -67,7 +55,7 @@ public class Decoder extends InstanceFactory {
 		}
 		return bds.rotate(Direction.EAST, facing, 0, 0);
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING).reverse();
@@ -79,11 +67,11 @@ public class Decoder extends InstanceFactory {
 		instance.addAttributeListener();
 		updatePorts(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING || attr == Plexers.ATTR_SELECT_LOC
-				|| attr == Plexers.ATTR_SELECT) {
+			|| attr == Plexers.ATTR_SELECT) {
 			instance.recomputeBounds();
 			updatePorts(instance);
 		} else if (attr == Plexers.ATTR_SELECT || attr == Plexers.ATTR_ENABLE) {
@@ -169,7 +157,7 @@ public class Decoder extends InstanceFactory {
 		Boolean threeState = state.getAttributeValue(Plexers.ATTR_TRISTATE);
 		boolean enable = state.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
 		int outputs = 1 << select.getWidth();
-		
+
 		// determine default output values
 		Value others; // the default output
 		if (threeState.booleanValue()) {
@@ -211,7 +199,7 @@ public class Decoder extends InstanceFactory {
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
 		BitWidth select = painter.getAttributeValue(Plexers.ATTR_SELECT);
 		Plexers.drawTrapezoid(painter.getGraphics(), painter.getBounds(),
-				facing.reverse(), select.getWidth() == 1 ? 10 : 20);
+			facing.reverse(), select.getWidth() == 1 ? 10 : 20);
 	}
 
 	@Override
@@ -246,10 +234,10 @@ public class Decoder extends InstanceFactory {
 			g.drawLine(en.getX(), en.getY(), en.getX() + len * dx, en.getY() + len * dy);
 		}
 		GraphicsUtil.switchToWidth(g, 1);
-		
+
 		// draw a circle indicating where the select input is located
 		Multiplexer.drawSelectCircle(g, bds, painter.getInstance().getPortLocation(outputs));
-		
+
 		// draw "0"
 		int x0;
 		int y0;
@@ -273,14 +261,14 @@ public class Decoder extends InstanceFactory {
 		}
 		g.setColor(Color.GRAY);
 		GraphicsUtil.drawText(g, "0", bds.getX() + x0, bds.getY() + y0,
-				halign, GraphicsUtil.V_BASELINE);
-		
+			halign, GraphicsUtil.V_BASELINE);
+
 		// draw trapezoid, "Decd", and ports
 		g.setColor(Color.BLACK);
 		Plexers.drawTrapezoid(g, bds, facing.reverse(), outputs == 2 ? 10 : 20);
 		GraphicsUtil.drawCenteredText(g, "Decd",
-				bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 2);
+			bds.getX() + bds.getWidth() / 2,
+			bds.getY() + bds.getHeight() / 2);
 		painter.drawPorts();
 	}
 }

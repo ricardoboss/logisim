@@ -3,18 +3,10 @@
 
 package com.cburch.logisim.gui.start;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JWindow;
-import javax.swing.SwingUtilities;
 
 public class SplashScreen extends JWindow implements ActionListener {
 	public static final int LIBRARIES = 0;
@@ -27,43 +19,32 @@ public class SplashScreen extends JWindow implements ActionListener {
 	public static final int FILE_LOAD = 7;
 	public static final int PROJECT_CREATE = 8;
 	public static final int FRAME_CREATE = 9;
-	
+
 	private static final int PROGRESS_MAX = 3568;
 	private static final boolean PRINT_TIMES = false;
-	
-	private static class Marker {
-		int count;
-		String message;
-		Marker(int count, String message) {
-			this.count = count;
-			this.message = message;
-		}
-	}
-
-	Marker[] markers = new Marker[] {
-			new Marker(377, Strings.get("progressLibraries")),
-			new Marker(990, Strings.get("progressTemplateCreate")),
-			new Marker(1002, Strings.get("progressTemplateOpen")),
-			new Marker(1002, Strings.get("progressTemplateLoad")),
-			new Marker(1470, Strings.get("progressTemplateClose")),
-			new Marker(1478, Strings.get("progressGuiInitialize")),
-			new Marker(2114, Strings.get("progressFileCreate")),
-			new Marker(2114, Strings.get("progressFileLoad")),
-			new Marker(2383, Strings.get("progressProjectCreate")),
-			new Marker(2519, Strings.get("progressFrameCreate")),
+	Marker[] markers = new Marker[]{
+		new Marker(377, Strings.get("progressLibraries")),
+		new Marker(990, Strings.get("progressTemplateCreate")),
+		new Marker(1002, Strings.get("progressTemplateOpen")),
+		new Marker(1002, Strings.get("progressTemplateLoad")),
+		new Marker(1470, Strings.get("progressTemplateClose")),
+		new Marker(1478, Strings.get("progressGuiInitialize")),
+		new Marker(2114, Strings.get("progressFileCreate")),
+		new Marker(2114, Strings.get("progressFileLoad")),
+		new Marker(2383, Strings.get("progressProjectCreate")),
+		new Marker(2519, Strings.get("progressFrameCreate")),
 	};
 	boolean inClose = false; // for avoiding mutual recursion
 	JProgressBar progress = new JProgressBar(0, PROGRESS_MAX);
 	JButton close = new JButton(Strings.get("startupCloseButton"));
 	JButton cancel = new JButton(Strings.get("startupQuitButton"));
 	long startTime = System.currentTimeMillis();
-
 	public SplashScreen() {
 		JPanel imagePanel = About.getImagePanel();
 		imagePanel.setBorder(null);
 
 		progress.setStringPainted(true);
-		
+
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(close);
 		close.addActionListener(this);
@@ -75,7 +56,7 @@ public class SplashScreen extends JWindow implements ActionListener {
 		contents.add(progress, BorderLayout.CENTER);
 		contents.add(buttonPanel, BorderLayout.SOUTH);
 		contents.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-		
+
 		Color bg = imagePanel.getBackground();
 		contents.setBackground(bg);
 		buttonPanel.setBackground(bg);
@@ -94,7 +75,7 @@ public class SplashScreen extends JWindow implements ActionListener {
 			});
 			if (PRINT_TIMES) {
 				System.err.println((System.currentTimeMillis() - startTime) //OK
-						+ " " + marker.message);
+					+ " " + marker.message);
 			}
 		} else {
 			if (PRINT_TIMES) {
@@ -102,7 +83,7 @@ public class SplashScreen extends JWindow implements ActionListener {
 			}
 		}
 	}
-	
+
 	@Override
 	public void setVisible(boolean value) {
 		if (value) {
@@ -122,17 +103,27 @@ public class SplashScreen extends JWindow implements ActionListener {
 		inClose = false;
 		if (PRINT_TIMES) {
 			System.err.println((System.currentTimeMillis() - startTime) //OK
-					+ " closed");
+				+ " closed");
 		}
 		markers = null;
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if (src == cancel) {
 			System.exit(0);
 		} else if (src == close) {
 			close();
+		}
+	}
+
+	private static class Marker {
+		int count;
+		String message;
+
+		Marker(int count, String message) {
+			this.count = count;
+			this.message = message;
 		}
 	}
 }

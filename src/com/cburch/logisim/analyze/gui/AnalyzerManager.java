@@ -3,18 +3,26 @@
 
 package com.cburch.logisim.analyze.gui;
 
-import javax.swing.JFrame;
-
 import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
+import javax.swing.*;
+
 public class AnalyzerManager extends WindowMenuItemManager
-		implements LocaleListener {
+	implements LocaleListener {
+	private static Analyzer analysisWindow = null;
+	private static AnalyzerManager analysisManager = null;
+
+	private AnalyzerManager() {
+		super(Strings.get("analyzerWindowTitle"), true);
+		LocaleManager.addLocaleListener(this);
+	}
+
 	public static void initialize() {
 		analysisManager = new AnalyzerManager();
 	}
-	
+
 	public static Analyzer getAnalyzer() {
 		if (analysisWindow == null) {
 			analysisWindow = new Analyzer();
@@ -23,15 +31,7 @@ public class AnalyzerManager extends WindowMenuItemManager
 		}
 		return analysisWindow;
 	}
-	
-	private static Analyzer analysisWindow = null;
-	private static AnalyzerManager analysisManager = null;
 
-	private AnalyzerManager() {
-		super(Strings.get("analyzerWindowTitle"), true);
-		LocaleManager.addLocaleListener(this);
-	}
-	
 	@Override
 	public JFrame getJFrame(boolean create) {
 		if (create) {

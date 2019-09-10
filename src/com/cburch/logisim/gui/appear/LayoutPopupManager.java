@@ -3,20 +3,6 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.JViewport;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
-
 import com.cburch.draw.canvas.SelectionEvent;
 import com.cburch.draw.canvas.SelectionListener;
 import com.cburch.draw.model.CanvasObject;
@@ -26,24 +12,34 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.instance.Instance;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotionListener {
 	private CanvasPane canvasPane;
 	private AppearanceCanvas canvas;
 	private Popup curPopup;
 	private long curPopupTime;
 	private Location dragStart;
-	
+
 	public LayoutPopupManager(CanvasPane canvasPane, AppearanceCanvas canvas) {
 		this.canvasPane = canvasPane;
 		this.canvas = canvas;
 		this.curPopup = null;
 		this.dragStart = null;
-		
+
 		canvas.getSelection().addSelectionListener(this);
 		canvas.addMouseListener(this);
 		canvas.addMouseMotionListener(this);
 	}
-	
+
 	public void hideCurrentPopup() {
 		Popup cur = curPopup;
 		if (cur != null) {
@@ -64,7 +60,7 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 			}
 		}
 	}
-	
+
 	private Set<AppearancePort> shouldShowPopup(Collection<CanvasObject> add) {
 		boolean found = false;
 		for (CanvasObject o : add) {
@@ -81,7 +77,7 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		}
 		return null;
 	}
-	
+
 	// returns all the ports in the current selection
 	private Set<AppearancePort> getSelectedPorts() {
 		HashSet<AppearancePort> ports = new HashSet<AppearancePort>();
@@ -92,7 +88,7 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		}
 		return ports;
 	}
-	
+
 	// returns true if the canvas contains any port not in the given set
 	private boolean isPortUnselected(Set<AppearancePort> selected) {
 		for (CanvasObject o : canvas.getModel().getObjectsFromBottom()) {
@@ -113,7 +109,7 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		for (AppearancePort portObject : portObjects) {
 			ports.add(portObject.getPin());
 		}
-		
+
 		hideCurrentPopup();
 		LayoutThumbnail layout = new LayoutThumbnail();
 		layout.setCircuit(circuitState, ports);
@@ -130,7 +126,8 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		curPopupTime = System.currentTimeMillis();
 	}
 
-	public void mouseClicked(MouseEvent e) { }
+	public void mouseClicked(MouseEvent e) {
+	}
 
 	public void mouseEntered(MouseEvent e) {
 		hideCurrentPopup();
@@ -147,7 +144,8 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		dragStart = Location.create(e.getX(), e.getY());
 	}
 
-	public void mouseReleased(MouseEvent e) { }
+	public void mouseReleased(MouseEvent e) {
+	}
 
 	public void mouseDragged(MouseEvent e) {
 		Location start = dragStart;
@@ -156,7 +154,8 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		}
 	}
 
-	public void mouseMoved(MouseEvent arg0) { }
-	
+	public void mouseMoved(MouseEvent arg0) {
+	}
+
 
 }

@@ -3,27 +3,27 @@
 
 package com.cburch.logisim.circuit.appear;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
-import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.model.AbstractCanvasObject;
+import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public abstract class AppearanceElement extends AbstractCanvasObject {
 	private Location location;
-	
+
 	public AppearanceElement(Location location) {
 		this.location = location;
 	}
-	
+
 	public Location getLocation() {
 		return location;
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof AppearanceElement) {
@@ -48,7 +48,7 @@ public abstract class AppearanceElement extends AbstractCanvasObject {
 	public <V> V getValue(Attribute<V> attr) {
 		return null;
 	}
-	
+
 	@Override
 	public boolean canRemove() {
 		return false;
@@ -69,7 +69,7 @@ public abstract class AppearanceElement extends AbstractCanvasObject {
 		int dy = loc.getY() - location.getY();
 		return dx * dx + dy * dy < radius * radius;
 	}
-	
+
 	@Override
 	public Location getRandomPoint(Bounds bds, Random rand) {
 		return null; // this is only used to determine what lies on top of what - but the elements will always be on top anyway
@@ -77,6 +77,6 @@ public abstract class AppearanceElement extends AbstractCanvasObject {
 
 	protected Bounds getBounds(int radius) {
 		return Bounds.create(location.getX() - radius, location.getY() - radius,
-				2 * radius, 2 * radius);
+			2 * radius, 2 * radius);
 	}
 }

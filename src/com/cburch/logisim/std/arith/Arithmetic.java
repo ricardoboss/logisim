@@ -3,43 +3,48 @@
 
 package com.cburch.logisim.std.arith;
 
-import java.util.List;
-
 import com.cburch.logisim.tools.FactoryDescription;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
+import java.util.List;
+
 public class Arithmetic extends Library {
 	private static FactoryDescription[] DESCRIPTIONS = {
 		new FactoryDescription("Adder", Strings.getter("adderComponent"),
-				"adder.gif", "Adder"),
+			"adder.gif", "Adder"),
 		new FactoryDescription("Subtractor", Strings.getter("subtractorComponent"),
-				"subtractor.gif", "Subtractor"),
+			"subtractor.gif", "Subtractor"),
 		new FactoryDescription("Multiplier", Strings.getter("multiplierComponent"),
-				"multiplier.gif", "Multiplier"),
+			"multiplier.gif", "Multiplier"),
 		new FactoryDescription("Divider", Strings.getter("dividerComponent"),
-				"divider.gif", "Divider"),
+			"divider.gif", "Divider"),
 		new FactoryDescription("Negator", Strings.getter("negatorComponent"),
-				"negator.gif", "Negator"),
+			"negator.gif", "Negator"),
 		new FactoryDescription("Comparator", Strings.getter("comparatorComponent"),
-				"comparator.gif", "Comparator"),
+			"comparator.gif", "Comparator"),
 		new FactoryDescription("Shifter", Strings.getter("shifterComponent"),
-				"shifter.gif", "Shifter"),
+			"shifter.gif", "Shifter"),
 		new FactoryDescription("BitAdder", Strings.getter("bitAdderComponent"),
-				"bitadder.gif", "BitAdder"),
+			"bitadder.gif", "BitAdder"),
 		new FactoryDescription("BitFinder", Strings.getter("bitFinderComponent"),
-				"bitfindr.gif", "BitFinder"),
+			"bitfindr.gif", "BitFinder"),
 	};
-	
+
 	private List<Tool> tools = null;
 
-	public Arithmetic() { }
+	public Arithmetic() {
+	}
 
 	@Override
-	public String getName() { return "Arithmetic"; }
+	public String getName() {
+		return "Arithmetic";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("arithmeticLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("arithmeticLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

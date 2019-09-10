@@ -3,41 +3,29 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-
-import javax.swing.tree.TreeNode;
-
-import com.cburch.logisim.circuit.CircuitAttributes;
-import com.cburch.logisim.circuit.CircuitEvent;
-import com.cburch.logisim.circuit.CircuitListener;
-import com.cburch.logisim.circuit.CircuitState;
-import com.cburch.logisim.circuit.SubcircuitFactory;
+import com.cburch.logisim.circuit.*;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.AttributeEvent;
 import com.cburch.logisim.data.AttributeListener;
 import com.cburch.logisim.instance.StdAttr;
 
-class SimulationTreeCircuitNode extends SimulationTreeNode
-		implements CircuitListener, AttributeListener, Comparator<Component> {
-	private static class CompareByName implements Comparator<Object> {
-		public int compare(Object a, Object b) {
-			return a.toString().compareToIgnoreCase(b.toString());
-		}
-	}
+import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
 
+class SimulationTreeCircuitNode extends SimulationTreeNode
+	implements CircuitListener, AttributeListener, Comparator<Component> {
 	private SimulationTreeModel model;
 	private SimulationTreeCircuitNode parent;
 	private CircuitState circuitState;
 	private Component subcircComp;
 	private ArrayList<TreeNode> children;
-		
 	public SimulationTreeCircuitNode(SimulationTreeModel model,
-			SimulationTreeCircuitNode parent, CircuitState circuitState,
-			Component subcircComp) {
+									 SimulationTreeCircuitNode parent, CircuitState circuitState,
+									 Component subcircComp) {
 		this.model = model;
 		this.parent = parent;
 		this.circuitState = circuitState;
@@ -51,21 +39,21 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 		}
 		computeChildren();
 	}
-	
+
 	public CircuitState getCircuitState() {
 		return circuitState;
 	}
-	
+
 	@Override
 	public ComponentFactory getComponentFactory() {
 		return circuitState.getCircuit().getSubcircuitFactory();
 	}
-	
+
 	@Override
 	public boolean isCurrentView(SimulationTreeModel model) {
 		return model.getCurrentView() == circuitState;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (subcircComp != null) {
@@ -126,7 +114,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			}
 		}
 	}
-	
+
 	// returns true if changed
 	private boolean computeChildren() {
 		ArrayList<TreeNode> newChildren = new ArrayList<TreeNode>();
@@ -150,7 +138,10 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			for (TreeNode o : children) {
 				if (o instanceof SimulationTreeCircuitNode) {
 					SimulationTreeCircuitNode n = (SimulationTreeCircuitNode) o;
-					if (n.circuitState == state) { toAdd = n; break; }
+					if (n.circuitState == state) {
+						toAdd = n;
+						break;
+					}
 				}
 			}
 			if (toAdd == null) {
@@ -158,7 +149,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			}
 			newChildren.add(toAdd);
 		}
-		
+
 		if (!children.equals(newChildren)) {
 			children = newChildren;
 			return true;
@@ -166,7 +157,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			return false;
 		}
 	}
-	
+
 	public int compare(Component a, Component b) {
 		if (a != b) {
 			String aName = a.getFactory().getDisplayName();
@@ -179,12 +170,19 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 
 	//
 	// AttributeListener methods
-	public void attributeListChanged(AttributeEvent e) { }
+	public void attributeListChanged(AttributeEvent e) {
+	}
 
 	public void attributeValueChanged(AttributeEvent e) {
 		Object attr = e.getAttribute();
 		if (attr == CircuitAttributes.CIRCUIT_LABEL_ATTR || attr == StdAttr.LABEL) {
 			model.fireNodeChanged(this);
+		}
+	}
+
+	private static class CompareByName implements Comparator<Object> {
+		public int compare(Object a, Object b) {
+			return a.toString().compareToIgnoreCase(b.toString());
 		}
 	}
 }

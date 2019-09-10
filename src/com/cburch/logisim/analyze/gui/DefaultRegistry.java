@@ -3,17 +3,25 @@
 
 package com.cburch.logisim.analyze.gui;
 
+import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JRootPane;
-
 class DefaultRegistry {
+	private JRootPane rootPane;
+
+	public DefaultRegistry(JRootPane rootPane) {
+		this.rootPane = rootPane;
+		rootPane.setDefaultButton(null);
+	}
+
+	public void registerDefaultButton(JComponent comp, JButton button) {
+		comp.addFocusListener(new MyListener(button));
+	}
+
 	private class MyListener implements FocusListener {
 		JButton defaultButton;
-		
+
 		MyListener(JButton defaultButton) {
 			this.defaultButton = defaultButton;
 		}
@@ -26,16 +34,5 @@ class DefaultRegistry {
 			JButton currentDefault = rootPane.getDefaultButton();
 			if (currentDefault == defaultButton) rootPane.setDefaultButton(null);
 		}
-	}
-	
-	private JRootPane rootPane;
-	
-	public DefaultRegistry(JRootPane rootPane) {
-		this.rootPane = rootPane;
-		rootPane.setDefaultButton(null);
-	}
-	
-	public void registerDefaultButton(JComponent comp, JButton button) {
-		comp.addFocusListener(new MyListener(button));
 	}
 }

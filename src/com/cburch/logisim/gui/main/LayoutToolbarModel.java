@@ -3,13 +3,6 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
 import com.cburch.draw.toolbar.ToolbarSeparator;
@@ -25,22 +18,109 @@ import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.InputEventUtil;
 
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 class LayoutToolbarModel extends AbstractToolbarModel {
+	private Frame frame;
+	private Project proj;
+	private MyListener myListener;
+	private List<ToolbarItem> items;
+	private Tool haloedTool;
+	public LayoutToolbarModel(Frame frame, Project proj) {
+		this.frame = frame;
+		this.proj = proj;
+		myListener = new MyListener();
+		items = Collections.emptyList();
+		haloedTool = null;
+		buildContents();
+
+		// set up listeners
+		ToolbarData data = proj.getOptions().getToolbarData();
+		data.addToolbarListener(myListener);
+		data.addToolAttributeListener(myListener);
+		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
+		proj.addProjectListener(myListener);
+	}
+
+	private static ToolbarItem findItem(List<ToolbarItem> items, Tool tool) {
+		for (ToolbarItem item : items) {
+			if (item instanceof ToolItem) {
+				if (tool == ((ToolItem) item).tool) {
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<ToolbarItem> getItems() {
+		return items;
+	}
+
+	@Override
+	public boolean isSelected(ToolbarItem item) {
+		if (item instanceof ToolItem) {
+			Tool tool = ((ToolItem) item).tool;
+			return tool == proj.getTool();
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public void itemSelected(ToolbarItem item) {
+		if (item instanceof ToolItem) {
+			Tool tool = ((ToolItem) item).tool;
+			proj.setTool(tool);
+		}
+	}
+
+	public void setHaloedTool(Tool t) {
+		if (haloedTool != t) {
+			haloedTool = t;
+			fireToolbarAppearanceChanged();
+		}
+	}
+
+	private void buildContents() {
+		List<ToolbarItem> oldItems = items;
+		List<ToolbarItem> newItems = new ArrayList<ToolbarItem>();
+		int pos = -1;
+		ToolbarData data = proj.getLogisimFile().getOptions().getToolbarData();
+		for (Tool tool : data.getContents()) {
+			++pos;
+			if (tool == null) {
+				newItems.add(new ToolbarSeparator(4));
+			} else {
+				ToolbarItem i = findItem(oldItems, tool);
+				if (i == null) {
+					newItems.add(new ToolItem(tool));
+				} else {
+					newItems.add(i);
+				}
+			}
+		}
+		items = Collections.unmodifiableList(newItems);
+		fireToolbarContentsChanged();
+	}
+
 	private class ToolItem implements ToolbarItem {
 		private Tool tool;
-		
+
 		ToolItem(Tool tool) {
 			this.tool = tool;
 		}
-		
+
 		public boolean isSelectable() {
 			return true;
 		}
-		
+
 		public void paintIcon(Component destination, Graphics g) {
 			// draw halo
 			if (tool == haloedTool && AppPreferences.ATTRIBUTE_HALO.getBoolean()) {
@@ -52,11 +132,11 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			g.setColor(Color.BLACK);
 			Graphics g_copy = g.create();
 			ComponentDrawContext c = new ComponentDrawContext(destination,
-					null, null, g, g_copy);
+				null, null, g, g_copy);
 			tool.paintIcon(c, 2, 2);
 			g_copy.dispose();
 		}
-		
+
 		public String getToolTip() {
 			String ret = tool.getDescription();
 			int index = 1;
@@ -72,14 +152,14 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			}
 			return ret;
 		}
-		
+
 		public Dimension getDimension(Object orientation) {
 			return new Dimension(24, 24);
 		}
 	}
 
 	private class MyListener implements ProjectListener, AttributeListener,
-				ToolbarData.ToolbarListener, PropertyChangeListener {
+		ToolbarData.ToolbarListener, PropertyChangeListener {
 		//
 		// ProjectListener methods
 		//
@@ -110,15 +190,17 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 		public void toolbarChanged() {
 			buildContents();
 		}
-		
+
 		//
 		// AttributeListener methods
 		//
-		public void attributeListChanged(AttributeEvent e) { }
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
 		public void attributeValueChanged(AttributeEvent e) {
 			fireToolbarAppearanceChanged();
 		}
-		
+
 		//
 		// PropertyChangeListener method
 		//
@@ -127,90 +209,5 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 				fireToolbarAppearanceChanged();
 			}
 		}
-	}
-		
-	private Frame frame;
-	private Project proj;
-	private MyListener myListener;
-	private List<ToolbarItem> items;
-	private Tool haloedTool;
-
-	public LayoutToolbarModel(Frame frame, Project proj) {
-		this.frame = frame;
-		this.proj = proj;
-		myListener = new MyListener();
-		items = Collections.emptyList();
-		haloedTool = null;
-		buildContents();
-
-		// set up listeners
-		ToolbarData data = proj.getOptions().getToolbarData();
-		data.addToolbarListener(myListener);
-		data.addToolAttributeListener(myListener);
-		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
-		proj.addProjectListener(myListener);
-	}
-
-	@Override
-	public List<ToolbarItem> getItems() {
-		return items;
-	}
-	
-	@Override
-	public boolean isSelected(ToolbarItem item) {
-		if (item instanceof ToolItem) {
-			Tool tool = ((ToolItem) item).tool;
-			return tool == proj.getTool();
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public void itemSelected(ToolbarItem item) {
-		if (item instanceof ToolItem) {
-			Tool tool = ((ToolItem) item).tool;
-			proj.setTool(tool);
-		}
-	}
-
-	public void setHaloedTool(Tool t) {
-		if (haloedTool != t) {
-			haloedTool = t;
-			fireToolbarAppearanceChanged();
-		}
-	}
-	
-	private void buildContents() {
-		List<ToolbarItem> oldItems = items;
-		List<ToolbarItem> newItems = new ArrayList<ToolbarItem>();
-		int pos = -1;
-		ToolbarData data = proj.getLogisimFile().getOptions().getToolbarData();
-		for (Tool tool : data.getContents()) {
-			++pos;
-			if (tool == null) {
-				newItems.add(new ToolbarSeparator(4));
-			} else {
-				ToolbarItem i = findItem(oldItems, tool);
-				if (i == null) {
-					newItems.add(new ToolItem(tool));
-				} else {
-					newItems.add(i);
-				}
-			}
-		}
-		items = Collections.unmodifiableList(newItems);
-		fireToolbarContentsChanged();
-	}
-	
-	private static ToolbarItem findItem(List<ToolbarItem> items, Tool tool) {
-		for (ToolbarItem item : items) {
-			if (item instanceof ToolItem) {
-				if (tool == ((ToolItem) item).tool) {
-					return item;
-				}
-			}
-		}
-		return null;
 	}
 }

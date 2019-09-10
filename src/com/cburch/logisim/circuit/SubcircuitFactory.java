@@ -3,34 +3,9 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Map;
-
-import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
-
 import com.cburch.logisim.comp.Component;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
 import com.cburch.logisim.tools.MenuExtender;
@@ -38,38 +13,13 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Map;
+
 public class SubcircuitFactory extends InstanceFactory {
-	private class CircuitFeature implements StringGetter, MenuExtender, ActionListener {
-		private Instance instance;
-		private Project proj;
-		
-		public CircuitFeature(Instance instance) {
-			this.instance = instance;
-		}
-		
-		public String get() {
-			return source.getName();
-		}
-
-		public void configureMenu(JPopupMenu menu, Project proj) {
-			this.proj = proj;
-			String name = instance.getFactory().getDisplayName();
-			String text = Strings.get("subcircuitViewItem", name);
-			JMenuItem item = new JMenuItem(text);
-			item.addActionListener(this);
-			menu.add(item);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			CircuitState superState = proj.getCircuitState();
-			if (superState == null) return;
-
-			CircuitState subState = getSubstate(superState, instance);
-			if (subState == null) return;
-			proj.setCircuitState(subState);
-		}
-	}
-
 	private Circuit source;
 
 	public SubcircuitFactory(Circuit source) {
@@ -83,7 +33,7 @@ public class SubcircuitFactory extends InstanceFactory {
 	public Circuit getSubcircuit() {
 		return source;
 	}
-	
+
 	@Override
 	public String getName() {
 		return source.getName();
@@ -101,7 +51,7 @@ public class SubcircuitFactory extends InstanceFactory {
 		Bounds bds = source.getAppearance().getOffsetBounds();
 		return bds.rotate(defaultFacing, facing, 0, 0);
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, AttributeSet attrs) {
 		if (super.contains(loc, attrs)) {
@@ -123,7 +73,7 @@ public class SubcircuitFactory extends InstanceFactory {
 	public AttributeSet createAttributeSet() {
 		return new CircuitAttributes(source);
 	}
-	
+
 	//
 	// methods for configuring instances
 	//
@@ -131,12 +81,12 @@ public class SubcircuitFactory extends InstanceFactory {
 	public void configureNewInstance(Instance instance) {
 		CircuitAttributes attrs = (CircuitAttributes) instance.getAttributeSet();
 		attrs.setSubcircuit(instance);
-		
+
 		instance.addAttributeListener();
 		computePorts(instance);
 		// configureLabel(instance); already done in computePorts
 	}
-	
+
 	@Override
 	public void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
@@ -145,13 +95,13 @@ public class SubcircuitFactory extends InstanceFactory {
 			configureLabel(instance);
 		}
 	}
-	
+
 	@Override
 	public Object getInstanceFeature(Instance instance, Object key) {
 		if (key == MenuExtender.class) return new CircuitFeature(instance);
 		return super.getInstanceFeature(instance, key);
 	}
-	
+
 	void computePorts(Instance instance) {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		Map<Location, Instance> portLocs = source.getAppearance().getPortOffsets(facing);
@@ -166,24 +116,24 @@ public class SubcircuitFactory extends InstanceFactory {
 			BitWidth width = pin.getAttributeValue(StdAttr.WIDTH);
 			ports[i] = new Port(loc.getX(), loc.getY(), type, width);
 			pins[i] = pin;
-			
+
 			String label = pin.getAttributeValue(StdAttr.LABEL);
 			if (label != null && label.length() > 0) {
 				ports[i].setToolTip(StringUtil.constantGetter(label));
 			}
 		}
-		
+
 		CircuitAttributes attrs = (CircuitAttributes) instance.getAttributeSet();
 		attrs.setPinInstances(pins);
 		instance.setPorts(ports);
 		instance.recomputeBounds();
 		configureLabel(instance); // since this affects the circuit's bounds
 	}
-	
+
 	private void configureLabel(Instance instance) {
 		Bounds bds = instance.getBounds();
 		Direction loc = instance.getAttributeValue(CircuitAttributes.LABEL_LOCATION_ATTR);
-		
+
 		int x = bds.getX() + bds.getWidth() / 2;
 		int y = bds.getY() + bds.getHeight() / 2;
 		int ha = GraphicsUtil.H_CENTER;
@@ -210,11 +160,11 @@ public class SubcircuitFactory extends InstanceFactory {
 	public CircuitState getSubstate(CircuitState superState, Instance instance) {
 		return getSubstate(createInstanceState(superState, instance));
 	}
-	
+
 	public CircuitState getSubstate(CircuitState superState, Component comp) {
 		return getSubstate(createInstanceState(superState, comp));
 	}
-	
+
 	private CircuitState getSubstate(InstanceState instanceState) {
 		CircuitState subState = (CircuitState) instanceState.getData();
 		if (subState == null) {
@@ -247,10 +197,10 @@ public class SubcircuitFactory extends InstanceFactory {
 			}
 		}
 	}
-	
+
 	//
 	// user interface features
-	//	
+	//
 	@Override
 	public void paintGhost(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
@@ -273,7 +223,7 @@ public class SubcircuitFactory extends InstanceFactory {
 		paintBase(painter, painter.getGraphics());
 		painter.drawPorts();
 	}
-	
+
 	private void paintBase(InstancePainter painter, Graphics g) {
 		CircuitAttributes attrs = (CircuitAttributes) painter.getAttributeSet();
 		Direction facing = attrs.getFacing();
@@ -285,9 +235,9 @@ public class SubcircuitFactory extends InstanceFactory {
 		g.translate(-loc.getX(), -loc.getY());
 		painter.drawLabel();
 	}
-	
+
 	private void drawCircuitLabel(InstancePainter painter, Bounds bds,
-			Direction facing, Direction defaultFacing) {
+								  Direction facing, Direction defaultFacing) {
 		AttributeSet staticAttrs = source.getStaticAttributes();
 		String label = staticAttrs.getValue(CircuitAttributes.CIRCUIT_LABEL_ATTR);
 		if (label != null && !label.equals("")) {
@@ -303,7 +253,7 @@ public class SubcircuitFactory extends InstanceFactory {
 				else if (c == '\\') backs = true;
 				back = label.indexOf('\\', back + 2);
 			}
-			
+
 			int x = bds.getX() + bds.getWidth() / 2;
 			int y = bds.getY() + bds.getHeight() / 2;
 			Graphics g = painter.getGraphics().create();
@@ -318,14 +268,14 @@ public class SubcircuitFactory extends InstanceFactory {
 			} else {
 				FontMetrics fm = g.getFontMetrics();
 				int height = fm.getHeight();
-				y = y - (height * lines - fm.getLeading()) / 2 + fm.getAscent(); 
+				y = y - (height * lines - fm.getLeading()) / 2 + fm.getAscent();
 				back = label.indexOf('\\');
 				while (back >= 0 && back <= label.length() - 2) {
 					char c = label.charAt(back + 1);
 					if (c == 'n') {
 						String line = label.substring(0, back);
 						GraphicsUtil.drawText(g, line, x, y,
-								GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+							GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 						y += height;
 						label = label.substring(back + 2);
 						back = label.indexOf('\\');
@@ -337,9 +287,40 @@ public class SubcircuitFactory extends InstanceFactory {
 					}
 				}
 				GraphicsUtil.drawText(g, label, x, y,
-						GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+					GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 			}
 			g.dispose();
+		}
+	}
+
+	private class CircuitFeature implements StringGetter, MenuExtender, ActionListener {
+		private Instance instance;
+		private Project proj;
+
+		public CircuitFeature(Instance instance) {
+			this.instance = instance;
+		}
+
+		public String get() {
+			return source.getName();
+		}
+
+		public void configureMenu(JPopupMenu menu, Project proj) {
+			this.proj = proj;
+			String name = instance.getFactory().getDisplayName();
+			String text = Strings.get("subcircuitViewItem", name);
+			JMenuItem item = new JMenuItem(text);
+			item.addActionListener(this);
+			menu.add(item);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			CircuitState superState = proj.getCircuitState();
+			if (superState == null) return;
+
+			CircuitState subState = getSubstate(superState, instance);
+			if (subState == null) return;
+			proj.setCircuitState(subState);
 		}
 	}
 

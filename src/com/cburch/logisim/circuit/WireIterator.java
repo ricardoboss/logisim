@@ -3,9 +3,9 @@
 
 package com.cburch.logisim.circuit;
 
-import java.util.Iterator;
-
 import com.cburch.logisim.data.Location;
+
+import java.util.Iterator;
 
 class WireIterator implements Iterator<Location> {
 	private int curX;
@@ -15,7 +15,7 @@ class WireIterator implements Iterator<Location> {
 	private int deltaX;
 	private int deltaY;
 	private boolean destReturned;
-	
+
 	public WireIterator(Location e0, Location e1) {
 		curX = e0.getX();
 		curY = e0.getY();
@@ -28,7 +28,7 @@ class WireIterator implements Iterator<Location> {
 		if (curY < destY) deltaY = 10;
 		else if (curY > destY) deltaY = -10;
 		else deltaY = 0;
-		
+
 		int offX = (destX - curX) % 10;
 		if (offX != 0) { // should not happen, but in case it does...
 			destX = curX + deltaX * ((destX - curX) / 10);
@@ -38,11 +38,11 @@ class WireIterator implements Iterator<Location> {
 			destY = curY + deltaY * ((destY - curY) / 10);
 		}
 	}
-	
+
 	public boolean hasNext() {
 		return !destReturned;
 	}
-	
+
 	public Location next() {
 		Location ret = Location.create(curX, curY);
 		destReturned |= curX == destX && curY == destY;
@@ -50,7 +50,7 @@ class WireIterator implements Iterator<Location> {
 		curY += deltaY;
 		return ret;
 	}
-	
+
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}

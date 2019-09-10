@@ -3,15 +3,16 @@
 
 package com.cburch.logisim.circuit;
 
+import com.cburch.logisim.comp.Component;
+import com.cburch.logisim.data.Location;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import com.cburch.logisim.comp.Component;
-import com.cburch.logisim.data.Location;
-
 public class WireUtil {
-	private WireUtil() { }
+	private WireUtil() {
+	}
 
 	static CircuitPoints computeCircuitPoints(Collection<? extends Component> components) {
 		CircuitPoints points = new CircuitPoints();
@@ -24,10 +25,10 @@ public class WireUtil {
 	// Merge all parallel endpoint-to-endpoint wires within the given set.
 	public static Collection<? extends Component> mergeExclusive(Collection<? extends Component> toMerge) {
 		if (toMerge.size() <= 1) return toMerge;
-		
+
 		HashSet<Component> ret = new HashSet<Component>(toMerge);
 		CircuitPoints points = computeCircuitPoints(toMerge);
-		
+
 		HashSet<Wire> wires = new HashSet<Wire>();
 		for (Location loc : points.getSplitLocations()) {
 			Collection<? extends Component> at = points.getComponents(loc);
@@ -46,7 +47,7 @@ public class WireUtil {
 			}
 		}
 		points = null;
-		
+
 		ret.removeAll(wires);
 		while (!wires.isEmpty()) {
 			Iterator<Wire> it = wires.iterator();
@@ -72,7 +73,7 @@ public class WireUtil {
 			} while (found);
 			ret.add(Wire.create(e0, e1));
 		}
-		
+
 		return ret;
 	}
 }

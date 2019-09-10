@@ -3,9 +3,12 @@
 
 package com.cburch.logisim.proj;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Window;
+import com.cburch.logisim.file.Loader;
+import com.cburch.logisim.gui.main.Frame;
+import com.cburch.logisim.util.MacCompatibility;
+import com.cburch.logisim.util.PropertyChangeWeakSupport;
+
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
@@ -15,75 +18,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import com.cburch.logisim.file.Loader;
-import com.cburch.logisim.gui.main.Frame;
-import com.cburch.logisim.util.MacCompatibility;
-import com.cburch.logisim.util.PropertyChangeWeakSupport;
-
 public class Projects {
 	public static final String projectListProperty = "projectList";
-	
+
 	private static final WeakHashMap<Window, Point> frameLocations
 		= new WeakHashMap<Window, Point>();
-	
+	private static final MyListener myListener = new MyListener();
+	private static final PropertyChangeWeakSupport propertySupport
+		= new PropertyChangeWeakSupport(Projects.class);
+	private static ArrayList<Project> openProjects = new ArrayList<Project>();
+	private static Frame mostRecentFrame = null;
+	private Projects() {
+	}
+
 	private static void projectRemoved(Project proj, Frame frame,
-			MyListener listener) {
+									   MyListener listener) {
 		frame.removeWindowListener(listener);
 		openProjects.remove(proj);
 		proj.getSimulator().shutDown();
 		propertySupport.firePropertyChange(projectListProperty, null, null);
 	}
 
-	private static class MyListener extends WindowAdapter {
-		@Override
-		public void windowActivated(WindowEvent event) {
-			mostRecentFrame = (Frame) event.getSource();
-		}
-		
-		@Override
-		public void windowClosing(WindowEvent event) {
-			Frame frame = (Frame) event.getSource();
-			if ((frame.getExtendedState() & Frame.ICONIFIED) == 0) {
-				mostRecentFrame = frame;
-				try {
-					frameLocations.put(frame, frame.getLocationOnScreen());
-				} catch (Throwable t) { }
-			}
-		}
-		
-		@Override
-		public void windowClosed(WindowEvent event) {
-			Frame frame = (Frame) event.getSource();
-			Project proj = frame.getProject();
-			
-			if (frame == proj.getFrame()) {
-				projectRemoved(proj, frame, this);
-			}
-			if (openProjects.isEmpty() && !MacCompatibility.isSwingUsingScreenMenuBar()) {
-				ProjectActions.doQuit();
-			}
-		}
-		
-		@Override
-		public void windowOpened(WindowEvent event) {
-			Frame frame = (Frame) event.getSource();
-			Project proj = frame.getProject();
-
-			if (frame == proj.getFrame() && !openProjects.contains(proj)) {
-				openProjects.add(proj);
-				propertySupport.firePropertyChange(projectListProperty, null, null);
-			}
-		}
-	}
-
-	private static final MyListener myListener = new MyListener();
-	private static final PropertyChangeWeakSupport propertySupport
-		= new PropertyChangeWeakSupport(Projects.class);
-	private static ArrayList<Project> openProjects = new ArrayList<Project>();
-	private static Frame mostRecentFrame = null;
-
-	private Projects() { }
-	
 	public static Frame getTopFrame() {
 		Frame ret = mostRecentFrame;
 		if (ret == null) {
@@ -99,14 +54,14 @@ public class Projects {
 		}
 		return ret;
 	}
-	
+
 	static void windowCreated(Project proj, Frame oldFrame, Frame frame) {
 		if (oldFrame != null) {
 			projectRemoved(proj, oldFrame, myListener);
 		}
 
 		if (frame == null) return;
-		
+
 		// locate the window
 		Point lowest = null;
 		for (Project p : openProjects) {
@@ -130,18 +85,18 @@ public class Projects {
 		}
 		frame.addWindowListener(myListener);
 	}
-	
+
 	public static List<Project> getOpenProjects() {
 		return Collections.unmodifiableList(openProjects);
 	}
-	
+
 	public static boolean windowNamed(String name) {
 		for (Project proj : openProjects) {
 			if (proj.getLogisimFile().getName().equals(name)) return true;
 		}
 		return false;
 	}
-	
+
 	public static Project findProjectFor(File query) {
 		for (Project proj : openProjects) {
 			Loader loader = proj.getLogisimFile().getLoader();
@@ -158,18 +113,64 @@ public class Projects {
 	public static void addPropertyChangeListener(PropertyChangeListener listener) {
 		propertySupport.addPropertyChangeListener(listener);
 	}
+
 	public static void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		propertySupport.addPropertyChangeListener(propertyName, listener);
 	}
+
 	public static void removePropertyChangeListener(PropertyChangeListener listener) {
 		propertySupport.removePropertyChangeListener(listener);
 	}
+
 	public static void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		propertySupport.removePropertyChangeListener(propertyName, listener);
 	}
-	
+
 	public static Point getLocation(Window win) {
 		Point ret = frameLocations.get(win);
 		return ret == null ? null : (Point) ret.clone();
+	}
+
+	private static class MyListener extends WindowAdapter {
+		@Override
+		public void windowActivated(WindowEvent event) {
+			mostRecentFrame = (Frame) event.getSource();
+		}
+
+		@Override
+		public void windowClosing(WindowEvent event) {
+			Frame frame = (Frame) event.getSource();
+			if ((frame.getExtendedState() & Frame.ICONIFIED) == 0) {
+				mostRecentFrame = frame;
+				try {
+					frameLocations.put(frame, frame.getLocationOnScreen());
+				} catch (Throwable t) {
+				}
+			}
+		}
+
+		@Override
+		public void windowClosed(WindowEvent event) {
+			Frame frame = (Frame) event.getSource();
+			Project proj = frame.getProject();
+
+			if (frame == proj.getFrame()) {
+				projectRemoved(proj, frame, this);
+			}
+			if (openProjects.isEmpty() && !MacCompatibility.isSwingUsingScreenMenuBar()) {
+				ProjectActions.doQuit();
+			}
+		}
+
+		@Override
+		public void windowOpened(WindowEvent event) {
+			Frame frame = (Frame) event.getSource();
+			Project proj = frame.getProject();
+
+			if (frame == proj.getFrame() && !openProjects.contains(proj)) {
+				openProjects.add(proj);
+				propertySupport.firePropertyChange(projectListProperty, null, null);
+			}
+		}
 	}
 }

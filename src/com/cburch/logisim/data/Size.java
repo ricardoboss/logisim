@@ -9,16 +9,15 @@ package com.cburch.logisim.data;
  * are immutable.
  */
 public class Size {
-	public static Size create(int wid, int ht) {
-		return new Size(wid, ht);
-	}
-
 	private final int wid;
 	private final int ht;
-
 	private Size(int wid, int ht) {
 		this.wid = wid;
 		this.ht = ht;
+	}
+
+	public static Size create(int wid, int ht) {
+		return new Size(wid, ht);
 	}
 
 	@Override

@@ -3,19 +3,19 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cburch.logisim.gui.main.EditHandler;
 import com.cburch.logisim.gui.menu.EditPopup;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.gui.menu.LogisimMenuItem;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AppearanceEditPopup extends EditPopup implements EditHandler.Listener {
 	private AppearanceCanvas canvas;
 	private EditHandler handler;
-	private Map<LogisimMenuItem, Boolean> enabled; 
-	
+	private Map<LogisimMenuItem, Boolean> enabled;
+
 	public AppearanceEditPopup(AppearanceCanvas canvas) {
 		super(true);
 		this.canvas = canvas;
@@ -25,9 +25,9 @@ public class AppearanceEditPopup extends EditPopup implements EditHandler.Listen
 		handler.computeEnabled();
 		initialize();
 	}
-	
+
 	public void enableChanged(EditHandler handler, LogisimMenuItem action,
-			boolean value) {
+							  boolean value) {
 		enabled.put(action, Boolean.valueOf(value));
 	}
 

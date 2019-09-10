@@ -7,17 +7,13 @@ import com.cburch.logisim.gui.generic.LFrame;
 import com.cburch.logisim.gui.start.About;
 import com.cburch.logisim.util.MacCompatibility;
 
+import javax.help.HelpSet;
+import javax.help.JHelp;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.Locale;
-
-import javax.help.HelpSet;
-import javax.help.JHelp;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 class MenuHelp extends JMenu implements ActionListener {
 	private LogisimMenuBar menubar;
@@ -74,7 +70,7 @@ class MenuHelp extends JMenu implements ActionListener {
 			About.showAboutDialog(menubar.getParentWindow());
 		}
 	}
-	
+
 	private void loadBroker() {
 		String helpUrl = Strings.get("helpsetUrl");
 		if (helpUrl == null) helpUrl = "doc/doc_en.hs";
@@ -85,7 +81,7 @@ class MenuHelp extends JMenu implements ActionListener {
 				if (hsURL == null) {
 					disableHelp();
 					JOptionPane.showMessageDialog(menubar.getParentWindow(),
-							Strings.get("helpNotFoundError"));
+						Strings.get("helpNotFoundError"));
 					return;
 				}
 				helpSetUrl = helpUrl;
@@ -106,7 +102,7 @@ class MenuHelp extends JMenu implements ActionListener {
 				disableHelp();
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(menubar.getParentWindow(),
-						Strings.get("helpUnavailableError"));
+					Strings.get("helpUnavailableError"));
 				return;
 			}
 		}
@@ -122,7 +118,7 @@ class MenuHelp extends JMenu implements ActionListener {
 			disableHelp();
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(menubar.getParentWindow(),
-					Strings.get("helpDisplayError"));
+				Strings.get("helpDisplayError"));
 		}
 	}
 

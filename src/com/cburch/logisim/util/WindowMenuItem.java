@@ -3,25 +3,23 @@
 
 package com.cburch.logisim.util;
 
-import java.awt.Frame;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-
-import javax.swing.JFrame;
-import javax.swing.JRadioButtonMenuItem;
 
 class WindowMenuItem extends JRadioButtonMenuItem {
 	private WindowMenuItemManager manager;
-	
+
 	WindowMenuItem(WindowMenuItemManager manager) {
 		this.manager = manager;
 		setText(manager.getText());
 		setSelected(WindowMenuManager.getCurrentManager() == manager);
 	}
-	
+
 	public JFrame getJFrame() {
 		return manager.getJFrame(true);
 	}
-	
+
 	public void actionPerformed(ActionEvent event) {
 		JFrame frame = getJFrame();
 		frame.setExtendedState(Frame.NORMAL);

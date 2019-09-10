@@ -8,7 +8,7 @@ import com.cburch.logisim.data.Value;
 public class TFlipFlop extends AbstractFlipFlop {
 	public TFlipFlop() {
 		super("T Flip-Flop", "tFlipFlop.gif",
-				Strings.getter("tFlipFlopComponent"), 1, false);
+			Strings.getter("tFlipFlopComponent"), 1, false);
 	}
 
 	@Override

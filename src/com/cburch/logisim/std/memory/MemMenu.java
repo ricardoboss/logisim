@@ -3,23 +3,19 @@
 
 package com.cburch.logisim.std.memory;
 
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.gui.hex.HexFile;
 import com.cburch.logisim.gui.hex.HexFrame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 class MemMenu implements ActionListener, MenuExtender {
 	private Mem factory;
@@ -36,12 +32,12 @@ class MemMenu implements ActionListener, MenuExtender {
 		this.factory = factory;
 		this.instance = instance;
 	}
-		
+
 	public void configureMenu(JPopupMenu menu, Project proj) {
 		this.proj = proj;
 		this.frame = proj.getFrame();
-		this.circState = proj.getCircuitState();    
-		
+		this.circState = proj.getCircuitState();
+
 		Object attrs = instance.getAttributeSet();
 		if (attrs instanceof RomAttributes) {
 			((RomAttributes) attrs).setProject(proj);
@@ -89,9 +85,9 @@ class MemMenu implements ActionListener, MenuExtender {
 		if (isAllZero) return;
 
 		int choice = JOptionPane.showConfirmDialog(frame,
-				Strings.get("ramConfirmClearMsg"),
-				Strings.get("ramConfirmClearTitle"),
-				JOptionPane.YES_NO_OPTION);
+			Strings.get("ramConfirmClearMsg"),
+			Strings.get("ramConfirmClearTitle"),
+			JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
 			s.getContents().clear();
 		}
@@ -109,7 +105,7 @@ class MemMenu implements ActionListener, MenuExtender {
 				factory.loadImage(circState.getInstanceState(instance), f);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(frame, e.getMessage(),
-						Strings.get("ramLoadErrorTitle"), JOptionPane.ERROR_MESSAGE);
+					Strings.get("ramLoadErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

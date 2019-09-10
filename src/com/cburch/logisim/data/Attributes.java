@@ -3,33 +3,24 @@
 
 package com.cburch.logisim.data;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-
 import com.bric.swing.ColorPicker;
 import com.cburch.logisim.util.FontUtil;
 import com.cburch.logisim.util.JInputComponent;
 import com.cburch.logisim.util.StringGetter;
 import com.connectina.swing.fontchooser.JFontChooser;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.awt.*;
+
 public class Attributes {
-	private Attributes() { }
-	
-	private static class ConstantGetter implements StringGetter {
-		private String str;
-		public ConstantGetter(String str) { this.str = str; }
-		public String get() { return str; }
-		@Override
-		public String toString() { return get(); }
+	private Attributes() {
 	}
-	private static StringGetter getter(String s) { return new ConstantGetter(s); } 
-	
+
+	private static StringGetter getter(String s) {
+		return new ConstantGetter(s);
+	}
+
 	//
 	// methods with display name == standard name
 	//
@@ -38,7 +29,7 @@ public class Attributes {
 	}
 
 	public static Attribute<?> forOption(String name,
-			Object[] vals) {
+										 Object[] vals) {
 		return forOption(name, getter(name), vals);
 	}
 
@@ -51,7 +42,7 @@ public class Attributes {
 	}
 
 	public static Attribute<Integer> forIntegerRange(String name,
-			int start, int end) {
+													 int start, int end) {
 		return forIntegerRange(name, getter(name), start, end);
 	}
 
@@ -82,11 +73,11 @@ public class Attributes {
 	public static Attribute<Location> forLocation(String name) {
 		return forLocation(name, getter(name));
 	}
-	
+
 	public static Attribute<Color> forColor(String name) {
 		return forColor(name, getter(name));
 	}
-	
+
 	//
 	// methods with internationalization support
 	//
@@ -95,7 +86,7 @@ public class Attributes {
 	}
 
 	public static <V> Attribute<V> forOption(String name, StringGetter disp,
-			V[] vals) {
+											 V[] vals) {
 		return new OptionAttribute<V>(name, disp, vals);
 	}
 
@@ -108,7 +99,7 @@ public class Attributes {
 	}
 
 	public static Attribute<Integer> forIntegerRange(String name, StringGetter disp,
-			int start, int end) {
+													 int start, int end) {
 		return new IntegerRangeAttribute(name, disp, start, end);
 	}
 
@@ -139,9 +130,26 @@ public class Attributes {
 	public static Attribute<Location> forLocation(String name, StringGetter disp) {
 		return new LocationAttribute(name, disp);
 	}
-	
+
 	public static Attribute<Color> forColor(String name, StringGetter disp) {
 		return new ColorAttribute(name, disp);
+	}
+
+	private static class ConstantGetter implements StringGetter {
+		private String str;
+
+		public ConstantGetter(String str) {
+			this.str = str;
+		}
+
+		public String get() {
+			return str;
+		}
+
+		@Override
+		public String toString() {
+			return get();
+		}
 	}
 
 	private static class StringAttribute extends Attribute<String> {
@@ -156,7 +164,7 @@ public class Attributes {
 	}
 
 	private static class OptionComboRenderer<V>
-			extends BasicComboBoxRenderer {
+		extends BasicComboBoxRenderer {
 		Attribute<V> attr;
 
 		OptionComboRenderer(Attribute<V> attr) {
@@ -165,8 +173,8 @@ public class Attributes {
 
 		@Override
 		public Component getListCellRendererComponent(JList list,
-				Object value, int index, boolean isSelected,
-				boolean cellHasFocus) {
+													  Object value, int index, boolean isSelected,
+													  boolean cellHasFocus) {
 			Component ret = super.getListCellRendererComponent(list,
 				value, index, isSelected, cellHasFocus);
 			if (ret instanceof JLabel) {
@@ -182,7 +190,7 @@ public class Attributes {
 		private V[] vals;
 
 		private OptionAttribute(String name, StringGetter disp,
-				V[] vals) {
+								V[] vals) {
 			super(name, disp);
 			this.vals = vals;
 		}
@@ -258,7 +266,7 @@ public class Attributes {
 			} else {
 				return Integer.valueOf((int) Long.parseLong(value, 10));
 			}
-			
+
 		}
 	}
 
@@ -274,7 +282,7 @@ public class Attributes {
 	}
 
 	private static class BooleanAttribute extends OptionAttribute<Boolean> {
-		private static Boolean[] vals = { Boolean.TRUE, Boolean.FALSE };
+		private static Boolean[] vals = {Boolean.TRUE, Boolean.FALSE};
 
 		private BooleanAttribute(String name, StringGetter disp) {
 			super(name, disp, vals);
@@ -297,11 +305,13 @@ public class Attributes {
 		Integer[] options = null;
 		int start;
 		int end;
+
 		private IntegerRangeAttribute(String name, StringGetter disp, int start, int end) {
 			super(name, disp);
 			this.start = start;
 			this.end = end;
 		}
+
 		@Override
 		public Integer parse(String value) {
 			int v = (int) Long.parseLong(value);
@@ -309,6 +319,7 @@ public class Attributes {
 			if (v > end) throw new NumberFormatException("integer too large");
 			return Integer.valueOf(v);
 		}
+
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
 			if (end - start + 1 > 32) {
@@ -381,9 +392,9 @@ public class Attributes {
 			return new FontChooser(value);
 		}
 	}
-	
+
 	private static class FontChooser extends JFontChooser
-			implements JInputComponent {
+		implements JInputComponent {
 		FontChooser(Font initial) {
 			super(initial);
 		}
@@ -396,11 +407,12 @@ public class Attributes {
 			setSelectedFont((Font) value);
 		}
 	}
-	
+
 	private static class LocationAttribute extends Attribute<Location> {
 		public LocationAttribute(String name, StringGetter desc) {
 			super(name, desc);
 		}
+
 		@Override
 		public Location parse(String value) {
 			return Location.parse(value);
@@ -416,15 +428,18 @@ public class Attributes {
 		public String toDisplayString(Color value) {
 			return toStandardString(value);
 		}
+
 		@Override
 		public String toStandardString(Color c) {
 			String ret = "#" + hex(c.getRed()) + hex(c.getGreen()) + hex(c.getBlue());
 			return c.getAlpha() == 255 ? ret : ret + hex(c.getAlpha());
 		}
+
 		private String hex(int value) {
 			if (value >= 16) return Integer.toHexString(value);
 			else return "0" + Integer.toHexString(value);
 		}
+
 		@Override
 		public Color parse(String value) {
 			if (value.length() == 9) {
@@ -437,15 +452,16 @@ public class Attributes {
 				return Color.decode(value);
 			}
 		}
+
 		@Override
 		public java.awt.Component getCellEditor(Color value) {
 			Color init = value == null ? Color.BLACK : value;
 			return new ColorChooser(init);
 		}
 	}
-	
+
 	private static class ColorChooser extends ColorPicker
-			implements JInputComponent {
+		implements JInputComponent {
 		ColorChooser(Color initial) {
 			if (initial != null) setColor(initial);
 			setOpacityVisible(true);

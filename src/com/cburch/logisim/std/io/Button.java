@@ -3,45 +3,31 @@
 
 package com.cburch.logisim.std.io;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-
 import com.cburch.logisim.circuit.Wire;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceDataSingleton;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstanceLogger;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstancePoker;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.util.GraphicsUtil;
+
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 public class Button extends InstanceFactory {
 	private static final int DEPTH = 3;
 
 	public Button() {
 		super("Button", Strings.getter("buttonComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, Io.ATTR_COLOR,
-				StdAttr.LABEL, Io.ATTR_LABEL_LOC,
-				StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR
-			}, new Object[] {
-				Direction.EAST, Color.WHITE,
-				"", Io.LABEL_CENTER,
-				StdAttr.DEFAULT_LABEL_FONT, Color.BLACK
-			});
+		setAttributes(new Attribute[]{
+			StdAttr.FACING, Io.ATTR_COLOR,
+			StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+			StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR
+		}, new Object[]{
+			Direction.EAST, Color.WHITE,
+			"", Io.LABEL_CENTER,
+			StdAttr.DEFAULT_LABEL_FONT, Color.BLACK
+		});
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("button.gif");
-		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
+		setPorts(new Port[]{new Port(0, 0, Port.OUTPUT, 1)});
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
 	}
@@ -57,7 +43,7 @@ public class Button extends InstanceFactory {
 		instance.addAttributeListener();
 		computeTextField(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
@@ -102,9 +88,9 @@ public class Button extends InstanceFactory {
 				valign = GraphicsUtil.V_BOTTOM;
 			}
 		}
-		
+
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT,
-				x, y, halign, valign);
+			x, y, halign, valign);
 	}
 
 	@Override
@@ -113,7 +99,7 @@ public class Button extends InstanceFactory {
 		Value val = data == null ? Value.FALSE : (Value) data.getValue();
 		state.setPort(0, val, 1);
 	}
-	
+
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
@@ -129,13 +115,13 @@ public class Button extends InstanceFactory {
 		} else {
 			val = Value.FALSE;
 		}
-		
+
 		Color color = painter.getAttributeValue(Io.ATTR_COLOR);
 		if (!painter.shouldDrawColor()) {
 			int hue = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
 			color = new Color(hue, hue, hue);
 		}
-		
+
 		Graphics g = painter.getGraphics();
 		int depress;
 		if (val == Value.TRUE) {
@@ -143,12 +129,12 @@ public class Button extends InstanceFactory {
 			y += DEPTH;
 			Object labelLoc = painter.getAttributeValue(Io.ATTR_LABEL_LOC);
 			if (labelLoc == Io.LABEL_CENTER || labelLoc == Direction.NORTH
-					|| labelLoc == Direction.WEST) {
+				|| labelLoc == Direction.WEST) {
 				depress = DEPTH;
 			} else {
 				depress = 0;
 			}
-			
+
 			Object facing = painter.getAttributeValue(StdAttr.FACING);
 			if (facing == Direction.NORTH || facing == Direction.WEST) {
 				Location p = painter.getLocation();
@@ -157,18 +143,18 @@ public class Button extends InstanceFactory {
 				GraphicsUtil.switchToWidth(g, Wire.WIDTH);
 				g.setColor(Value.TRUE_COLOR);
 				if (facing == Direction.NORTH) g.drawLine(px, py, px, py + 10);
-				else                          g.drawLine(px, py, px + 10, py);
+				else g.drawLine(px, py, px + 10, py);
 				GraphicsUtil.switchToWidth(g, 1);
 			}
-			
+
 			g.setColor(color);
 			g.fillRect(x, y, w - DEPTH, h - DEPTH);
 			g.setColor(Color.BLACK);
 			g.drawRect(x, y, w - DEPTH, h - DEPTH);
 		} else {
 			depress = 0;
-			int[] xp = new int[] { x, x + w - DEPTH, x + w, x + w, x + DEPTH, x };
-			int[] yp = new int[] { y, y, y + DEPTH, y + h, y + h, y + h - DEPTH };
+			int[] xp = new int[]{x, x + w - DEPTH, x + w, x + w, x + DEPTH, x};
+			int[] yp = new int[]{y, y, y + DEPTH, y + h, y + h, y + h - DEPTH};
 			g.setColor(color.darker());
 			g.fillPolygon(xp, yp, xp.length);
 			g.setColor(color);
@@ -178,25 +164,25 @@ public class Button extends InstanceFactory {
 			g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);
 			g.drawPolygon(xp, yp, xp.length);
 		}
-		
+
 		g.translate(depress, depress);
 		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		g.translate(-depress, -depress);
 		painter.drawPorts();
 	}
-	
+
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mousePressed(InstanceState state, MouseEvent e) {
 			setValue(state, Value.TRUE);
 		}
-		
+
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			setValue(state, Value.FALSE);
 		}
-		
+
 		private void setValue(InstanceState state, Value val) {
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			if (data == null) {

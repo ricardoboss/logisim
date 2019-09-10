@@ -3,25 +3,20 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import com.cburch.logisim.circuit.CircuitState;
-import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.util.GraphicsUtil;
 
+import java.awt.*;
+
 class SplitterPainter {
 	private static final int SPINE_WIDTH = Wire.WIDTH + 2;
 	private static final int SPINE_DOT = Wire.WIDTH + 4;
-	
+
 	static void drawLines(ComponentDrawContext context,
-			SplitterAttributes attrs, Location origin) {
+						  SplitterAttributes attrs, Location origin) {
 		boolean showState = context.getShowState();
 		CircuitState state = showState ? context.getCircuitState() : null;
 		if (state == null) showState = false;
@@ -35,7 +30,7 @@ class SplitterPainter {
 		int dy = parms.getEndToEndDeltaY();
 		int dxEndSpine = parms.getEndToSpineDeltaX();
 		int dyEndSpine = parms.getEndToSpineDeltaY();
-		
+
 		Graphics g = context.getGraphics();
 		Color oldColor = g.getColor();
 		GraphicsUtil.switchToWidth(g, Wire.WIDTH);
@@ -86,14 +81,14 @@ class SplitterPainter {
 				g.drawLine(spine0x, spine0y, spine1x, spine1y);
 			}
 		} else {
-			int[] xSpine = { spine0x, spine1x, x0 + parms.getSpine1X() / 4 };
-			int[] ySpine = { spine0y, spine1y, y0 + parms.getSpine1Y() / 4 };
+			int[] xSpine = {spine0x, spine1x, x0 + parms.getSpine1X() / 4};
+			int[] ySpine = {spine0y, spine1y, y0 + parms.getSpine1Y() / 4};
 			g.drawPolyline(xSpine, ySpine, 3);
 		}
 	}
 
 	static void drawLabels(ComponentDrawContext context,
-			SplitterAttributes attrs, Location origin) {
+						   SplitterAttributes attrs, Location origin) {
 		// compute labels
 		String[] ends = new String[attrs.fanout + 1];
 		int curEnd = -1;
@@ -126,7 +121,7 @@ class SplitterPainter {
 		Graphics g = context.getGraphics().create();
 		Font font = g.getFont();
 		g.setFont(font.deriveFont(7.0f));
-		
+
 		SplitterParameters parms = attrs.getParameters();
 		int x = origin.getX() + parms.getEnd0X() + parms.getEndToSpineDeltaX();
 		int y = origin.getY() + parms.getEnd0Y() + parms.getEndToSpineDeltaY();
@@ -135,8 +130,12 @@ class SplitterPainter {
 		if (parms.getTextAngle() != 0) {
 			((Graphics2D) g).rotate(Math.PI / 2.0);
 			int t;
-			t = -x; x = y; y = t;
-			t = -dx; dx = dy; dy = t;
+			t = -x;
+			x = y;
+			y = t;
+			t = -dx;
+			dx = dy;
+			dy = t;
 		}
 		int halign = parms.getTextHorzAlign();
 		int valign = parms.getTextVertAlign();
@@ -153,15 +152,15 @@ class SplitterPainter {
 
 		g.dispose();
 	}
-	
+
 	static void drawLegacy(ComponentDrawContext context, SplitterAttributes attrs,
-			Location origin) {
+						   Location origin) {
 		Graphics g = context.getGraphics();
 		CircuitState state = context.getCircuitState();
 		Direction facing = attrs.facing;
 		int fanout = attrs.fanout;
 		SplitterParameters parms = attrs.getParameters();
-		
+
 		g.setColor(Color.BLACK);
 		int x0 = origin.getX();
 		int y0 = origin.getY();
@@ -191,7 +190,7 @@ class SplitterPainter {
 			} else {
 				g.setColor(Color.BLACK);
 				g.fillOval(x0 - SPINE_DOT / 2, ySpine - SPINE_DOT / 2,
-						SPINE_DOT, SPINE_DOT);
+					SPINE_DOT, SPINE_DOT);
 			}
 		} else {
 			int xSpine = (x0 + x1) / 2;
@@ -215,7 +214,7 @@ class SplitterPainter {
 			} else {
 				g.setColor(Color.BLACK);
 				g.fillOval(xSpine - SPINE_DOT / 2, y0 - SPINE_DOT / 2,
-						SPINE_DOT, SPINE_DOT);
+					SPINE_DOT, SPINE_DOT);
 			}
 		}
 		GraphicsUtil.switchToWidth(g, 1);

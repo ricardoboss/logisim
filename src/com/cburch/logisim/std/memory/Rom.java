@@ -3,18 +3,6 @@
 
 package com.cburch.logisim.std.memory;
 
-import java.awt.Window;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-import java.util.WeakHashMap;
-
-import javax.swing.JLabel;
-
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
@@ -28,17 +16,28 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.proj.Project;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.WeakHashMap;
+
 public class Rom extends Mem {
 	public static Attribute<MemContents> CONTENTS_ATTR = new ContentsAttribute();
-	
+
 	// The following is so that instance's MemListeners aren't freed by the
 	// garbage collector until the instance itself is ready to be freed.
-	private WeakHashMap<Instance,MemListener> memListeners;
-	
+	private WeakHashMap<Instance, MemListener> memListeners;
+
 	public Rom() {
 		super("ROM", Strings.getter("romComponent"), 0);
 		setIconName("rom.gif");
-		memListeners = new WeakHashMap<Instance,MemListener>();
+		memListeners = new WeakHashMap<Instance, MemListener>();
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class Rom extends Mem {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	MemState getState(InstanceState state) {
 		MemState ret = (MemState) state.getData();
@@ -74,12 +73,12 @@ public class Rom extends Mem {
 		}
 		return ret;
 	}
- 
+
 	@Override
 	HexFrame getHexFrame(Project proj, Instance instance, CircuitState state) {
 		return RomAttributes.getHexFrame(getMemContents(instance), proj);
 	}
-	
+
 	// TODO - maybe delete this method?
 	MemContents getMemContents(Instance instance) {
 		return instance.getAttributeValue(CONTENTS_ATTR);
@@ -92,7 +91,7 @@ public class Rom extends Mem {
 
 		Value addrValue = state.getPort(ADDR);
 		boolean chipSelect = state.getPort(CS) != Value.FALSE;
-		
+
 		if (!chipSelect) {
 			myState.setCurrent(-1);
 			state.setPort(DATA, Value.createUnknown(dataBits), DELAY);
@@ -110,7 +109,7 @@ public class Rom extends Mem {
 		int val = myState.getContents().get(addr);
 		state.setPort(DATA, Value.createKnown(dataBits, val), DELAY);
 	}
-	
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		super.configureNewInstance(instance);
@@ -119,7 +118,7 @@ public class Rom extends Mem {
 		memListeners.put(instance, listener);
 		contents.addHexModelListener(listener);
 	}
-	
+
 	private static class ContentsAttribute extends Attribute<MemContents> {
 		public ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
@@ -149,7 +148,8 @@ public class Rom extends Mem {
 			ret.write("addr/data: " + addr + " " + data + "\n");
 			try {
 				HexFile.save(ret, state);
-			} catch (IOException e) { }
+			} catch (IOException e) {
+			}
 			return ret.toString();
 		}
 
@@ -176,12 +176,12 @@ public class Rom extends Mem {
 			}
 		}
 	}
-		
+
 	private static class ContentsCell extends JLabel
-			implements MouseListener {
+		implements MouseListener {
 		Window source;
 		MemContents contents;
-		
+
 		ContentsCell(Window source, MemContents contents) {
 			super(Strings.get("romContentsValue"));
 			this.source = source;
@@ -197,12 +197,16 @@ public class Rom extends Mem {
 			frame.toFront();
 		}
 
-		public void mousePressed(MouseEvent e) { }
+		public void mousePressed(MouseEvent e) {
+		}
 
-		public void mouseReleased(MouseEvent e) { }
+		public void mouseReleased(MouseEvent e) {
+		}
 
-		public void mouseEntered(MouseEvent e) { }
+		public void mouseEntered(MouseEvent e) {
+		}
 
-		public void mouseExited(MouseEvent e) { }
+		public void mouseExited(MouseEvent e) {
+		}
 	}
 }

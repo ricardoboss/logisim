@@ -3,19 +3,21 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import com.cburch.draw.toolbar.Toolbar;
 import com.cburch.draw.toolbar.ToolbarItem;
 import com.cburch.draw.toolbar.ToolbarModel;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 public class KeyboardToolSelection extends AbstractAction {
+	private Toolbar toolbar;
+	private int index;
+	public KeyboardToolSelection(Toolbar toolbar, int index) {
+		this.toolbar = toolbar;
+		this.index = index;
+	}
+
 	public static void register(Toolbar toolbar) {
 		ActionMap amap = toolbar.getActionMap();
 		InputMap imap = toolbar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -29,15 +31,7 @@ public class KeyboardToolSelection extends AbstractAction {
 			imap.put(keyStroke, key);
 		}
 	}
-	
-	private Toolbar toolbar;
-	private int index;
-	
-	public KeyboardToolSelection(Toolbar toolbar, int index) {
-		this.toolbar = toolbar;
-		this.index = index;
-	}
-	
+
 	public void actionPerformed(ActionEvent event) {
 		ToolbarModel model = toolbar.getToolbarModel();
 		int i = -1;

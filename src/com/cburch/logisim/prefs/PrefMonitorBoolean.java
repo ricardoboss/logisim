@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
 class PrefMonitorBoolean extends AbstractPrefMonitor<Boolean> {
 	private boolean dflt;
 	private boolean value;
-	
+
 	PrefMonitorBoolean(String name, boolean dflt) {
 		super(name);
 		this.dflt = dflt;
@@ -18,16 +18,16 @@ class PrefMonitorBoolean extends AbstractPrefMonitor<Boolean> {
 		set(Boolean.valueOf(prefs.getBoolean(name, dflt)));
 		prefs.addPreferenceChangeListener(this);
 	}
-	
+
 	public Boolean get() {
 		return Boolean.valueOf(value);
 	}
-	
+
 	@Override
 	public boolean getBoolean() {
 		return value;
 	}
-	
+
 	public void set(Boolean newValue) {
 		boolean newVal = newValue.booleanValue();
 		if (value != newVal) {

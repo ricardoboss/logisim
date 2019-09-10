@@ -19,7 +19,7 @@ public class ShiftRegisterLogger extends InstanceLogger {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public String getLogName(InstanceState state, Object option) {
 		String inName = state.getAttributeValue(StdAttr.LABEL);
@@ -42,7 +42,7 @@ public class ShiftRegisterLogger extends InstanceLogger {
 		if (data == null) {
 			return Value.createKnown(dataWidth, 0);
 		} else {
-			int index = option == null ? 0 : ((Integer) option).intValue(); 
+			int index = option == null ? 0 : ((Integer) option).intValue();
 			return data.get(index);
 		}
 	}

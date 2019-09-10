@@ -3,21 +3,50 @@
 
 package com.cburch.logisim.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 public class VerticalSplitPane extends JPanel {
+	private JComponent comp0;
+	private JComponent comp1;
+	private MyDragbar dragbar;
+	private double fraction;
+	public VerticalSplitPane(JComponent comp0, JComponent comp1) {
+		this(comp0, comp1, 0.5);
+	}
+	public VerticalSplitPane(JComponent comp0, JComponent comp1,
+							 double fraction) {
+		this.comp0 = comp0;
+		this.comp1 = comp1;
+		this.dragbar = new MyDragbar(); // above the other components
+		this.fraction = fraction;
+
+		setLayout(new MyLayout());
+		add(dragbar); // above the other components
+		add(comp0);
+		add(comp1);
+	}
+
+	public double getFraction() {
+		return fraction;
+	}
+
+	public void setFraction(double value) {
+		if (value < 0.0) value = 0.0;
+		if (value > 1.0) value = 1.0;
+		if (fraction != value) {
+			fraction = value;
+			revalidate();
+		}
+	}
+
 	private class MyLayout implements LayoutManager {
-		public void addLayoutComponent(String name, Component comp) { }
-		public void removeLayoutComponent(Component comp) { }
+		public void addLayoutComponent(String name, Component comp) {
+		}
+
+		public void removeLayoutComponent(Component comp) {
+		}
 
 		public Dimension preferredLayoutSize(Container parent) {
 			if (fraction <= 0.0) return comp1.getPreferredSize();
@@ -26,7 +55,7 @@ public class VerticalSplitPane extends JPanel {
 			Dimension d0 = comp0.getPreferredSize();
 			Dimension d1 = comp1.getPreferredSize();
 			return new Dimension(in.left + d0.width + d1.width + in.right,
-					in.top + Math.max(d0.height, d1.height) + in.bottom);
+				in.top + Math.max(d0.height, d1.height) + in.bottom);
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {
@@ -36,7 +65,7 @@ public class VerticalSplitPane extends JPanel {
 			Dimension d0 = comp0.getMinimumSize();
 			Dimension d1 = comp1.getMinimumSize();
 			return new Dimension(in.left + d0.width + d1.width + in.right,
-					in.top + Math.max(d0.height, d1.height) + in.bottom);
+				in.top + Math.max(d0.height, d1.height) + in.bottom);
 		}
 
 		public void layoutContainer(Container parent) {
@@ -55,63 +84,28 @@ public class VerticalSplitPane extends JPanel {
 			}
 
 			comp0.setBounds(in.left, in.top,
-					split, maxHeight);
+				split, maxHeight);
 			comp1.setBounds(in.left + split, in.top,
-					maxWidth - split, maxHeight);
+				maxWidth - split, maxHeight);
 			dragbar.setBounds(in.left + split - HorizontalSplitPane.DRAG_TOLERANCE, in.top,
-					2 * HorizontalSplitPane.DRAG_TOLERANCE, maxHeight);
+				2 * HorizontalSplitPane.DRAG_TOLERANCE, maxHeight);
 		}
 	}
-	
+
 	private class MyDragbar extends HorizontalSplitPane.Dragbar {
 		MyDragbar() {
 			setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 		}
-		
+
 		@Override
 		int getDragValue(MouseEvent e) {
 			return getX() + e.getX() - VerticalSplitPane.this.getInsets().left;
 		}
-	
+
 		@Override
 		void setDragValue(int value) {
 			Insets in = VerticalSplitPane.this.getInsets();
 			setFraction((double) value / (VerticalSplitPane.this.getWidth() - in.left - in.right));
-			revalidate();
-		}
-	}
-
-	private JComponent comp0;
-	private JComponent comp1;
-	private MyDragbar dragbar;
-	private double fraction;
-	
-	public VerticalSplitPane(JComponent comp0, JComponent comp1) {
-		this(comp0, comp1, 0.5);
-	}
-	
-	public VerticalSplitPane(JComponent comp0, JComponent comp1,
-			double fraction) {
-		this.comp0 = comp0;
-		this.comp1 = comp1;
-		this.dragbar = new MyDragbar(); // above the other components
-		this.fraction = fraction;
-
-		setLayout(new MyLayout());
-		add(dragbar); // above the other components
-		add(comp0);
-		add(comp1);
-	}
-	
-	public double getFraction() {
-		return fraction;
-	}
-	
-	public void setFraction(double value) {
-		if (value < 0.0) value = 0.0;
-		if (value > 1.0) value = 1.0;
-		if (fraction != value) {
-			fraction = value;
 			revalidate();
 		}
 	}

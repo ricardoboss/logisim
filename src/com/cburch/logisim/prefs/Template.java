@@ -3,13 +3,15 @@
 
 package com.cburch.logisim.prefs;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 public class Template {
+	private String contents;
+
+	private Template(String contents) {
+		this.contents = contents;
+	}
+
 	public static Template createEmpty() {
 		String circName = Strings.get("newCircuitName");
 		StringBuilder buf = new StringBuilder();
@@ -19,7 +21,7 @@ public class Template {
 		buf.append("</project>");
 		return new Template(buf.toString());
 	}
-	
+
 	public static Template create(InputStream in) {
 		InputStreamReader reader = new InputStreamReader(in);
 		char[] buf = new char[4096];
@@ -35,13 +37,7 @@ public class Template {
 		}
 		return new Template(dest.toString());
 	}
-	
-	private String contents;
-	
-	private Template(String contents) {
-		this.contents = contents;
-	}
-	
+
 	public InputStream createStream() {
 		try {
 			return new ByteArrayInputStream(contents.getBytes("UTF-8"));

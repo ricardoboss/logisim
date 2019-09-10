@@ -3,9 +3,6 @@
 
 package com.cburch.logisim.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitMutation;
 import com.cburch.logisim.circuit.CircuitTransaction;
@@ -17,6 +14,9 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.StringGetter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SetAttributeAction extends Action {
 	private StringGetter nameGetter;
 	private Circuit circuit;
@@ -25,7 +25,7 @@ public class SetAttributeAction extends Action {
 	private List<Object> values;
 	private List<Object> oldValues;
 	private CircuitTransaction xnReverse;
-	
+
 	public SetAttributeAction(Circuit circuit, StringGetter nameGetter) {
 		this.nameGetter = nameGetter;
 		this.circuit = circuit;
@@ -34,7 +34,7 @@ public class SetAttributeAction extends Action {
 		this.values = new ArrayList<Object>();
 		this.oldValues = new ArrayList<Object>();
 	}
-	
+
 	public void set(Component comp, Attribute<?> attr, Object value) {
 		@SuppressWarnings("unchecked")
 		Attribute<Object> a = (Attribute<Object>) attr;
@@ -42,16 +42,16 @@ public class SetAttributeAction extends Action {
 		attrs.add(a);
 		values.add(value);
 	}
-	
+
 	public boolean isEmpty() {
 		return comps.isEmpty();
 	}
-	
+
 	@Override
 	public String getName() {
 		return nameGetter.get();
 	}
-	
+
 	@Override
 	public void doIt(Project proj) {
 		CircuitMutation xn = new CircuitMutation(circuit);
@@ -67,10 +67,10 @@ public class SetAttributeAction extends Action {
 			} else {
 				AttributeSet compAttrs = comp.getAttributeSet();
 				oldValues.add(compAttrs.getValue(attr));
-				compAttrs.setValue(attr, value);    
+				compAttrs.setValue(attr, value);
 			}
 		}
-		
+
 		if (!xn.isEmpty()) {
 			CircuitTransactionResult result = xn.execute();
 			xnReverse = result.getReverseTransaction();

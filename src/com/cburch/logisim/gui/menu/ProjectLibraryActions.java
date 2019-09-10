@@ -3,6 +3,13 @@
 
 package com.cburch.logisim.gui.menu;
 
+import com.cburch.logisim.file.Loader;
+import com.cburch.logisim.file.LogisimFile;
+import com.cburch.logisim.file.LogisimFileActions;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.tools.Library;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,48 +17,8 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import javax.swing.JFileChooser;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-
-import com.cburch.logisim.file.Loader;
-import com.cburch.logisim.file.LogisimFile;
-import com.cburch.logisim.file.LogisimFileActions;
-import com.cburch.logisim.proj.Project;
-import com.cburch.logisim.tools.Library;
-
 public class ProjectLibraryActions {
-	private ProjectLibraryActions() { }
-	
-	private static class BuiltinOption {
-		Library lib;
-		BuiltinOption(Library lib) { this.lib = lib; }
-		@Override
-		public String toString() { return lib.getDisplayName(); }
-	}
-	
-	private static class LibraryJList extends JList {
-		LibraryJList(List<Library> libraries) {
-			ArrayList<BuiltinOption> options = new ArrayList<BuiltinOption>();
-			for (Library lib : libraries) {
-				options.add(new BuiltinOption(lib));
-			}
-			setListData(options.toArray());
-		}
-		
-		Library[] getSelectedLibraries() {
-			Object[] selected = getSelectedValues();
-			if (selected != null && selected.length > 0) {
-				Library[] libs = new Library[selected.length];
-				for (int i = 0; i < selected.length; i++) {
-					libs[i] = ((BuiltinOption) selected[i]).lib;
-				}
-				return libs;
-			} else {
-				return null;
-			}
-		}
+	private ProjectLibraryActions() {
 	}
 
 	public static void doLoadBuiltinLibrary(Project proj) {
@@ -61,22 +28,22 @@ public class ProjectLibraryActions {
 		builtins.removeAll(file.getLibraries());
 		if (builtins.isEmpty()) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
-					Strings.get("loadBuiltinNoneError"),
-					Strings.get("loadBuiltinErrorTitle"),
-					JOptionPane.INFORMATION_MESSAGE);
+				Strings.get("loadBuiltinNoneError"),
+				Strings.get("loadBuiltinErrorTitle"),
+				JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		LibraryJList list = new LibraryJList(builtins);
 		JScrollPane listPane = new JScrollPane(list);
 		int action = JOptionPane.showConfirmDialog(proj.getFrame(), listPane,
-				Strings.get("loadBuiltinDialogTitle"), JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+			Strings.get("loadBuiltinDialogTitle"), JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.QUESTION_MESSAGE);
 		if (action == JOptionPane.OK_OPTION) {
 			Library[] libs = list.getSelectedLibraries();
 			if (libs != null) proj.doAction(LogisimFileActions.loadLibraries(libs));
 		}
 	}
-	
+
 	public static void doLoadLogisimLibrary(Project proj) {
 		Loader loader = proj.getLogisimFile().getLoader();
 		JFileChooser chooser = loader.createChooser();
@@ -91,7 +58,7 @@ public class ProjectLibraryActions {
 			}
 		}
 	}
-	
+
 	public static void doLoadJarLibrary(Project proj) {
 		Loader loader = proj.getLogisimFile().getLoader();
 		JFileChooser chooser = loader.createChooser();
@@ -101,7 +68,7 @@ public class ProjectLibraryActions {
 		if (check == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			String className = null;
-			
+
 			// try to retrieve the class name from the "Library-Class"
 			// attribute in the manifest. This section of code was contributed
 			// by Christophe Jacquet (Request Tracker #2024431).
@@ -114,10 +81,13 @@ public class ProjectLibraryActions {
 				// if opening the JAR file failed, do nothing
 			} finally {
 				if (jarFile != null) {
-					try { jarFile.close(); } catch (IOException e) { }
+					try {
+						jarFile.close();
+					} catch (IOException e) {
+					}
 				}
 			}
-			
+
 			// if the class name was not found, go back to the good old dialog
 			if (className == null) {
 				className = JOptionPane.showInputDialog(proj.getFrame(),
@@ -134,7 +104,7 @@ public class ProjectLibraryActions {
 			}
 		}
 	}
-	
+
 	public static void doUnloadLibraries(Project proj) {
 		LogisimFile file = proj.getLogisimFile();
 		ArrayList<Library> canUnload = new ArrayList<Library>();
@@ -144,16 +114,16 @@ public class ProjectLibraryActions {
 		}
 		if (canUnload.isEmpty()) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
-					Strings.get("unloadNoneError"),
-					Strings.get("unloadErrorTitle"),
-					JOptionPane.INFORMATION_MESSAGE);
+				Strings.get("unloadNoneError"),
+				Strings.get("unloadErrorTitle"),
+				JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		LibraryJList list = new LibraryJList(canUnload);
 		JScrollPane listPane = new JScrollPane(list);
 		int action = JOptionPane.showConfirmDialog(proj.getFrame(), listPane,
-				Strings.get("unloadLibrariesDialogTitle"), JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+			Strings.get("unloadLibrariesDialogTitle"), JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.QUESTION_MESSAGE);
 		if (action == JOptionPane.OK_OPTION) {
 			Library[] libs = list.getSelectedLibraries();
 			if (libs != null) proj.doAction(LogisimFileActions.unloadLibraries(libs));
@@ -167,6 +137,42 @@ public class ProjectLibraryActions {
 				Strings.get("unloadErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		} else {
 			proj.doAction(LogisimFileActions.unloadLibrary(lib));
+		}
+	}
+
+	private static class BuiltinOption {
+		Library lib;
+
+		BuiltinOption(Library lib) {
+			this.lib = lib;
+		}
+
+		@Override
+		public String toString() {
+			return lib.getDisplayName();
+		}
+	}
+
+	private static class LibraryJList extends JList {
+		LibraryJList(List<Library> libraries) {
+			ArrayList<BuiltinOption> options = new ArrayList<BuiltinOption>();
+			for (Library lib : libraries) {
+				options.add(new BuiltinOption(lib));
+			}
+			setListData(options.toArray());
+		}
+
+		Library[] getSelectedLibraries() {
+			Object[] selected = getSelectedValues();
+			if (selected != null && selected.length > 0) {
+				Library[] libs = new Library[selected.length];
+				for (int i = 0; i < selected.length; i++) {
+					libs[i] = ((BuiltinOption) selected[i]).lib;
+				}
+				return libs;
+			} else {
+				return null;
+			}
 		}
 	}
 }

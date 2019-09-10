@@ -3,26 +3,27 @@
 
 package com.cburch.logisim.gui.generic;
 
-import java.awt.Image;
-import java.awt.Window;
+import com.cburch.logisim.util.WindowClosable;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-
-import com.cburch.logisim.util.WindowClosable;
-
 public class LFrame extends JFrame implements WindowClosable {
 	private static final String PATH = "resources/logisim/img/logisim-icon-";
-	private static final int[] SIZES = { 16, 20, 24, 48, 64, 128 };
-	private static List<Image> ICONS = null;
+	private static final int[] SIZES = {16, 20, 24, 48, 64, 128};
 	private static final int DEFAULT_SIZE = 48;
+	private static List<Image> ICONS = null;
 	private static Image DEFAULT_ICON = null;
-	
+
+	public LFrame() {
+		LFrame.attachIcon(this);
+	}
+
 	public static void attachIcon(Window frame) {
 		if (ICONS == null) {
 			List<Image> loadedIcons = new ArrayList<Image>();
@@ -39,7 +40,7 @@ public class LFrame extends JFrame implements WindowClosable {
 			}
 			ICONS = loadedIcons;
 		}
-		
+
 		boolean success = false;
 		try {
 			if (ICONS != null && !ICONS.isEmpty()) {
@@ -47,15 +48,12 @@ public class LFrame extends JFrame implements WindowClosable {
 				set.invoke(frame, ICONS);
 				success = true;
 			}
-		} catch (Exception e) { }
-		
+		} catch (Exception e) {
+		}
+
 		if (!success && frame instanceof JFrame && DEFAULT_ICON != null) {
 			((JFrame) frame).setIconImage(DEFAULT_ICON);
 		}
-	}
-
-	public LFrame() {
-		LFrame.attachIcon(this);
 	}
 
 	public void requestClose() {

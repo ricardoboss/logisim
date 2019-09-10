@@ -3,11 +3,11 @@
 
 package com.cburch.logisim.gui.start;
 
-import java.util.Locale;
-
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
+
+import java.util.Locale;
 
 class Strings {
 	private static LocaleManager source
@@ -16,12 +16,15 @@ class Strings {
 	public static String get(String key) {
 		return source.get(key);
 	}
+
 	public static String get(String key, String arg) {
 		return StringUtil.format(source.get(key), arg);
 	}
+
 	public static StringGetter getter(String key) {
 		return source.getter(key);
 	}
+
 	public static Locale[] getLocaleOptions() {
 		return source.getLocaleOptions();
 	}

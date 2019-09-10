@@ -3,10 +3,6 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 import com.cburch.draw.canvas.Selection;
 import com.cburch.draw.model.CanvasModel;
 import com.cburch.draw.model.CanvasObject;
@@ -17,6 +13,10 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.StringGetter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 class SelectionAction extends Action {
 	private StringGetter displayName;
@@ -30,11 +30,11 @@ class SelectionAction extends Action {
 	private Direction anchorNewFacing;
 	private Location anchorOldLocation;
 	private Direction anchorOldFacing;
-	
+
 	public SelectionAction(AppearanceCanvas canvas, StringGetter displayName,
-			Collection<CanvasObject> toRemove, Collection<CanvasObject> toAdd,
-			Collection<CanvasObject> newSelection, Location anchorLocation,
-			Direction anchorFacing) {
+						   Collection<CanvasObject> toRemove, Collection<CanvasObject> toAdd,
+						   Collection<CanvasObject> newSelection, Location anchorLocation,
+						   Direction anchorFacing) {
 		this.canvas = canvas;
 		this.canvasModel = canvas.getModel();
 		this.displayName = displayName;
@@ -50,7 +50,7 @@ class SelectionAction extends Action {
 	public String getName() {
 		return displayName.get();
 	}
-	
+
 	@Override
 	public void doIt(Project proj) {
 		Selection sel = canvas.getSelection();
@@ -63,7 +63,7 @@ class SelectionAction extends Action {
 		if (anchor != null && anchorNewLocation != null) {
 			anchorOldLocation = anchor.getLocation();
 			anchor.translate(anchorNewLocation.getX() - anchorOldLocation.getX(),
-					anchorNewLocation.getY() - anchorOldLocation.getY());
+				anchorNewLocation.getY() - anchorOldLocation.getY());
 		}
 		if (anchor != null && anchorNewFacing != null) {
 			anchorOldFacing = anchor.getFacing();
@@ -72,7 +72,7 @@ class SelectionAction extends Action {
 		sel.setSelected(newSelection, true);
 		canvas.repaint();
 	}
-	
+
 	private AppearanceAnchor findAnchor(CanvasModel canvasModel) {
 		for (Object o : canvasModel.getObjectsFromTop()) {
 			if (o instanceof AppearanceAnchor) {
@@ -81,13 +81,13 @@ class SelectionAction extends Action {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void undo(Project proj) {
 		AppearanceAnchor anchor = findAnchor(canvasModel);
 		if (anchor != null && anchorOldLocation != null) {
 			anchor.translate(anchorOldLocation.getX() - anchorNewLocation.getX(),
-					anchorOldLocation.getY() - anchorNewLocation.getY());
+				anchorOldLocation.getY() - anchorNewLocation.getY());
 		}
 		if (anchor != null && anchorOldFacing != null) {
 			anchor.setValue(AppearanceAnchor.FACING, anchorOldFacing);

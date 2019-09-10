@@ -12,36 +12,15 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.GifEncoder;
 import com.cburch.logisim.util.StringGetter;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.List;
-
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.List;
 
 class ExportImage {
 	private static final int SLIDER_DIVISIONS = 6;
@@ -49,10 +28,11 @@ class ExportImage {
 	private static final int FORMAT_GIF = 0;
 	private static final int FORMAT_PNG = 1;
 	private static final int FORMAT_JPG = 2;
-	
+
 	private static final int BORDER_SIZE = 5;
 
-	private ExportImage() { }
+	private ExportImage() {
+	}
 
 	static void doExport(Project proj) {
 		// First display circuit/parameter selection dialog
@@ -60,42 +40,42 @@ class ExportImage {
 		CircuitJList list = new CircuitJList(proj, true);
 		if (list.getModel().getSize() == 0) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
-					Strings.get("exportEmptyCircuitsMessage"),
-					Strings.get("exportEmptyCircuitsTitle"),
-					JOptionPane.YES_NO_OPTION);
+				Strings.get("exportEmptyCircuitsMessage"),
+				Strings.get("exportEmptyCircuitsTitle"),
+				JOptionPane.YES_NO_OPTION);
 			return;
 		}
 		OptionsPanel options = new OptionsPanel(list);
 		int action = JOptionPane.showConfirmDialog(frame,
-				options, Strings.get("exportImageSelect"),
-				JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+			options, Strings.get("exportImageSelect"),
+			JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.QUESTION_MESSAGE);
 		if (action != JOptionPane.OK_OPTION) return;
 		List<Circuit> circuits = list.getSelectedCircuits();
 		double scale = options.getScale();
 		boolean printerView = options.getPrinterView();
 		if (circuits.isEmpty()) return;
-		
+
 		ImageFileFilter filter;
 		int fmt = options.getImageFormat();
 		switch (options.getImageFormat()) {
-		case FORMAT_GIF:
-			filter = new ImageFileFilter(fmt, Strings.getter("exportGifFilter"),
-				new String[] { "gif" });
-			break;
-		case FORMAT_PNG:
-			filter = new ImageFileFilter(fmt, Strings.getter("exportPngFilter"),
-				new String[] { "png" });
-			break;
-		case FORMAT_JPG:
-			filter = new ImageFileFilter(fmt, Strings.getter("exportJpgFilter"),
-				new String[] { "jpg", "jpeg", "jpe", "jfi", "jfif", "jfi" });
-			break;
-		default:
-			System.err.println("unexpected format; aborted"); //OK
-			return;
+			case FORMAT_GIF:
+				filter = new ImageFileFilter(fmt, Strings.getter("exportGifFilter"),
+					new String[]{"gif"});
+				break;
+			case FORMAT_PNG:
+				filter = new ImageFileFilter(fmt, Strings.getter("exportPngFilter"),
+					new String[]{"png"});
+				break;
+			case FORMAT_JPG:
+				filter = new ImageFileFilter(fmt, Strings.getter("exportJpgFilter"),
+					new String[]{"jpg", "jpeg", "jpe", "jfi", "jfif", "jfi"});
+				break;
+			default:
+				System.err.println("unexpected format; aborted"); //OK
+				return;
 		}
-		
+
 		// Then display file chooser
 		Loader loader = proj.getLogisimFile().getLoader();
 		JFileChooser chooser = loader.createChooser();
@@ -125,9 +105,9 @@ class ExportImage {
 				boolean created = dest.mkdir();
 				if (!created) {
 					JOptionPane.showMessageDialog(proj.getFrame(),
-							Strings.get("exportNewDirectoryErrorMessage"),
-							Strings.get("exportNewDirectoryErrorTitle"),
-							JOptionPane.YES_NO_OPTION);
+						Strings.get("exportNewDirectoryErrorMessage"),
+						Strings.get("exportNewDirectoryErrorTitle"),
+						JOptionPane.YES_NO_OPTION);
 					return;
 				}
 			}
@@ -135,9 +115,9 @@ class ExportImage {
 
 		// Create the progress monitor
 		ProgressMonitor monitor = new ProgressMonitor(frame,
-				Strings.get("exportImageProgress"),
-				null,
-				0, 10000);
+			Strings.get("exportImageProgress"),
+			null,
+			0, 10000);
 		monitor.setMillisToDecideToPopup(100);
 		monitor.setMillisToPopup(200);
 		monitor.setProgress(0);
@@ -146,7 +126,7 @@ class ExportImage {
 		// (This is run in a thread so that Swing will update the
 		// monitor.)
 		new ExportThread(frame, frame.getCanvas(), dest, filter,
-				circuits, scale, printerView, monitor).start();
+			circuits, scale, printerView, monitor).start();
 
 	}
 
@@ -173,7 +153,7 @@ class ExportImage {
 			formatPng.setSelected(true);
 
 			slider = new JSlider(JSlider.HORIZONTAL,
-					-3 * SLIDER_DIVISIONS, 3 * SLIDER_DIVISIONS, 0);
+				-3 * SLIDER_DIVISIONS, 3 * SLIDER_DIVISIONS, 0);
 			slider.setMajorTickSpacing(10);
 			slider.addChangeListener(this);
 			curScale = new JLabel("222%");
@@ -181,7 +161,7 @@ class ExportImage {
 			curScale.setVerticalAlignment(SwingConstants.CENTER);
 			curScaleDim = new Dimension(curScale.getPreferredSize());
 			curScaleDim.height = Math.max(curScaleDim.height,
-					slider.getPreferredSize().height);
+				slider.getPreferredSize().height);
 			stateChanged(null);
 
 			printerView = new JCheckBox();
@@ -202,7 +182,7 @@ class ExportImage {
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			addGb(new JScrollPane(list));
 			gbc.fill = GridBagConstraints.NONE;
-			
+
 			gbc.gridy++;
 			addGb(new JLabel(Strings.get("labelImageFormat") + " "));
 			Box formatsPanel = new Box(BoxLayout.Y_AXIS);
@@ -210,17 +190,17 @@ class ExportImage {
 			formatsPanel.add(formatGif);
 			formatsPanel.add(formatJpg);
 			addGb(formatsPanel);
-			
+
 			gbc.gridy++;
 			addGb(new JLabel(Strings.get("labelScale") + " "));
 			addGb(slider);
 			addGb(curScale);
-			
+
 			gbc.gridy++;
 			addGb(new JLabel(Strings.get("labelPrinterView") + " "));
 			addGb(printerView);
 		}
-		
+
 		private void addGb(JComponent comp) {
 			gridbag.setConstraints(comp, gbc);
 			add(comp);
@@ -229,9 +209,11 @@ class ExportImage {
 		double getScale() {
 			return Math.pow(2.0, (double) slider.getValue() / SLIDER_DIVISIONS);
 		}
-		
-		boolean getPrinterView() { return printerView.isSelected(); }
-		
+
+		boolean getPrinterView() {
+			return printerView.isSelected();
+		}
+
 		int getImageFormat() {
 			if (formatGif.isSelected()) return FORMAT_GIF;
 			if (formatJpg.isSelected()) return FORMAT_JPG;
@@ -244,21 +226,21 @@ class ExportImage {
 			if (curScaleDim != null) curScale.setPreferredSize(curScaleDim);
 		}
 	}
-	
+
 	private static class ImageFileFilter extends FileFilter {
 		private int type;
 		private String[] extensions;
 		private StringGetter desc;
-		
+
 		private ImageFileFilter(int type, StringGetter desc, String[] exts) {
 			this.type = type;
 			this.desc = desc;
 			extensions = new String[exts.length];
 			for (int i = 0; i < exts.length; i++) {
-				extensions[i] = "." + exts[i].toLowerCase();    
+				extensions[i] = "." + exts[i].toLowerCase();
 			}
 		}
-		
+
 		@Override
 		public boolean accept(File f) {
 			String name = f.getName().toLowerCase();
@@ -285,8 +267,8 @@ class ExportImage {
 		ProgressMonitor monitor;
 
 		ExportThread(Frame frame, Canvas canvas, File dest, ImageFileFilter f,
-				List<Circuit> circuits, double scale, boolean printerView,
-				ProgressMonitor monitor) {
+					 List<Circuit> circuits, double scale, boolean printerView,
+					 ProgressMonitor monitor) {
 			this.frame = frame;
 			this.canvas = canvas;
 			this.dest = dest;
@@ -303,14 +285,14 @@ class ExportImage {
 				export(circ);
 			}
 		}
-		
+
 		private void export(Circuit circuit) {
 			Bounds bds = circuit.getBounds(canvas.getGraphics())
 				.expand(BORDER_SIZE);
 			int width = (int) Math.round(bds.getWidth() * scale);
 			int height = (int) Math.round(bds.getHeight() * scale);
 			BufferedImage img = new BufferedImage(width, height,
-					BufferedImage.TYPE_INT_RGB);
+				BufferedImage.TYPE_INT_RGB);
 			Graphics base = img.getGraphics();
 			Graphics g = base.create();
 			g.setColor(Color.white);
@@ -321,13 +303,13 @@ class ExportImage {
 				((Graphics2D) g).translate(-bds.getX(), -bds.getY());
 			} else {
 				JOptionPane.showMessageDialog(frame,
-						Strings.get("couldNotCreateImage"));
+					Strings.get("couldNotCreateImage"));
 				monitor.close();
 			}
 
 			CircuitState circuitState = canvas.getProject().getCircuitState(circuit);
 			ComponentDrawContext context = new ComponentDrawContext(canvas,
-					circuit, circuitState, base, g, printerView);
+				circuit, circuitState, base, g, printerView);
 			circuit.draw(context, null);
 
 			File where;
@@ -341,13 +323,19 @@ class ExportImage {
 			}
 			try {
 				switch (filter.type) {
-				case FORMAT_GIF: GifEncoder.toFile(img, where, monitor); break;
-				case FORMAT_PNG: ImageIO.write(img, "PNG", where); break;
-				case FORMAT_JPG: ImageIO.write(img, "JPEG", where); break;
+					case FORMAT_GIF:
+						GifEncoder.toFile(img, where, monitor);
+						break;
+					case FORMAT_PNG:
+						ImageIO.write(img, "PNG", where);
+						break;
+					case FORMAT_JPG:
+						ImageIO.write(img, "JPEG", where);
+						break;
 				}
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(frame,
-						Strings.get("couldNotCreateFile"));
+					Strings.get("couldNotCreateFile"));
 				monitor.close();
 				return;
 			}

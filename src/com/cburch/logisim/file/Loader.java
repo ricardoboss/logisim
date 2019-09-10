@@ -3,22 +3,6 @@
 
 package com.cburch.logisim.file;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.filechooser.FileFilter;
-
 import com.cburch.logisim.std.Builtin;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.JFileChoosers;
@@ -26,59 +10,63 @@ import com.cburch.logisim.util.MacCompatibility;
 import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.ZipClassLoader;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 public class Loader implements LibraryLoader {
 	public static final String LOGISIM_EXTENSION = ".circ";
 	public static final FileFilter LOGISIM_FILTER = new LogisimFileFilter();
 	public static final FileFilter JAR_FILTER = new JarFileFilter();
-
-	private static class LogisimFileFilter extends FileFilter {
-		@Override
-		public boolean accept(File f) {
-			return f.isDirectory()
-				|| f.getName().endsWith(LOGISIM_EXTENSION);
-		}
-
-		@Override
-		public String getDescription() {
-			return Strings.get("logisimFileFilter");
-		}
-	}
-
-	private static class JarFileFilter extends FileFilter {
-		@Override
-		public boolean accept(File f) {
-			return f.isDirectory()
-				|| f.getName().endsWith(".jar");
-		}
-
-		@Override
-		public String getDescription() {
-			return Strings.get("jarFileFilter");
-		}
-	}
-	
 	// fixed
 	private Component parent;
 	private Builtin builtin = new Builtin();
-
 	// to be cleared with each new file
 	private File mainFile = null;
 	private Stack<File> filesOpening = new Stack<File>();
-	private Map<File,File> substitutions = new HashMap<File,File>();
-
+	private Map<File, File> substitutions = new HashMap<File, File>();
 	public Loader(Component parent) {
 		this.parent = parent;
 		clear();
 	}
-	
+
+	private static File determineBackupName(File base) {
+		File dir = base.getParentFile();
+		String name = base.getName();
+		if (name.endsWith(LOGISIM_EXTENSION)) {
+			name = name.substring(0, name.length() - LOGISIM_EXTENSION.length());
+		}
+		for (int i = 1; i <= 20; i++) {
+			String ext = i == 1 ? ".bak" : (".bak" + i);
+			File candidate = new File(dir, name + ext);
+			if (!candidate.exists()) return candidate;
+		}
+		return null;
+	}
+
+	private static void recoverBackup(File backup, File dest) {
+		if (backup != null && backup.exists()) {
+			if (dest.exists()) dest.delete();
+			backup.renameTo(dest);
+		}
+	}
+
 	public Builtin getBuiltin() {
 		return builtin;
 	}
-	
+
 	public void setParent(Component value) {
 		parent = value;
 	}
-	
+
 	private File getSubstitution(File source) {
 		File ret = substitutions.get(source);
 		return ret == null ? source : ret;
@@ -89,6 +77,10 @@ public class Loader implements LibraryLoader {
 	//
 	public File getMainFile() {
 		return mainFile;
+	}
+
+	private void setMainFile(File value) {
+		mainFile = value;
 	}
 
 	public JFileChooser createChooser() {
@@ -106,10 +98,6 @@ public class Loader implements LibraryLoader {
 		return ref == null ? null : ref.getParentFile();
 	}
 
-	private void setMainFile(File value) {
-		mainFile = value;
-	}
-
 	//
 	// more substantive methods accessed from outside this package
 	//
@@ -117,9 +105,9 @@ public class Loader implements LibraryLoader {
 		filesOpening.clear();
 		mainFile = null;
 	}
-	
-	public LogisimFile openLogisimFile(File file, Map<File,File> substitutions)
-			throws LoadFailedException {
+
+	public LogisimFile openLogisimFile(File file, Map<File, File> substitutions)
+		throws LoadFailedException {
 		this.substitutions = substitutions;
 		try {
 			return openLogisimFile(file);
@@ -138,9 +126,9 @@ public class Loader implements LibraryLoader {
 			throw new LoadFailedException(e.getMessage(), e.isShown());
 		}
 	}
-	
+
 	public LogisimFile openLogisimFile(InputStream reader)
-			throws LoadFailedException, IOException {
+		throws LoadFailedException, IOException {
 		LogisimFile ret = null;
 		try {
 			ret = LogisimFile.load(reader, this);
@@ -160,34 +148,35 @@ public class Loader implements LibraryLoader {
 		}
 		return ret;
 	}
-	
+
 	public Library loadJarLibrary(File file, String className) {
 		File actual = getSubstitution(file);
 		return LibraryManager.instance.loadJarLibrary(this, actual, className);
 	}
-	
+
 	public void reload(LoadedLibrary lib) {
 		LibraryManager.instance.reload(this, lib);
 	}
-	
+
 	public boolean save(LogisimFile file, File dest) {
 		Library reference = LibraryManager.instance.findReference(file, dest);
 		if (reference != null) {
 			JOptionPane.showMessageDialog(parent,
-					StringUtil.format(Strings.get("fileCircularError"), reference.getDisplayName()),
-					Strings.get("fileSaveErrorTitle"),
-					JOptionPane.ERROR_MESSAGE);
+				StringUtil.format(Strings.get("fileCircularError"), reference.getDisplayName()),
+				Strings.get("fileSaveErrorTitle"),
+				JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-		
+
 		File backup = determineBackupName(dest);
 		boolean backupCreated = backup != null && dest.renameTo(backup);
-		
+
 		FileOutputStream fwrite = null;
 		try {
 			try {
 				MacCompatibility.setFileCreatorAndType(dest, "LGSM", "circ");
-			} catch (IOException e) { }
+			} catch (IOException e) {
+			}
 			fwrite = new FileOutputStream(dest);
 			file.write(fwrite, this);
 			file.setName(toProjectName(dest));
@@ -220,7 +209,7 @@ public class Loader implements LibraryLoader {
 				}
 			}
 		}
-		
+
 		if (!dest.exists() || dest.length() == 0) {
 			if (backupCreated && backup != null && backup.exists()) {
 				recoverBackup(backup, dest);
@@ -228,48 +217,27 @@ public class Loader implements LibraryLoader {
 				dest.delete();
 			}
 			JOptionPane.showMessageDialog(parent,
-					Strings.get("fileSaveZeroError"),
-					Strings.get("fileSaveErrorTitle"),
-					JOptionPane.ERROR_MESSAGE);
+				Strings.get("fileSaveZeroError"),
+				Strings.get("fileSaveErrorTitle"),
+				JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-		
+
 		if (backupCreated && backup.exists()) {
 			backup.delete();
 		}
 		return true;
 	}
-	
-	private static File determineBackupName(File base) {
-		File dir = base.getParentFile();
-		String name = base.getName();
-		if (name.endsWith(LOGISIM_EXTENSION)) {
-			name = name.substring(0, name.length() - LOGISIM_EXTENSION.length());
-		}
-		for (int i = 1; i <= 20; i++) {
-			String ext = i == 1 ? ".bak" : (".bak" + i);
-			File candidate = new File(dir, name + ext);
-			if (!candidate.exists()) return candidate;
-		}
-		return null;
-	}
-	
-	private static void recoverBackup(File backup, File dest) {
-		if (backup != null && backup.exists()) {
-			if (dest.exists()) dest.delete();
-			backup.renameTo(dest);
-		}
-	}
 
 	//
 	// methods for LibraryManager
-	//  
+	//
 	LogisimFile loadLogisimFile(File request) throws LoadFailedException {
 		File actual = getSubstitution(request);
 		for (File fileOpening : filesOpening) {
 			if (fileOpening.equals(actual)) {
 				throw new LoadFailedException(StringUtil.format(Strings.get("logisimCircularError"),
-						toProjectName(actual)));
+					toProjectName(actual)));
 			}
 		}
 
@@ -279,7 +247,7 @@ public class Loader implements LibraryLoader {
 			ret = LogisimFile.load(actual, this);
 		} catch (IOException e) {
 			throw new LoadFailedException(StringUtil.format(Strings.get("logisimLoadError"),
-					toProjectName(actual), e.toString()));
+				toProjectName(actual), e.toString()));
 		} finally {
 			filesOpening.pop();
 		}
@@ -295,10 +263,10 @@ public class Loader implements LibraryLoader {
 		// a custom-written class ZipClassLoader instead. The ZipClassLoader
 		// is based on something downloaded off a forum, and I'm not as sure
 		// that it works as well. It certainly does more file accesses.
-		
+
 		// Anyway, here's the line for this new version:
 		ZipClassLoader loader = new ZipClassLoader(actual);
-		
+
 		// And here's the code that was present up until 2.1.8, and which I
 		// know to work well except for the closing-files bit. If necessary, we
 		// can revert by deleting the above declaration and reinstating the below.
@@ -313,7 +281,7 @@ public class Loader implements LibraryLoader {
 		}
 		URLClassLoader loader = new URLClassLoader(new URL[] { url });
 		*/
-		
+
 		// load library class from loader
 		Class<?> retClass;
 		try {
@@ -324,7 +292,7 @@ public class Loader implements LibraryLoader {
 		if (!(Library.class.isAssignableFrom(retClass))) {
 			throw new LoadFailedException(StringUtil.format(Strings.get("jarClassNotLibraryError"), className));
 		}
-		
+
 		// instantiate library
 		Library ret;
 		try {
@@ -356,11 +324,11 @@ public class Loader implements LibraryLoader {
 				description = init + " " + description;
 			}
 		}
-		
+
 		if (description.contains("\n") || description.length() > 60) {
 			int lines = 1;
 			for (int pos = description.indexOf('\n'); pos >= 0;
-					pos = description.indexOf('\n', pos + 1)) {
+				 pos = description.indexOf('\n', pos + 1)) {
 				lines++;
 			}
 			lines = Math.max(4, Math.min(lines, 7));
@@ -369,14 +337,14 @@ public class Loader implements LibraryLoader {
 			textArea.setEditable(false);
 			textArea.setText(description);
 			textArea.setCaretPosition(0);
-			
-			JScrollPane scrollPane = new JScrollPane(textArea);		
+
+			JScrollPane scrollPane = new JScrollPane(textArea);
 			scrollPane.setPreferredSize(new Dimension(350, 150));
 			JOptionPane.showMessageDialog(parent, scrollPane,
-					Strings.get("fileErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				Strings.get("fileErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		} else {
 			JOptionPane.showMessageDialog(parent, description,
-					Strings.get("fileErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				Strings.get("fileErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -424,6 +392,32 @@ public class Loader implements LibraryLoader {
 			return ret.substring(0, ret.length() - LOGISIM_EXTENSION.length());
 		} else {
 			return ret;
+		}
+	}
+
+	private static class LogisimFileFilter extends FileFilter {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory()
+				|| f.getName().endsWith(LOGISIM_EXTENSION);
+		}
+
+		@Override
+		public String getDescription() {
+			return Strings.get("logisimFileFilter");
+		}
+	}
+
+	private static class JarFileFilter extends FileFilter {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory()
+				|| f.getName().endsWith(".jar");
+		}
+
+		@Override
+		public String getDescription() {
+			return Strings.get("jarFileFilter");
 		}
 	}
 

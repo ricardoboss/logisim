@@ -3,9 +3,16 @@
 
 package com.cburch.logisim.gui.prefs;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.cburch.logisim.file.Loader;
+import com.cburch.logisim.file.LoaderException;
+import com.cburch.logisim.file.LogisimFile;
+import com.cburch.logisim.prefs.AppPreferences;
+import com.cburch.logisim.prefs.Template;
+import com.cburch.logisim.util.JFileChoosers;
+import com.cburch.logisim.util.StringUtil;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,23 +22,93 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
-import com.cburch.logisim.file.Loader;
-import com.cburch.logisim.file.LoaderException;
-import com.cburch.logisim.file.LogisimFile;
-import com.cburch.logisim.prefs.AppPreferences;
-import com.cburch.logisim.prefs.Template;
-import com.cburch.logisim.util.JFileChoosers;
-import com.cburch.logisim.util.StringUtil;
-
 class TemplateOptions extends OptionsPanel {
+	private MyListener myListener = new MyListener();
+	private JRadioButton plain = new JRadioButton();
+	private JRadioButton empty = new JRadioButton();
+	private JRadioButton custom = new JRadioButton();
+	private JTextField templateField = new JTextField(40);
+	private JButton templateButton = new JButton();
+	public TemplateOptions(PreferencesFrame window) {
+		super(window);
+
+		ButtonGroup bgroup = new ButtonGroup();
+		bgroup.add(plain);
+		bgroup.add(empty);
+		bgroup.add(custom);
+
+		plain.addActionListener(myListener);
+		empty.addActionListener(myListener);
+		custom.addActionListener(myListener);
+		templateField.setEditable(false);
+		templateButton.addActionListener(myListener);
+		myListener.computeEnabled();
+
+		GridBagLayout gridbag = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+		setLayout(gridbag);
+		gbc.weightx = 1.0;
+		gbc.gridx = 0;
+		gbc.gridy = GridBagConstraints.RELATIVE;
+		gbc.gridwidth = 3;
+		gbc.anchor = GridBagConstraints.LINE_START;
+		gridbag.setConstraints(plain, gbc);
+		add(plain);
+		gridbag.setConstraints(empty, gbc);
+		add(empty);
+		gridbag.setConstraints(custom, gbc);
+		add(custom);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 1;
+		gbc.gridy = 3;
+		gbc.gridx = GridBagConstraints.RELATIVE;
+		JPanel strut = new JPanel();
+		strut.setMinimumSize(new Dimension(50, 1));
+		strut.setPreferredSize(new Dimension(50, 1));
+		gbc.weightx = 0.0;
+		gridbag.setConstraints(strut, gbc);
+		add(strut);
+		gbc.weightx = 1.0;
+		gridbag.setConstraints(templateField, gbc);
+		add(templateField);
+		gbc.weightx = 0.0;
+		gridbag.setConstraints(templateButton, gbc);
+		add(templateButton);
+
+		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_TYPE, myListener);
+		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_FILE, myListener);
+		switch (AppPreferences.getTemplateType()) {
+			case AppPreferences.TEMPLATE_PLAIN:
+				plain.setSelected(true);
+				break;
+			case AppPreferences.TEMPLATE_EMPTY:
+				empty.setSelected(true);
+				break;
+			case AppPreferences.TEMPLATE_CUSTOM:
+				custom.setSelected(true);
+				break;
+		}
+		myListener.setTemplateField(AppPreferences.getTemplateFile());
+	}
+
+	@Override
+	public String getTitle() {
+		return Strings.get("templateTitle");
+	}
+
+	@Override
+	public String getHelpText() {
+		return Strings.get("templateHelp");
+	}
+
+	@Override
+	public void localeChanged() {
+		plain.setText(Strings.get("templatePlainOption"));
+		empty.setText(Strings.get("templateEmptyOption"));
+		custom.setText(Strings.get("templateCustomOption"));
+		templateButton.setText(Strings.get("templateSelectButton"));
+	}
+
 	private class MyListener implements ActionListener, PropertyChangeListener {
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
@@ -55,16 +132,18 @@ class TemplateOptions extends OptionsPanel {
 					} catch (LoaderException ex) {
 					} catch (IOException ex) {
 						JOptionPane.showMessageDialog(getPreferencesFrame(),
-								StringUtil.format(Strings.get("templateErrorMessage"), ex.toString()),
-								Strings.get("templateErrorTitle"),
-								JOptionPane.ERROR_MESSAGE);
+							StringUtil.format(Strings.get("templateErrorMessage"), ex.toString()),
+							Strings.get("templateErrorTitle"),
+							JOptionPane.ERROR_MESSAGE);
 					} finally {
 						try {
 							if (reader != null) reader.close();
-						} catch (IOException ex) { }
+						} catch (IOException ex) {
+						}
 						try {
 							if (reader != null) reader2.close();
-						} catch (IOException ex) { }
+						} catch (IOException ex) {
+						}
 					}
 				}
 			} else {
@@ -88,7 +167,7 @@ class TemplateOptions extends OptionsPanel {
 				setTemplateField((File) event.getNewValue());
 			}
 		}
-		
+
 		private void setTemplateField(File f) {
 			try {
 				templateField.setText(f == null ? "" : f.getCanonicalPath());
@@ -97,83 +176,10 @@ class TemplateOptions extends OptionsPanel {
 			}
 			computeEnabled();
 		}
-		
+
 		private void computeEnabled() {
 			custom.setEnabled(!templateField.getText().equals(""));
 			templateField.setEnabled(custom.isSelected());
 		}
-	}
-	
-	private MyListener myListener = new MyListener();
-
-	private JRadioButton plain = new JRadioButton();
-	private JRadioButton empty = new JRadioButton();
-	private JRadioButton custom = new JRadioButton();
-	private JTextField templateField = new JTextField(40);
-	private JButton templateButton = new JButton();
-
-	public TemplateOptions(PreferencesFrame window) {
-		super(window);
-		
-		ButtonGroup bgroup = new ButtonGroup();
-		bgroup.add(plain);
-		bgroup.add(empty);
-		bgroup.add(custom);
-		
-		plain.addActionListener(myListener);
-		empty.addActionListener(myListener);
-		custom.addActionListener(myListener);
-		templateField.setEditable(false);
-		templateButton.addActionListener(myListener);
-		myListener.computeEnabled();
-		
-		GridBagLayout gridbag = new GridBagLayout();
-		GridBagConstraints gbc = new GridBagConstraints();
-		setLayout(gridbag);
-		gbc.weightx = 1.0;
-		gbc.gridx = 0;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.gridwidth = 3;
-		gbc.anchor = GridBagConstraints.LINE_START;
-		gridbag.setConstraints(plain, gbc); add(plain);
-		gridbag.setConstraints(empty, gbc); add(empty);
-		gridbag.setConstraints(custom, gbc); add(custom);
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 1;
-		gbc.gridy = 3;
-		gbc.gridx = GridBagConstraints.RELATIVE;
-		JPanel strut = new JPanel();
-		strut.setMinimumSize(new Dimension(50, 1));
-		strut.setPreferredSize(new Dimension(50, 1));
-		gbc.weightx = 0.0; gridbag.setConstraints(strut, gbc); add(strut);
-		gbc.weightx = 1.0; gridbag.setConstraints(templateField, gbc); add(templateField);
-		gbc.weightx = 0.0; gridbag.setConstraints(templateButton, gbc); add(templateButton);
-		
-		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_TYPE, myListener);
-		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_FILE, myListener);
-		switch (AppPreferences.getTemplateType()) {
-		case AppPreferences.TEMPLATE_PLAIN: plain.setSelected(true); break;
-		case AppPreferences.TEMPLATE_EMPTY: empty.setSelected(true); break;
-		case AppPreferences.TEMPLATE_CUSTOM: custom.setSelected(true); break;
-		}
-		myListener.setTemplateField(AppPreferences.getTemplateFile());
-	}
-
-	@Override
-	public String getTitle() {
-		return Strings.get("templateTitle");
-	}
-
-	@Override
-	public String getHelpText() {
-		return Strings.get("templateHelp");
-	}
-	
-	@Override
-	public void localeChanged() {
-		plain.setText(Strings.get("templatePlainOption"));
-		empty.setText(Strings.get("templateEmptyOption"));
-		custom.setText(Strings.get("templateCustomOption"));
-		templateButton.setText(Strings.get("templateSelectButton"));
 	}
 }

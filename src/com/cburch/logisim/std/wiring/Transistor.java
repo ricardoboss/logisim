@@ -7,32 +7,17 @@
 
 package com.cburch.logisim.std.wiring;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-
-import javax.swing.Icon;
-
 import com.cburch.logisim.circuit.Wire;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
-import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.WireRepair;
 import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Transistor extends InstanceFactory {
 	static final AttributeOption TYPE_P
@@ -41,22 +26,22 @@ public class Transistor extends InstanceFactory {
 		= new AttributeOption("n", Strings.getter("transistorTypeN"));
 	static final Attribute<AttributeOption> ATTR_TYPE
 		= Attributes.forOption("type", Strings.getter("transistorTypeAttr"),
-				new AttributeOption[] { TYPE_P, TYPE_N });
-	
+		new AttributeOption[]{TYPE_P, TYPE_N});
+
 	static final int OUTPUT = 0;
 	static final int INPUT = 1;
 	static final int GATE = 2;
-	
+
 	private static final Icon ICON_N = Icons.getIcon("trans1.gif");
 	private static final Icon ICON_P = Icons.getIcon("trans0.gif");
 
 	public Transistor() {
 		super("Transistor", Strings.getter("transistorComponent"));
 		setAttributes(
-				new Attribute[] { ATTR_TYPE, StdAttr.FACING,
-						Wiring.ATTR_GATE, StdAttr.WIDTH },
-				new Object[] { TYPE_P, Direction.EAST,
-						Wiring.GATE_TOP_LEFT, BitWidth.ONE });
+			new Attribute[]{ATTR_TYPE, StdAttr.FACING,
+				Wiring.ATTR_GATE, StdAttr.WIDTH},
+			new Object[]{TYPE_P, Direction.EAST,
+				Wiring.GATE_TOP_LEFT, BitWidth.ONE});
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
@@ -107,7 +92,7 @@ public class Transistor extends InstanceFactory {
 		}
 		instance.setPorts(ports);
 	}
-	
+
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == WireRepair.class) {
@@ -135,7 +120,7 @@ public class Transistor extends InstanceFactory {
 			return Bounds.create(-40, delta, 40, 20);
 		}
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, AttributeSet attrs) {
 		if (super.contains(loc, attrs)) {
@@ -151,7 +136,7 @@ public class Transistor extends InstanceFactory {
 	public void propagate(InstanceState state) {
 		state.setPort(OUTPUT, computeOutput(state), 1);
 	}
-	
+
 	private Value computeOutput(InstanceState state) {
 		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
 		Value gate = state.getPort(GATE);
@@ -177,7 +162,7 @@ public class Transistor extends InstanceFactory {
 			return input;
 		}
 	}
-	
+
 	@Override
 	public void paintIcon(InstancePainter painter) {
 		Object type = painter.getAttributeValue(ATTR_TYPE);
@@ -230,7 +215,7 @@ public class Transistor extends InstanceFactory {
 			output = base;
 			platform = base;
 		}
-		
+
 		// input and output lines
 		GraphicsUtil.switchToWidth(g, Wire.WIDTH);
 		g.setColor(output);
@@ -251,7 +236,7 @@ public class Transistor extends InstanceFactory {
 			g.drawLine(-20, m * 20, -20, m * 11);
 			GraphicsUtil.switchToWidth(g, 1);
 		}
-		
+
 		// draw platforms
 		g.drawLine(-10, m * 10, -30, m * 10); // gate platform
 		g.setColor(platform);

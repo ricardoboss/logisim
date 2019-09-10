@@ -3,26 +3,6 @@
 
 package com.cburch.logisim.file;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.xml.sax.SAXException;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.comp.Component;
@@ -34,34 +14,18 @@ import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.EventSourceWeakSupport;
 import com.cburch.logisim.util.ListUtil;
 import com.cburch.logisim.util.StringUtil;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class LogisimFile extends Library implements LibraryEventSource {
-	private static class WritingThread extends Thread {
-		OutputStream out;
-		LogisimFile file;
-
-		WritingThread(OutputStream out, LogisimFile file) {
-			this.out = out;
-			this.file = file;
-		}
-
-		@Override
-		public void run() {
-			try {
-				file.write(out, file.loader);
-			} catch (IOException e) {
-				file.loader.showError(StringUtil.format(
-					Strings.get("fileDuplicateError"), e.toString()));
-			}
-			try {
-				out.close();
-			} catch (IOException e) {
-				file.loader.showError(StringUtil.format(
-					Strings.get("fileDuplicateError"), e.toString()));
-			}
-		}
-	}
-
 	private EventSourceWeakSupport<LibraryListener> listeners
 		= new EventSourceWeakSupport<LibraryListener>();
 	private Loader loader;
@@ -72,10 +36,9 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	private Circuit main = null;
 	private String name;
 	private boolean dirty = false;
-
 	LogisimFile(Loader loader) {
 		this.loader = loader;
-		
+
 		name = Strings.get("defaultProjectName");
 		if (Projects.windowNamed(name)) {
 			for (int i = 2; true; i++) {
@@ -89,13 +52,120 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	}
 
 	//
+	// creation methods
+	//
+	public static LogisimFile createNew(Loader loader) {
+		LogisimFile ret = new LogisimFile(loader);
+		ret.main = new Circuit("main");
+		// The name will be changed in LogisimPreferences
+		ret.tools.add(new AddTool(ret.main.getSubcircuitFactory()));
+		return ret;
+	}
+
+	public static LogisimFile load(File file, Loader loader)
+		throws IOException {
+		InputStream in = new FileInputStream(file);
+		Throwable firstExcept = null;
+		try {
+			return loadSub(in, loader);
+		} catch (Throwable t) {
+			firstExcept = t;
+		} finally {
+			in.close();
+		}
+
+		if (firstExcept != null) {
+			// We'll now try to do it using a reader. This is to work around
+			// Logisim versions prior to 2.5.1, when files were not saved using
+			// UTF-8 as the encoding (though the XML file reported otherwise).
+			try {
+				in = new ReaderInputStream(new FileReader(file), "UTF8");
+				return loadSub(in, loader);
+			} catch (Throwable t) {
+				loader.showError(StringUtil.format(
+					Strings.get("xmlFormatError"), firstExcept.toString()));
+			} finally {
+				try {
+					in.close();
+				} catch (Throwable t) {
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static LogisimFile load(InputStream in, Loader loader)
+		throws IOException {
+		try {
+			return loadSub(in, loader);
+		} catch (SAXException e) {
+			loader.showError(StringUtil.format(
+				Strings.get("xmlFormatError"), e.toString()));
+			return null;
+		}
+	}
+
+	public static LogisimFile loadSub(InputStream in, Loader loader)
+		throws IOException, SAXException {
+		// fetch first line and then reset
+		BufferedInputStream inBuffered = new BufferedInputStream(in);
+		String firstLine = getFirstLine(inBuffered);
+
+		if (firstLine == null) {
+			throw new IOException("File is empty");
+		} else if (firstLine.equals("Logisim v1.0")) {
+			// if this is a 1.0 file, then set up a pipe to translate to
+			// 2.0 and then interpret as a 2.0 file
+			throw new IOException("Version 1.0 files no longer supported");
+		}
+
+		XmlReader xmlReader = new XmlReader(loader);
+		LogisimFile ret = xmlReader.readLibrary(inBuffered);
+		ret.loader = loader;
+		return ret;
+	}
+
+	private static String getFirstLine(BufferedInputStream in)
+		throws IOException {
+		byte[] first = new byte[512];
+		in.mark(first.length - 1);
+		in.read(first);
+		in.reset();
+
+		int lineBreak = first.length;
+		for (int i = 0; i < lineBreak; i++) {
+			if (first[i] == '\n') {
+				lineBreak = i;
+			}
+		}
+		return new String(first, 0, lineBreak, "UTF-8");
+	}
+
+	//
 	// access methods
 	//
 	@Override
-	public String getName() { return name; }
-	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		fireEvent(LibraryEvent.SET_NAME, name);
+	}
+
 	@Override
-	public boolean isDirty() { return dirty; }
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean value) {
+		if (dirty != value) {
+			dirty = value;
+			fireEvent(LibraryEvent.DIRTY_STATE, value ? Boolean.TRUE : Boolean.FALSE);
+		}
+	}
 
 	public String getMessage() {
 		if (messages.size() == 0) return null;
@@ -133,7 +203,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 		return null;
 	}
-	
+
 	public boolean contains(Circuit circ) {
 		for (AddTool tool : tools) {
 			SubcircuitFactory factory = (SubcircuitFactory) tool.getFactory();
@@ -141,7 +211,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 		return false;
 	}
-	
+
 	public List<Circuit> getCircuits() {
 		List<Circuit> ret = new ArrayList<Circuit>(tools.size());
 		for (AddTool tool : tools) {
@@ -150,7 +220,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 		return ret;
 	}
-	
+
 	public AddTool getAddTool(Circuit circ) {
 		for (AddTool tool : tools) {
 			SubcircuitFactory factory = (SubcircuitFactory) tool.getFactory();
@@ -163,6 +233,12 @@ public class LogisimFile extends Library implements LibraryEventSource {
 
 	public Circuit getMainCircuit() {
 		return main;
+	}
+
+	public void setMainCircuit(Circuit circuit) {
+		if (circuit == null) return;
+		this.main = circuit;
+		fireEvent(LibraryEvent.SET_MAIN, circuit);
 	}
 
 	public int getCircuitCount() {
@@ -187,30 +263,17 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 	}
 
-
 	//
 	// modification actions
 	//
 	public void addMessage(String msg) {
 		messages.addLast(msg);
 	}
-	
-	public void setDirty(boolean value) {
-		if (dirty != value) {
-			dirty = value;
-			fireEvent(LibraryEvent.DIRTY_STATE, value ? Boolean.TRUE : Boolean.FALSE);
-		}
-	}
-
-	public void setName(String name) {
-		this.name = name;
-		fireEvent(LibraryEvent.SET_NAME, name);
-	}
 
 	public void addCircuit(Circuit circuit) {
 		addCircuit(circuit, tools.size());
 	}
-	
+
 	public void addCircuit(Circuit circuit, int index) {
 		AddTool tool = new AddTool(circuit.getSubcircuitFactory());
 		tools.add(index, tool);
@@ -235,7 +298,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 			fireEvent(LibraryEvent.REMOVE_TOOL, circuitTool);
 		}
 	}
-	
+
 	public void moveCircuit(AddTool tool, int index) {
 		int oldIndex = tools.indexOf(tool);
 		if (oldIndex < 0) {
@@ -257,7 +320,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		libraries.remove(lib);
 		fireEvent(LibraryEvent.REMOVE_LIBRARY, lib);
 	}
-	
+
 	public String getUnloadLibraryMessage(Library lib) {
 		HashSet<ComponentFactory> factories = new HashSet<ComponentFactory>();
 		for (Tool tool : lib.getTools()) {
@@ -265,16 +328,16 @@ public class LogisimFile extends Library implements LibraryEventSource {
 				factories.add(((AddTool) tool).getFactory());
 			}
 		}
-		
+
 		for (Circuit circuit : getCircuits()) {
 			for (Component comp : circuit.getNonWires()) {
 				if (factories.contains(comp.getFactory())) {
 					return StringUtil.format(Strings.get("unloadUsedError"),
-							circuit.getName());
+						circuit.getName());
 				}
 			}
 		}
-		
+
 		ToolbarData tb = options.getToolbarData();
 		MouseMappings mm = options.getMouseMappings();
 		for (Tool t : lib.getTools()) {
@@ -285,14 +348,8 @@ public class LogisimFile extends Library implements LibraryEventSource {
 				return Strings.get("unloadMappingError");
 			}
 		}
-		
-		return null;
-	}
 
-	public void setMainCircuit(Circuit circuit) {
-		if (circuit == null) return;
-		this.main = circuit;
-		fireEvent(LibraryEvent.SET_MAIN, circuit);
+		return null;
 	}
 
 	//
@@ -332,7 +389,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 			return null;
 		}
 	}
-	
+
 	Tool findTool(Tool query) {
 		for (Library lib : getLibraries()) {
 			Tool ret = findTool(lib, query);
@@ -340,7 +397,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 		return null;
 	}
-	
+
 	private Tool findTool(Library lib, Tool query) {
 		for (Tool tool : lib.getTools()) {
 			if (tool.equals(query)) return tool;
@@ -348,93 +405,29 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		return null;
 	}
 
-	//
-	// creation methods
-	//
-	public static LogisimFile createNew(Loader loader) {
-		LogisimFile ret = new LogisimFile(loader);
-		ret.main = new Circuit("main");
-		// The name will be changed in LogisimPreferences
-		ret.tools.add(new AddTool(ret.main.getSubcircuitFactory()));
-		return ret;
-	}
+	private static class WritingThread extends Thread {
+		OutputStream out;
+		LogisimFile file;
 
-	public static LogisimFile load(File file, Loader loader)
-			throws IOException {
-		InputStream in = new FileInputStream(file);
-		Throwable firstExcept = null;
-		try {
-			return loadSub(in, loader);
-		} catch (Throwable t) {
-			firstExcept = t;
-		} finally {
-			in.close();
+		WritingThread(OutputStream out, LogisimFile file) {
+			this.out = out;
+			this.file = file;
 		}
-		
-		if (firstExcept != null) {
-			// We'll now try to do it using a reader. This is to work around
-			// Logisim versions prior to 2.5.1, when files were not saved using
-			// UTF-8 as the encoding (though the XML file reported otherwise).
+
+		@Override
+		public void run() {
 			try {
-				in = new ReaderInputStream(new FileReader(file), "UTF8");
-				return loadSub(in, loader);
-			} catch (Throwable t) {
-				loader.showError(StringUtil.format(
-						Strings.get("xmlFormatError"), firstExcept.toString()));
-			} finally {
-				try {
-					in.close();
-				} catch (Throwable t) { }
+				file.write(out, file.loader);
+			} catch (IOException e) {
+				file.loader.showError(StringUtil.format(
+					Strings.get("fileDuplicateError"), e.toString()));
+			}
+			try {
+				out.close();
+			} catch (IOException e) {
+				file.loader.showError(StringUtil.format(
+					Strings.get("fileDuplicateError"), e.toString()));
 			}
 		}
-		
-		return null;
-	}
-	
-	public static LogisimFile load(InputStream in, Loader loader)
-			throws IOException {
-		try {
-			return loadSub(in, loader);
-		} catch (SAXException e) {
-			loader.showError(StringUtil.format(
-				Strings.get("xmlFormatError"), e.toString()));
-			return null;
-		}
-	}
-
-	public static LogisimFile loadSub(InputStream in, Loader loader)
-			throws IOException, SAXException {
-		// fetch first line and then reset
-		BufferedInputStream inBuffered = new BufferedInputStream(in);
-		String firstLine = getFirstLine(inBuffered);
-
-		if (firstLine == null) {
-			throw new IOException("File is empty");
-		} else if (firstLine.equals("Logisim v1.0")) {
-			// if this is a 1.0 file, then set up a pipe to translate to
-			// 2.0 and then interpret as a 2.0 file
-			throw new IOException("Version 1.0 files no longer supported");
-		}
-
-		XmlReader xmlReader = new XmlReader(loader);
-		LogisimFile ret = xmlReader.readLibrary(inBuffered);
-		ret.loader = loader;
-		return ret;
-	}
-
-	private static String getFirstLine(BufferedInputStream in)
-			throws IOException {
-		byte[] first = new byte[512];
-		in.mark(first.length - 1);
-		in.read(first);
-		in.reset();
-		
-		int lineBreak = first.length;
-		for (int i = 0; i < lineBreak; i++) {
-			if (first[i] == '\n') {
-				lineBreak = i;
-			}
-		}
-		return new String(first, 0, lineBreak, "UTF-8");
 	}
 }

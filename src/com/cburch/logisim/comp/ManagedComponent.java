@@ -3,16 +3,16 @@
 
 package com.cburch.logisim.comp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.EventSourceWeakSupport;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class ManagedComponent extends AbstractComponent {
 	private EventSourceWeakSupport<ComponentListener> listeners
@@ -49,8 +49,8 @@ public abstract class ManagedComponent extends AbstractComponent {
 		for (ComponentListener l : listeners) {
 			if (copy == null) {
 				copy = new ComponentEvent(e.getSource(),
-						Collections.singletonList(e.getOldData()),
-						Collections.singletonList(e.getData()));
+					Collections.singletonList(e.getOldData()),
+					Collections.singletonList(e.getData()));
 			}
 			l.endChanged(copy);
 		}
@@ -79,6 +79,10 @@ public abstract class ManagedComponent extends AbstractComponent {
 		return attrs;
 	}
 
+	public void setAttributeSet(AttributeSet value) {
+		attrs = value;
+	}
+
 	@Override
 	public Bounds getBounds() {
 		if (bounds == null) {
@@ -88,7 +92,11 @@ public abstract class ManagedComponent extends AbstractComponent {
 		}
 		return bounds;
 	}
-	
+
+	public void setBounds(Bounds bounds) {
+		this.bounds = bounds;
+	}
+
 	protected void recomputeBounds() {
 		bounds = null;
 	}
@@ -97,58 +105,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 	public List<EndData> getEnds() {
 		return endsView;
 	}
-	
-	public int getEndCount() {
-		return ends.size();
-	}
 
-	@Override
-	public abstract void propagate(CircuitState state);
-
-	//
-	// methods for altering data
-	//
-	public void clearManager() {
-		for (EndData end : ends) {
-			fireEndChanged(new ComponentEvent(this, end, null));
-		}
-		ends.clear();
-		bounds = null;
-	}
-
-	public void setBounds(Bounds bounds) {
-		this.bounds = bounds;
-	}
-	
-	public void setAttributeSet(AttributeSet value) {
-		attrs = value;
-	}
-	
-	public void removeEnd(int index) {
-		ends.remove(index);
-	}
-
-	public void setEnd(int i, EndData data) {
-		if (i == ends.size()) {
-			ends.add(data);
-			fireEndChanged(new ComponentEvent(this, null, data));
-		} else {
-			EndData old = ends.get(i);
-			if (old == null || !old.equals(data)) {
-				ends.set(i, data);
-				fireEndChanged(new ComponentEvent(this, old, data));
-			}
-		}
-	}
-
-	public void setEnd(int i, Location end, BitWidth width, int type) {
-		setEnd(i, new EndData(end, width, type));
-	}
-
-	public void setEnd(int i, Location end, BitWidth width, int type, boolean exclusive) {
-		setEnd(i, new EndData(end, width, type, exclusive));
-	}
-	
 	public void setEnds(EndData[] newEnds) {
 		List<EndData> oldEnds = ends;
 		int minLen = Math.min(oldEnds.size(), newEnds.length);
@@ -174,6 +131,49 @@ public abstract class ManagedComponent extends AbstractComponent {
 		fireEndsChanged(changesOld, changesNew);
 	}
 
+	public int getEndCount() {
+		return ends.size();
+	}
+
+	@Override
+	public abstract void propagate(CircuitState state);
+
+	//
+	// methods for altering data
+	//
+	public void clearManager() {
+		for (EndData end : ends) {
+			fireEndChanged(new ComponentEvent(this, end, null));
+		}
+		ends.clear();
+		bounds = null;
+	}
+
+	public void removeEnd(int index) {
+		ends.remove(index);
+	}
+
+	public void setEnd(int i, EndData data) {
+		if (i == ends.size()) {
+			ends.add(data);
+			fireEndChanged(new ComponentEvent(this, null, data));
+		} else {
+			EndData old = ends.get(i);
+			if (old == null || !old.equals(data)) {
+				ends.set(i, data);
+				fireEndChanged(new ComponentEvent(this, old, data));
+			}
+		}
+	}
+
+	public void setEnd(int i, Location end, BitWidth width, int type) {
+		setEnd(i, new EndData(end, width, type));
+	}
+
+	public void setEnd(int i, Location end, BitWidth width, int type, boolean exclusive) {
+		setEnd(i, new EndData(end, width, type, exclusive));
+	}
+
 	public Location getEndLocation(int i) {
 		return getEnd(i).getLocation();
 	}
@@ -189,7 +189,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 				bounds.getWidth() + 10, bounds.getHeight() + 10);
 		}
 	}
-	
+
 	public Object getFeature(Object key) {
 		return null;
 	}

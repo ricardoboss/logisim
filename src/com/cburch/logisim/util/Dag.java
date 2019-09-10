@@ -5,24 +5,14 @@ package com.cburch.logisim.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Dag {
-	private static class Node {
-		Object data;
-		HashSet<Node> succs = new HashSet<Node>(); // of Nodes
-		int numPreds = 0;
-		boolean mark;
+	private HashMap<Object, Node> nodes = new HashMap<Object, Node>();
 
-		Node(Object data) {
-			this.data = data;
-		}
+	public Dag() {
 	}
-
-	private HashMap<Object,Node> nodes = new HashMap<Object,Node>();
-
-	public Dag() { }
 
 	public boolean hasPredecessors(Object data) {
 		Node from = findNode(data);
@@ -80,7 +70,7 @@ public class Dag {
 			for (Iterator<Node> it = nodes.values().iterator(); it.hasNext(); ) {
 				Node q = it.next();
 				if (q.succs.remove(n) && q.numPreds == 0
-						&& q.succs.isEmpty()) it.remove();
+					&& q.succs.isEmpty()) it.remove();
 			}
 		}
 	}
@@ -123,5 +113,16 @@ public class Dag {
 			}
 		}
 		return true;
+	}
+
+	private static class Node {
+		Object data;
+		HashSet<Node> succs = new HashSet<Node>(); // of Nodes
+		int numPreds = 0;
+		boolean mark;
+
+		Node(Object data) {
+			this.data = data;
+		}
 	}
 }

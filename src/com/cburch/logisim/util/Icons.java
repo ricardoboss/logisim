@@ -3,19 +3,16 @@
 
 package com.cburch.logisim.util;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import com.cburch.logisim.data.Direction;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Icons {
 	private static final String path = "resources/logisim/icons";
 
-	private Icons() { }
+	private Icons() {
+	}
 
 	public static Icon getIcon(String name) {
 		java.net.URL url = Icons.class.getClassLoader().getResource(path + "/" + name);
@@ -33,11 +30,11 @@ public class Icons {
 		double cx = x + icon.getIconWidth() / 2.0;
 		double cy = y + icon.getIconHeight() / 2.0;
 		if (dir == Direction.WEST) {
-			g2.rotate( Math.PI, cx, cy);
+			g2.rotate(Math.PI, cx, cy);
 		} else if (dir == Direction.NORTH) {
 			g2.rotate(-Math.PI / 2.0, cx, cy);
 		} else if (dir == Direction.SOUTH) {
-			g2.rotate( Math.PI / 2.0, cx, cy);
+			g2.rotate(Math.PI / 2.0, cx, cy);
 		} else {
 			g2.translate(-x, -y);
 		}

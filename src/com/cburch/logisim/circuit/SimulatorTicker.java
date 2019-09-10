@@ -11,7 +11,7 @@ class SimulatorTicker extends Thread {
 	private boolean shouldTick;
 	private int ticksPending;
 	private boolean complete;
-	
+
 	public SimulatorTicker(Simulator.PropagationManager manager) {
 		this.manager = manager;
 		ticksPerTickPhase = 1;
@@ -20,7 +20,7 @@ class SimulatorTicker extends Thread {
 		ticksPending = 0;
 		complete = false;
 	}
-	
+
 	public synchronized void setTickFrequency(int millis, int ticks) {
 		millisPerTickPhase = millis;
 		ticksPerTickPhase = ticks;
@@ -30,12 +30,12 @@ class SimulatorTicker extends Thread {
 		shouldTick = value;
 		if (shouldTick) notifyAll();
 	}
-	
+
 	public synchronized void shutDown() {
 		complete = true;
 		notifyAll();
 	}
-	
+
 	public synchronized void tickOnce() {
 		ticksPending++;
 		notifyAll();
@@ -49,22 +49,23 @@ class SimulatorTicker extends Thread {
 			int millis = millisPerTickPhase;
 			int ticks = ticksPerTickPhase;
 			try {
-				synchronized(this) {
+				synchronized (this) {
 					curShouldTick = shouldTick;
 					millis = millisPerTickPhase;
 					ticks = ticksPerTickPhase;
 					while (!curShouldTick && ticksPending == 0
-							&& !complete) {
+						&& !complete) {
 						wait();
 						curShouldTick = shouldTick;
 						millis = millisPerTickPhase;
 						ticks = ticksPerTickPhase;
 					}
 				}
-			} catch (InterruptedException e) { }
-			
+			} catch (InterruptedException e) {
+			}
+
 			if (complete) break;
-			
+
 			int toTick;
 			long now = System.currentTimeMillis();
 			if (curShouldTick && now - lastTick >= millis) {
@@ -78,7 +79,7 @@ class SimulatorTicker extends Thread {
 				for (int i = 0; i < toTick; i++) {
 					manager.requestTick();
 				}
-				synchronized(this) {
+				synchronized (this) {
 					if (ticksPending > toTick) ticksPending -= toTick;
 					else ticksPending = 0;
 				}
@@ -93,7 +94,8 @@ class SimulatorTicker extends Thread {
 				if (wait < 1) wait = 1;
 				if (wait > 100) wait = 100;
 				Thread.sleep(wait);
-			} catch (InterruptedException e) { }
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 }

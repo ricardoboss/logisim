@@ -3,35 +3,35 @@
 
 package com.cburch.logisim.gui.log;
 
+import com.cburch.logisim.data.Value;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import com.cburch.logisim.data.Value;
-
 class LogThread extends Thread implements ModelListener {
 	// file will be flushed with at least this frequency
 	private static final int FLUSH_FREQUENCY = 500;
-	
+
 	// file will be closed after waiting this many milliseconds between writes
 	private static final int IDLE_UNTIL_CLOSE = 10000;
-	
+
 	private Model model;
 	private boolean canceled = false;
 	private Object lock = new Object();
 	private PrintWriter writer = null;
 	private boolean headerDirty = true;
 	private long lastWrite = 0;
-	
+
 	public LogThread(Model model) {
 		this.model = model;
 		model.addModelListener(this);
 	}
-	
+
 	@Override
 	public void run() {
 		while (!canceled) {
-			synchronized(lock) {
+			synchronized (lock) {
 				if (writer != null) {
 					if (System.currentTimeMillis() - lastWrite > IDLE_UNTIL_CLOSE) {
 						writer.close();
@@ -43,18 +43,19 @@ class LogThread extends Thread implements ModelListener {
 			}
 			try {
 				Thread.sleep(FLUSH_FREQUENCY);
-			} catch (InterruptedException e) { }
+			} catch (InterruptedException e) {
+			}
 		}
-		synchronized(lock) {
+		synchronized (lock) {
 			if (writer != null) {
 				writer.close();
 				writer = null;
 			}
 		}
 	}
-	
+
 	public void cancel() {
-		synchronized(lock) {
+		synchronized (lock) {
 			canceled = true;
 			if (writer != null) {
 				writer.close();
@@ -68,13 +69,13 @@ class LogThread extends Thread implements ModelListener {
 	}
 
 	public void entryAdded(ModelEvent event, Value[] values) {
-		synchronized(lock) {
+		synchronized (lock) {
 			if (isFileEnabled()) addEntry(values);
 		}
 	}
 
 	public void filePropertyChanged(ModelEvent event) {
-		synchronized(lock) {
+		synchronized (lock) {
 			if (isFileEnabled()) {
 				if (writer == null) {
 					Selection sel = model.getSelection();
@@ -94,12 +95,12 @@ class LogThread extends Thread implements ModelListener {
 			}
 		}
 	}
-	
+
 	private boolean isFileEnabled() {
 		return !canceled && model.isSelected() && model.isFileEnabled()
 			&& model.getFile() != null;
 	}
-	
+
 	// Should hold lock and have verified that isFileEnabled() before
 	// entering this method.
 	private void addEntry(Value[] values) {

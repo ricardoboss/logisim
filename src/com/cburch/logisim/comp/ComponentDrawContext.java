@@ -3,10 +3,6 @@
 
 package com.cburch.logisim.comp;
 
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.circuit.WireSet;
@@ -17,6 +13,8 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.GraphicsUtil;
+
+import java.awt.*;
 
 public class ComponentDrawContext {
 	private static final int PIN_OFFS = 2;
@@ -34,8 +32,8 @@ public class ComponentDrawContext {
 	private InstancePainter instancePainter;
 
 	public ComponentDrawContext(java.awt.Component dest,
-			Circuit circuit, CircuitState circuitState,
-			Graphics base, Graphics g, boolean printView) {
+								Circuit circuit, CircuitState circuitState,
+								Graphics base, Graphics g, boolean printView) {
 		this.dest = dest;
 		this.circuit = circuit;
 		this.circuitState = circuitState;
@@ -49,33 +47,33 @@ public class ComponentDrawContext {
 	}
 
 	public ComponentDrawContext(java.awt.Component dest,
-			Circuit circuit, CircuitState circuitState,
-			Graphics base, Graphics g) {
+								Circuit circuit, CircuitState circuitState,
+								Graphics base, Graphics g) {
 		this(dest, circuit, circuitState, base, g, false);
 	}
-	
-	public void setShowState(boolean value) {
-		showState = value;
-	}
-	
+
 	public void setShowColor(boolean value) {
 		showColor = value;
 	}
-	
+
 	public InstancePainter getInstancePainter() {
 		return instancePainter;
 	}
-	
-	public void setHighlightedWires(WireSet value) {
-		this.highlightedWires = value == null ? WireSet.EMPTY : value;
-	}
-	
+
 	public WireSet getHighlightedWires() {
 		return highlightedWires;
 	}
 
+	public void setHighlightedWires(WireSet value) {
+		this.highlightedWires = value == null ? WireSet.EMPTY : value;
+	}
+
 	public boolean getShowState() {
 		return !printView && showState;
+	}
+
+	public void setShowState(boolean value) {
+		showState = value;
 	}
 
 	public boolean isPrintView() {
@@ -94,16 +92,16 @@ public class ComponentDrawContext {
 		return g;
 	}
 
+	public void setGraphics(Graphics g) {
+		this.g = g;
+	}
+
 	public Circuit getCircuit() {
 		return circuit;
 	}
 
 	public CircuitState getCircuitState() {
 		return circuitState;
-	}
-
-	public void setGraphics(Graphics g) {
-		this.g = g;
 	}
 
 	public Object getGateShape() {
@@ -118,14 +116,14 @@ public class ComponentDrawContext {
 		g.setColor(Color.BLACK);
 		Bounds bds = comp.getBounds();
 		g.drawRect(bds.getX(), bds.getY(),
-				bds.getWidth(), bds.getHeight());
+			bds.getWidth(), bds.getHeight());
 		GraphicsUtil.switchToWidth(g, 1);
 	}
 
 	public void drawRectangle(Component comp) {
 		drawRectangle(comp, "");
 	}
-	
+
 	public void drawRectangle(Component comp, String label) {
 		Bounds bds = comp.getBounds(g);
 		drawRectangle(bds.getX(), bds.getY(), bds.getWidth(),
@@ -133,7 +131,7 @@ public class ComponentDrawContext {
 	}
 
 	public void drawRectangle(int x, int y,
-			int width, int height, String label) {
+							  int width, int height, String label) {
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawRect(x, y, width, height);
 		if (label != null && !label.equals("")) {
@@ -148,16 +146,16 @@ public class ComponentDrawContext {
 			}
 		}
 	}
-	
+
 	public void drawRectangle(ComponentFactory source, int x, int y,
-			AttributeSet attrs, String label) {
+							  AttributeSet attrs, String label) {
 		Bounds bds = source.getOffsetBounds(attrs);
 		drawRectangle(source, x + bds.getX(), y + bds.getY(), bds.getWidth(),
 			bds.getHeight(), label);
 	}
 
 	public void drawRectangle(ComponentFactory source, int x, int y,
-			int width, int height, String label) {
+							  int width, int height, String label) {
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawRect(x + 1, y + 1, width - 1, height - 1);
 		if (label != null && !label.equals("")) {
@@ -179,7 +177,7 @@ public class ComponentDrawContext {
 	}
 
 	public void drawPin(Component comp, int i,
-			String label, Direction dir) {
+						String label, Direction dir) {
 		Color curColor = g.getColor();
 		if (i < 0 || i >= comp.getEnds().size()) return;
 		EndData e = comp.getEnd(i);
@@ -196,16 +194,16 @@ public class ComponentDrawContext {
 		g.setColor(curColor);
 		if (dir == Direction.EAST) {
 			GraphicsUtil.drawText(g, label, x + 3, y,
-					GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
+				GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
 		} else if (dir == Direction.WEST) {
 			GraphicsUtil.drawText(g, label, x - 3, y,
-					GraphicsUtil.H_RIGHT, GraphicsUtil.V_CENTER);
+				GraphicsUtil.H_RIGHT, GraphicsUtil.V_CENTER);
 		} else if (dir == Direction.SOUTH) {
 			GraphicsUtil.drawText(g, label, x, y - 3,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 		} else if (dir == Direction.NORTH) {
 			GraphicsUtil.drawText(g, label, x, y + 3,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
 	}
 
@@ -239,7 +237,7 @@ public class ComponentDrawContext {
 	}
 
 	public void drawClock(Component comp, int i,
-			Direction dir) {
+						  Direction dir) {
 		Color curColor = g.getColor();
 		g.setColor(Color.BLACK);
 		GraphicsUtil.switchToWidth(g, 2);
@@ -275,11 +273,11 @@ public class ComponentDrawContext {
 		int top = b.getY();
 		int bot = top + b.getHeight();
 		drawHandle(right, top);
-		drawHandle(left,  bot);
+		drawHandle(left, bot);
 		drawHandle(right, bot);
-		drawHandle(left,  top);
+		drawHandle(left, top);
 	}
-	
+
 	public void drawHandle(Location loc) {
 		drawHandle(loc.getX(), loc.getY());
 	}

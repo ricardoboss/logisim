@@ -22,10 +22,16 @@ public class AttributeOption implements AttributeOptionInterface {
 		this.desc = desc;
 	}
 
-	public Object getValue() { return value; }
+	public Object getValue() {
+		return value;
+	}
 
 	@Override
-	public String toString() { return name; }
+	public String toString() {
+		return name;
+	}
 
-	public String toDisplayString() { return desc.get(); }
+	public String toDisplayString() {
+		return desc.get();
+	}
 }

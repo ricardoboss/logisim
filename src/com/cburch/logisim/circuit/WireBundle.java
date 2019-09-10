@@ -9,12 +9,12 @@ import com.cburch.logisim.data.Value;
 import com.cburch.logisim.util.SmallSet;
 
 class WireBundle {
+	WireThread[] threads = null;
+	SmallSet<Location> points = new SmallSet<Location>(); // points bundle hits
 	private BitWidth width = BitWidth.UNKNOWN;
 	private Value pullValue = Value.UNKNOWN;
 	private WireBundle parent;
 	private Location widthDeterminant = null;
-	WireThread[] threads = null;
-	SmallSet<Location> points = new SmallSet<Location>(); // points bundle hits
 	private WidthIncompatibilityData incompatibilityData = null;
 
 	WireBundle() {
@@ -87,11 +87,11 @@ class WireBundle {
 		}
 		return ret;
 	}
-	
+
 	void addPullValue(Value val) {
 		pullValue = pullValue.combine(val);
 	}
-	
+
 	Value getPullValue() {
 		return pullValue;
 	}

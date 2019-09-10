@@ -3,23 +3,23 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.util.ArrayList;
-
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.appear.CircuitAppearance;
 import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 
+import java.util.ArrayList;
+
 public class RevertAppearanceAction extends Action {
 	private Circuit circuit;
 	private ArrayList<CanvasObject> old;
 	private boolean wasDefault;
-	
+
 	public RevertAppearanceAction(Circuit circuit) {
 		this.circuit = circuit;
 	}
-	
+
 	@Override
 	public String getName() {
 		return Strings.get("revertAppearanceAction");

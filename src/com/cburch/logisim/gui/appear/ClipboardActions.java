@@ -3,9 +3,6 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.cburch.draw.model.CanvasModel;
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.util.ZOrder;
@@ -15,28 +12,22 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class ClipboardActions extends Action {
-	
-	public static Action cut(AppearanceCanvas canvas) {
-		return new ClipboardActions(true, canvas);
-	}
-	
-	public static Action copy(AppearanceCanvas canvas) {
-		return new ClipboardActions(false, canvas);
-	}
-	
+
 	private boolean remove;
 	private AppearanceCanvas canvas;
 	private CanvasModel canvasModel;
 	private ClipboardContents oldClipboard;
 	private Map<CanvasObject, Integer> affected;
 	private ClipboardContents newClipboard;
-
 	private ClipboardActions(boolean remove, AppearanceCanvas canvas) {
 		this.remove = remove;
 		this.canvas = canvas;
 		this.canvasModel = canvas.getModel();
-		
+
 		ArrayList<CanvasObject> contents = new ArrayList<CanvasObject>();
 		Direction anchorFacing = null;
 		Location anchorLocation = null;
@@ -55,7 +46,15 @@ public class ClipboardActions extends Action {
 		affected = ZOrder.getZIndex(aff, canvasModel);
 		newClipboard = new ClipboardContents(contents, anchorLocation, anchorFacing);
 	}
-	
+
+	public static Action cut(AppearanceCanvas canvas) {
+		return new ClipboardActions(true, canvas);
+	}
+
+	public static Action copy(AppearanceCanvas canvas) {
+		return new ClipboardActions(false, canvas);
+	}
+
 	@Override
 	public String getName() {
 		if (remove) {
@@ -64,7 +63,7 @@ public class ClipboardActions extends Action {
 			return Strings.get("copySelectionAction");
 		}
 	}
-	
+
 	@Override
 	public void doIt(Project proj) {
 		oldClipboard = Clipboard.get();
@@ -73,7 +72,7 @@ public class ClipboardActions extends Action {
 			canvasModel.removeObjects(affected.keySet());
 		}
 	}
-	
+
 	@Override
 	public void undo(Project proj) {
 		if (remove) {
@@ -83,5 +82,5 @@ public class ClipboardActions extends Action {
 		}
 		Clipboard.set(oldClipboard);
 	}
-	
+
 }

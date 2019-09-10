@@ -3,18 +3,12 @@
 
 package com.cburch.logisim.circuit;
 
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.StdAttr;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.cburch.logisim.circuit.Strings;
-import com.cburch.logisim.data.AbstractAttributeSet;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.instance.StdAttr;
 
 class SplitterAttributes extends AbstractAttributeSet {
 	public static final AttributeOption APPEAR_LEGACY
@@ -25,124 +19,85 @@ class SplitterAttributes extends AbstractAttributeSet {
 		= new AttributeOption("right", Strings.getter("splitterAppearanceRight"));
 	public static final AttributeOption APPEAR_CENTER
 		= new AttributeOption("center", Strings.getter("splitterAppearanceCenter"));
-	
+
 	public static final Attribute<AttributeOption> ATTR_APPEARANCE
 		= Attributes.forOption("appear", Strings.getter("splitterAppearanceAttr"),
-				new AttributeOption[] { APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER,
-					APPEAR_LEGACY});
-	
+		new AttributeOption[]{APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER,
+			APPEAR_LEGACY});
+
 	public static final Attribute<BitWidth> ATTR_WIDTH
 		= Attributes.forBitWidth("incoming", Strings.getter("splitterBitWidthAttr"));
 	public static final Attribute<Integer> ATTR_FANOUT
 		= Attributes.forIntegerRange("fanout", Strings.getter("splitterFanOutAttr"), 1, 32);
 
 	private static final List<Attribute<?>> INIT_ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE,
-		});
+		= Arrays.asList(new Attribute<?>[]{
+		StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE,
+	});
 
 	private static final String unchosen_val = "none";
-
-	private static class BitOutOption {
-		int value;
-		boolean isVertical;
-		boolean isLast;
-
-		BitOutOption(int value, boolean isVertical, boolean isLast) {
-			this.value = value;
-			this.isVertical = isVertical;
-			this.isLast = isLast;
-		}
-
-		@Override
-		public String toString() {
-			if (value < 0) {
-				return Strings.get("splitterBitNone");
-			} else {
-				String ret = "" + value;
-				Direction noteDir;
-				if (value == 0) {
-					noteDir = isVertical ? Direction.NORTH : Direction.EAST;
-				} else if (isLast) {
-					noteDir = isVertical ? Direction.SOUTH : Direction.WEST;
-				} else {
-					noteDir = null;
-				}
-				if (noteDir != null) {
-					ret += " (" + noteDir.toVerticalDisplayString() + ")";
-				}
-				return ret;
-			}
-		}
-	}
-
-	static class BitOutAttribute extends Attribute<Integer> {
-		int which;
-		BitOutOption[] options;
-
-		private BitOutAttribute(int which, BitOutOption[] options) {
-			super("bit" + which, Strings.getter("splitterBitAttr", "" + which));
-			this.which = which;
-			this.options = options;
-		}
-		
-		private BitOutAttribute createCopy() {
-			return new BitOutAttribute(which, options);
-		}
-		
-		public Object getDefault() {
-			return Integer.valueOf(which + 1);
-		}
-
-		@Override
-		public Integer parse(String value) {
-			if (value.equals(unchosen_val)) {
-				return Integer.valueOf(0);
-			} else {
-				return Integer.valueOf(1 + Integer.parseInt(value));
-			}
-		}
-
-		@Override
-		public String toDisplayString(Integer value) {
-			int index = value.intValue();
-			return options[index].toString();
-		}
-
-		@Override
-		public String toStandardString(Integer value) {
-			int index = value.intValue();
-			if (index == 0) {
-				return unchosen_val;
-			} else {
-				return "" + (index - 1);
-			}
-		}
-
-		@Override
-		public java.awt.Component getCellEditor(Integer value) {
-			int index = value.intValue();
-			javax.swing.JComboBox combo = new javax.swing.JComboBox(options);
-			combo.setSelectedIndex(index);
-			return combo;
-		}
-	}
-
-	private ArrayList<Attribute<?>> attrs = new ArrayList<Attribute<?>>(INIT_ATTRIBUTES);
-	private SplitterParameters parameters;
 	AttributeOption appear = APPEAR_LEFT;
 	Direction facing = Direction.EAST;
 	byte fanout = 2;                 // number of ends this splits into
 	byte[] bit_end = new byte[2];    // how each bit maps to an end (0 if nowhere);
-									 //   other values will be between 1 and fanout
+	//   other values will be between 1 and fanout
 	BitOutOption[] options = null;
-
+	private ArrayList<Attribute<?>> attrs = new ArrayList<Attribute<?>>(INIT_ATTRIBUTES);
+	private SplitterParameters parameters;
 	SplitterAttributes() {
 		configureOptions();
 		configureDefaults();
 		parameters = new SplitterParameters(this);
 	}
-	
+
+	static byte[] computeDistribution(int fanout, int bits, int order) {
+		byte[] ret = new byte[bits];
+		if (order >= 0) {
+			if (fanout >= bits) {
+				for (int i = 0; i < bits; i++) ret[i] = (byte) (i + 1);
+			} else {
+				int threads_per_end = bits / fanout;
+				int ends_with_extra = bits % fanout;
+				int cur_end = -1; // immediately increments
+				int left_in_end = 0;
+				for (int i = 0; i < bits; i++) {
+					if (left_in_end == 0) {
+						++cur_end;
+						left_in_end = threads_per_end;
+						if (ends_with_extra > 0) {
+							++left_in_end;
+							--ends_with_extra;
+						}
+					}
+					ret[i] = (byte) (1 + cur_end);
+					--left_in_end;
+				}
+			}
+		} else {
+			if (fanout >= bits) {
+				for (int i = 0; i < bits; i++) ret[i] = (byte) (fanout - i);
+			} else {
+				int threads_per_end = bits / fanout;
+				int ends_with_extra = bits % fanout;
+				int cur_end = -1;
+				int left_in_end = 0;
+				for (int i = bits - 1; i >= 0; i--) {
+					if (left_in_end == 0) {
+						++cur_end;
+						left_in_end = threads_per_end;
+						if (ends_with_extra > 0) {
+							++left_in_end;
+							--ends_with_extra;
+						}
+					}
+					ret[i] = (byte) (1 + cur_end);
+					--left_in_end;
+				}
+			}
+		}
+		return ret;
+	}
+
 	Attribute<?> getBitOutAttribute(int index) {
 		return attrs.get(INIT_ATTRIBUTES.size() + index);
 	}
@@ -164,7 +119,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		dest.bit_end = this.bit_end.clone();
 		dest.options = this.options;
 	}
-	
+
 	public SplitterParameters getParameters() {
 		SplitterParameters ret = parameters;
 		if (ret == null) {
@@ -228,7 +183,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			if (value instanceof Integer) {
 				val = ((Integer) value).intValue();
 			} else {
-				val= ((BitOutOption) value).value + 1;
+				val = ((BitOutOption) value).value + 1;
 			}
 			if (val >= 0 && val <= fanout) {
 				bit_end[bitOutAttr.which] = (byte) val;
@@ -255,7 +210,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			attr.options = options;
 		}
 	}
-	
+
 	private void configureDefaults() {
 		int offs = INIT_ATTRIBUTES.size();
 		int curNum = attrs.size() - offs;
@@ -264,7 +219,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		byte[] dflt = computeDistribution(fanout, bit_end.length, 1);
 
 		boolean changed = curNum != bit_end.length;
-		
+
 		// remove excess attributes
 		while (curNum > bit_end.length) {
 			curNum--;
@@ -286,55 +241,92 @@ class SplitterAttributes extends AbstractAttributeSet {
 			bit_end[i] = dflt[i];
 			attrs.add(attr);
 		}
-		
+
 		if (changed) fireAttributeListChanged();
 	}
-	
-	static byte[] computeDistribution(int fanout, int bits, int order) {
-		byte[] ret = new byte[bits];
-		if (order >= 0) {
-			if (fanout >= bits) {
-				for (int i = 0; i < bits; i++) ret[i] = (byte) (i + 1);
+
+	private static class BitOutOption {
+		int value;
+		boolean isVertical;
+		boolean isLast;
+
+		BitOutOption(int value, boolean isVertical, boolean isLast) {
+			this.value = value;
+			this.isVertical = isVertical;
+			this.isLast = isLast;
+		}
+
+		@Override
+		public String toString() {
+			if (value < 0) {
+				return Strings.get("splitterBitNone");
 			} else {
-				int threads_per_end = bits / fanout;
-				int ends_with_extra = bits % fanout;
-				int cur_end = -1; // immediately increments
-				int left_in_end = 0;
-				for (int i = 0; i < bits; i++) {
-					if (left_in_end == 0) {
-						++cur_end;
-						left_in_end = threads_per_end;
-						if (ends_with_extra > 0) {
-							++left_in_end;
-							--ends_with_extra;
-						}
-					}
-					ret[i] = (byte) (1 + cur_end);
-					--left_in_end;
+				String ret = "" + value;
+				Direction noteDir;
+				if (value == 0) {
+					noteDir = isVertical ? Direction.NORTH : Direction.EAST;
+				} else if (isLast) {
+					noteDir = isVertical ? Direction.SOUTH : Direction.WEST;
+				} else {
+					noteDir = null;
 				}
-			}
-		} else {
-			if (fanout >= bits) {
-				for (int i = 0; i < bits; i++) ret[i] = (byte) (fanout - i);
-			} else {
-				int threads_per_end = bits / fanout;
-				int ends_with_extra = bits % fanout;
-				int cur_end = -1;
-				int left_in_end = 0;
-				for (int i = bits - 1; i >= 0; i--) {
-					if (left_in_end == 0) {
-						++cur_end;
-						left_in_end = threads_per_end;
-						if (ends_with_extra > 0) {
-							++left_in_end;
-							--ends_with_extra;
-						}
-					}
-					ret[i] = (byte) (1 + cur_end);
-					--left_in_end;
+				if (noteDir != null) {
+					ret += " (" + noteDir.toVerticalDisplayString() + ")";
 				}
+				return ret;
 			}
 		}
-		return ret;
+	}
+
+	static class BitOutAttribute extends Attribute<Integer> {
+		int which;
+		BitOutOption[] options;
+
+		private BitOutAttribute(int which, BitOutOption[] options) {
+			super("bit" + which, Strings.getter("splitterBitAttr", "" + which));
+			this.which = which;
+			this.options = options;
+		}
+
+		private BitOutAttribute createCopy() {
+			return new BitOutAttribute(which, options);
+		}
+
+		public Object getDefault() {
+			return Integer.valueOf(which + 1);
+		}
+
+		@Override
+		public Integer parse(String value) {
+			if (value.equals(unchosen_val)) {
+				return Integer.valueOf(0);
+			} else {
+				return Integer.valueOf(1 + Integer.parseInt(value));
+			}
+		}
+
+		@Override
+		public String toDisplayString(Integer value) {
+			int index = value.intValue();
+			return options[index].toString();
+		}
+
+		@Override
+		public String toStandardString(Integer value) {
+			int index = value.intValue();
+			if (index == 0) {
+				return unchosen_val;
+			} else {
+				return "" + (index - 1);
+			}
+		}
+
+		@Override
+		public java.awt.Component getCellEditor(Integer value) {
+			int index = value.intValue();
+			javax.swing.JComboBox combo = new javax.swing.JComboBox(options);
+			combo.setSelectedIndex(index);
+			return combo;
+		}
 	}
 }

@@ -4,26 +4,21 @@
 package com.cburch.logisim.file;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 import com.cburch.logisim.data.AttributeListener;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.AttributeSets;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.EventSourceWeakSupport;
 
-public class ToolbarData {
-	public static interface ToolbarListener {
-		public void toolbarChanged();
-	}
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
+public class ToolbarData {
 	private EventSourceWeakSupport<ToolbarListener> listeners;
 	private EventSourceWeakSupport<AttributeListener> toolListeners;
 	private ArrayList<Tool> contents;
-
 	public ToolbarData() {
 		listeners = new EventSourceWeakSupport<ToolbarListener>();
 		toolListeners = new EventSourceWeakSupport<AttributeListener>();
@@ -40,7 +35,7 @@ public class ToolbarData {
 	public void removeToolbarListener(ToolbarListener l) {
 		listeners.remove(l);
 	}
-	
+
 	public void addToolAttributeListener(AttributeListener l) {
 		for (Tool tool : contents) {
 			if (tool != null) {
@@ -50,7 +45,7 @@ public class ToolbarData {
 		}
 		toolListeners.add(l);
 	}
-	
+
 	public void removeToolAttributeListener(AttributeListener l) {
 		for (Tool tool : contents) {
 			if (tool != null) {
@@ -94,11 +89,11 @@ public class ToolbarData {
 		}
 		return null;
 	}
-	
+
 	public int size() {
 		return contents.size();
 	}
-	
+
 	public Object get(int index) {
 		return contents.get(index);
 	}
@@ -122,7 +117,7 @@ public class ToolbarData {
 				if (toolCopy != null) {
 					Tool dstTool = toolCopy.cloneTool();
 					AttributeSets.copy(srcTool.getAttributeSet(),
-							dstTool.getAttributeSet());
+						dstTool.getAttributeSet());
 					this.addTool(dstTool);
 					addAttributeListeners(toolCopy);
 				}
@@ -177,7 +172,7 @@ public class ToolbarData {
 	//
 	// package-protected methods
 	//
-	void replaceAll(Map<Tool,Tool> toolMap) {
+	void replaceAll(Map<Tool, Tool> toolMap) {
 		boolean changed = false;
 		for (ListIterator<Tool> it = contents.listIterator(); it.hasNext(); ) {
 			Object old = it.next();
@@ -191,11 +186,15 @@ public class ToolbarData {
 					Tool addedTool = newTool.cloneTool();
 					addAttributeListeners(addedTool);
 					LoadedLibrary.copyAttributes(addedTool.getAttributeSet(),
-							((Tool) old).getAttributeSet());
+						((Tool) old).getAttributeSet());
 					it.set(addedTool);
 				}
 			}
 		}
 		if (changed) fireToolbarChanged();
+	}
+
+	public static interface ToolbarListener {
+		public void toolbarChanged();
 	}
 }

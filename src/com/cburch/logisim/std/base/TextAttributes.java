@@ -3,28 +3,28 @@
 
 package com.cburch.logisim.std.base;
 
-import java.awt.Font;
-import java.util.Arrays;
-import java.util.List;
-
 import com.cburch.logisim.data.AbstractAttributeSet;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.instance.StdAttr;
 
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+
 class TextAttributes extends AbstractAttributeSet {
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_HALIGN, Text.ATTR_VALIGN
-		});
+		= Arrays.asList(new Attribute<?>[]{
+		Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_HALIGN, Text.ATTR_VALIGN
+	});
 
 	private String text;
 	private Font font;
 	private AttributeOption halign;
 	private AttributeOption valign;
 	private Bounds offsetBounds;
-	
+
 	public TextAttributes() {
 		text = "";
 		font = StdAttr.DEFAULT_LABEL_FONT;
@@ -32,27 +32,27 @@ class TextAttributes extends AbstractAttributeSet {
 		valign = Text.ATTR_VALIGN.parse("base");
 		offsetBounds = null;
 	}
-	
+
 	String getText() {
 		return text;
 	}
-	
+
 	Font getFont() {
 		return font;
 	}
-	
+
 	int getHorizontalAlign() {
 		return ((Integer) halign.getValue()).intValue();
 	}
-	
+
 	int getVerticalAlign() {
 		return ((Integer) valign.getValue()).intValue();
 	}
-	
+
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
-	
+
 	boolean setOffsetBounds(Bounds value) {
 		Bounds old = offsetBounds;
 		boolean same = old == null ? value == null : old.equals(value);

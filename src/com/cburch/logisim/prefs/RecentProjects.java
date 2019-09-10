@@ -15,47 +15,29 @@ import java.util.prefs.Preferences;
 class RecentProjects implements PreferenceChangeListener {
 	private static final String BASE_PROPERTY = "recent";
 	private static final int NUM_RECENT = 10;
-	
-	private static class FileTime {
-		private long time;
-		private File file;
-		
-		public FileTime(File file, long time) {
-			this.time = time;
-			this.file = file;
-		}
-		
-		@Override
-		public boolean equals(Object other) {
-			if (other instanceof FileTime) {
-				FileTime o = (FileTime) other;
-				return this.time == o.time && isSame(this.file, o.file);
-			} else {
-				return false;
-			}
-		}
-	}
-	
 	private File[] recentFiles;
 	private long[] recentTimes;
-	
 	RecentProjects() {
 		recentFiles = new File[NUM_RECENT];
 		recentTimes = new long[NUM_RECENT];
 		Arrays.fill(recentTimes, System.currentTimeMillis());
-		
+
 		Preferences prefs = AppPreferences.getPrefs();
 		prefs.addPreferenceChangeListener(this);
-		
+
 		for (int index = 0; index < NUM_RECENT; index++) {
 			getAndDecode(prefs, index);
 		}
 	}
-	
+
+	private static boolean isSame(Object a, Object b) {
+		return a == null ? b == null : a.equals(b);
+	}
+
 	public List<File> getRecentFiles() {
 		long now = System.currentTimeMillis();
 		long[] ages = new long[NUM_RECENT];
-		long[] toSort = new long[NUM_RECENT]; 
+		long[] toSort = new long[NUM_RECENT];
 		for (int i = 0; i < NUM_RECENT; i++) {
 			if (recentFiles[i] == null) {
 				ages[i] = -1;
@@ -84,17 +66,18 @@ class RecentProjects implements PreferenceChangeListener {
 		}
 		return ret;
 	}
-	
+
 	public void updateRecent(File file) {
 		File fileToSave = file;
 		try {
 			fileToSave = file.getCanonicalFile();
-		} catch (IOException e) { }
+		} catch (IOException e) {
+		}
 		long now = System.currentTimeMillis();
 		int index = getReplacementIndex(now, fileToSave);
 		updateInto(index, now, fileToSave);
 	}
-	
+
 	private int getReplacementIndex(long now, File f) {
 		long oldestAge = -1;
 		int oldestIndex = 0;
@@ -128,7 +111,8 @@ class RecentProjects implements PreferenceChangeListener {
 			try {
 				index = Integer.parseInt(rest);
 				if (index < 0 || index >= NUM_RECENT) index = -1;
-			} catch (NumberFormatException e) { }
+			} catch (NumberFormatException e) {
+			}
 			if (index >= 0) {
 				File oldValue = recentFiles[index];
 				long oldTime = recentTimes[index];
@@ -137,8 +121,8 @@ class RecentProjects implements PreferenceChangeListener {
 				long newTime = recentTimes[index];
 				if (!isSame(oldValue, newValue) || oldTime != newTime) {
 					AppPreferences.firePropertyChange(AppPreferences.RECENT_PROJECTS,
-							new FileTime(oldValue, oldTime),
-							new FileTime(newValue, newTime));
+						new FileTime(oldValue, oldTime),
+						new FileTime(newValue, newTime));
 				}
 			}
 		}
@@ -152,17 +136,17 @@ class RecentProjects implements PreferenceChangeListener {
 			recentTimes[index] = time;
 			try {
 				AppPreferences.getPrefs().put(BASE_PROPERTY + index,
-						"" + time + ";" + file.getCanonicalPath());
+					"" + time + ";" + file.getCanonicalPath());
 				AppPreferences.firePropertyChange(AppPreferences.RECENT_PROJECTS,
-						new FileTime(oldFile, oldTime),
-						new FileTime(file, time));
+					new FileTime(oldFile, oldTime),
+					new FileTime(file, time));
 			} catch (IOException e) {
 				recentFiles[index] = oldFile;
 				recentTimes[index] = oldTime;
 			}
 		}
 	}
-	
+
 	private void getAndDecode(Preferences prefs, int index) {
 		String encoding = prefs.get(BASE_PROPERTY + index, null);
 		if (encoding == null) return;
@@ -172,11 +156,27 @@ class RecentProjects implements PreferenceChangeListener {
 			long time = Long.parseLong(encoding.substring(0, semi));
 			File file = new File(encoding.substring(semi + 1));
 			updateInto(index, time, file);
-		} catch (NumberFormatException e) { }
+		} catch (NumberFormatException e) {
+		}
 	}
-	
-	
-	private static boolean isSame(Object a, Object b) {
-		return a == null ? b == null : a.equals(b);
+
+	private static class FileTime {
+		private long time;
+		private File file;
+
+		public FileTime(File file, long time) {
+			this.time = time;
+			this.file = file;
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (other instanceof FileTime) {
+				FileTime o = (FileTime) other;
+				return this.time == o.time && isSame(this.file, o.file);
+			} else {
+				return false;
+			}
+		}
 	}
 }

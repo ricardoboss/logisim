@@ -3,14 +3,6 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitEvent;
 import com.cburch.logisim.circuit.CircuitListener;
@@ -26,102 +18,17 @@ import com.cburch.logisim.proj.ProjectEvent;
 import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.tools.CustomHandles;
 
+import java.awt.*;
+import java.util.*;
+
 public class Selection extends SelectionBase {
-	public static class Event {
-		Object source;
-		Event(Object source) { this.source = source; }
-		public Object getSource() { return source; }
-	}
-
-	public static interface Listener {
-		public void selectionChanged(Selection.Event event);
-	}
-	
-	private class MyListener implements ProjectListener, CircuitListener {
-		private WeakHashMap<Action,SelectionSave> savedSelections;
-		
-		MyListener() {
-			savedSelections = new WeakHashMap<Action,SelectionSave>();
-		}
-		
-		public void projectChanged(ProjectEvent event) {
-			int type = event.getAction();
-			if (type == ProjectEvent.ACTION_START) {
-				SelectionSave save = SelectionSave.create(Selection.this);
-				savedSelections.put((Action) event.getData(), save);
-			} else if (type == ProjectEvent.ACTION_COMPLETE) {
-				SelectionSave save = savedSelections.get(event.getData());
-				if (save != null && save.isSame(Selection.this)) {
-					savedSelections.remove(event.getData());
-				}
-			} else if (type == ProjectEvent.ACTION_MERGE) {
-				SelectionSave save = savedSelections.get(event.getOldData());
-				savedSelections.put((Action) event.getData(), save);
-			} else if (type == ProjectEvent.UNDO_COMPLETE) {
-				Circuit circ = event.getProject().getCurrentCircuit();
-				Action act = (Action) event.getData();
-				SelectionSave save = savedSelections.get(act);
-				if (save != null) {
-					lifted.clear();
-					selected.clear();
-					for (int i = 0; i < 2; i++) {
-						Component[] cs;
-						if (i == 0) cs = save.getFloatingComponents();
-						else cs = save.getAnchoredComponents();
-
-						if (cs != null) {
-							for (Component c : cs) {
-								if (circ.contains(c)) {
-									selected.add(c);
-								} else {
-									lifted.add(c);
-								}
-							}
-						}
-					}
-					fireSelectionChanged();
-				}
-			}
-		}
-		
-		public void circuitChanged(CircuitEvent event) {
-			if (event.getAction() == CircuitEvent.TRANSACTION_DONE) {
-				Circuit circuit = event.getCircuit();
-				ReplacementMap repl = event.getResult().getReplacementMap(circuit);
-				boolean change = false;
-				
-				ArrayList<Component> oldAnchored;
-				oldAnchored = new ArrayList<Component>(getComponents());
-				for (Component comp : oldAnchored) {
-					Collection<Component> replacedBy = repl.get(comp);
-					if (replacedBy != null) {
-						change = true;
-						selected.remove(comp);
-						lifted.remove(comp);
-						for (Component add : replacedBy) {
-							if (circuit.contains(add)) {
-								selected.add(add);
-							} else {
-								lifted.add(add);
-							}
-						}
-					}
-				}
-				
-				if (change) {
-					fireSelectionChanged();
-				}
-			}
-		}       
-	}
-
 	private MyListener myListener;
 	private boolean isVisible = true;
 	private SelectionAttributes attrs;
 
 	public Selection(Project proj, Canvas canvas) {
 		super(proj);
-		
+
 		myListener = new MyListener();
 		attrs = new SelectionAttributes(canvas, this);
 		proj.addProjectListener(myListener);
@@ -134,7 +41,7 @@ public class Selection extends SelectionBase {
 	public boolean isEmpty() {
 		return selected.isEmpty() && lifted.isEmpty();
 	}
-	
+
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
@@ -150,11 +57,11 @@ public class Selection extends SelectionBase {
 	public Set<Component> getComponents() {
 		return unionSet;
 	}
-	
+
 	public Collection<Component> getAnchoredComponents() {
 		return selected;
 	}
-	
+
 	public Collection<Component> getFloatingComponents() {
 		return lifted;
 	}
@@ -204,11 +111,11 @@ public class Selection extends SelectionBase {
 		for (Component c : lifted) {
 			if (!hidden.contains(c)) {
 				Location loc = c.getLocation();
-	
+
 				Graphics g_new = g.create();
 				context.setGraphics(g_new);
 				c.getFactory().drawGhost(context, Color.GRAY,
-						loc.getX(), loc.getY(), c.getAttributeSet());
+					loc.getX(), loc.getY(), c.getAttributeSet());
 				g_new.dispose();
 			}
 		}
@@ -232,7 +139,7 @@ public class Selection extends SelectionBase {
 	}
 
 	public void drawGhostsShifted(ComponentDrawContext context,
-			int dx, int dy) {
+								  int dx, int dy) {
 		if (shouldSnap()) {
 			dx = Canvas.snapXToGrid(dx);
 			dy = Canvas.snapYToGrid(dy);
@@ -249,11 +156,105 @@ public class Selection extends SelectionBase {
 		}
 		context.setGraphics(g);
 	}
-	
+
 	@Override
 	public void print() {
 		System.err.println(" isVisible: " + isVisible); //OK
 		super.print();
+	}
+
+	public static interface Listener {
+		public void selectionChanged(Selection.Event event);
+	}
+
+	public static class Event {
+		Object source;
+
+		Event(Object source) {
+			this.source = source;
+		}
+
+		public Object getSource() {
+			return source;
+		}
+	}
+
+	private class MyListener implements ProjectListener, CircuitListener {
+		private WeakHashMap<Action, SelectionSave> savedSelections;
+
+		MyListener() {
+			savedSelections = new WeakHashMap<Action, SelectionSave>();
+		}
+
+		public void projectChanged(ProjectEvent event) {
+			int type = event.getAction();
+			if (type == ProjectEvent.ACTION_START) {
+				SelectionSave save = SelectionSave.create(Selection.this);
+				savedSelections.put((Action) event.getData(), save);
+			} else if (type == ProjectEvent.ACTION_COMPLETE) {
+				SelectionSave save = savedSelections.get(event.getData());
+				if (save != null && save.isSame(Selection.this)) {
+					savedSelections.remove(event.getData());
+				}
+			} else if (type == ProjectEvent.ACTION_MERGE) {
+				SelectionSave save = savedSelections.get(event.getOldData());
+				savedSelections.put((Action) event.getData(), save);
+			} else if (type == ProjectEvent.UNDO_COMPLETE) {
+				Circuit circ = event.getProject().getCurrentCircuit();
+				Action act = (Action) event.getData();
+				SelectionSave save = savedSelections.get(act);
+				if (save != null) {
+					lifted.clear();
+					selected.clear();
+					for (int i = 0; i < 2; i++) {
+						Component[] cs;
+						if (i == 0) cs = save.getFloatingComponents();
+						else cs = save.getAnchoredComponents();
+
+						if (cs != null) {
+							for (Component c : cs) {
+								if (circ.contains(c)) {
+									selected.add(c);
+								} else {
+									lifted.add(c);
+								}
+							}
+						}
+					}
+					fireSelectionChanged();
+				}
+			}
+		}
+
+		public void circuitChanged(CircuitEvent event) {
+			if (event.getAction() == CircuitEvent.TRANSACTION_DONE) {
+				Circuit circuit = event.getCircuit();
+				ReplacementMap repl = event.getResult().getReplacementMap(circuit);
+				boolean change = false;
+
+				ArrayList<Component> oldAnchored;
+				oldAnchored = new ArrayList<Component>(getComponents());
+				for (Component comp : oldAnchored) {
+					Collection<Component> replacedBy = repl.get(comp);
+					if (replacedBy != null) {
+						change = true;
+						selected.remove(comp);
+						lifted.remove(comp);
+						for (Component add : replacedBy) {
+							if (circuit.contains(add)) {
+								selected.add(add);
+							} else {
+								lifted.add(add);
+							}
+						}
+					}
+				}
+
+				if (change) {
+					fireSelectionChanged();
+				}
+			}
+		}
 	}
 
 }
