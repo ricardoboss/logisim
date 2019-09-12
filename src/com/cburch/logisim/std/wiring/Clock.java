@@ -16,22 +16,21 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class Clock extends InstanceFactory {
+	public static final Attribute<Integer> ATTR_HIGH = new DurationAttribute("highDuration", Strings.getter("clockHighAttr"), 1, Integer.MAX_VALUE);
+
+	public static final Attribute<Integer> ATTR_LOW = new DurationAttribute("lowDuration", Strings.getter("clockLowAttr"), 1, Integer.MAX_VALUE);
+
 	public static final Clock FACTORY = new Clock();
-	private static final Attribute<Integer> ATTR_HIGH
-		= new DurationAttribute("highDuration", Strings.getter("clockHighAttr"),
-		1, Integer.MAX_VALUE);
-	private static final Attribute<Integer> ATTR_LOW
-		= new DurationAttribute("lowDuration", Strings.getter("clockLowAttr"),
-		1, Integer.MAX_VALUE);
+
 	private static final Icon toolIcon = Icons.getIcon("clock.gif");
 
-	private Clock() {
+	public Clock() {
 		super("Clock", Strings.getter("clockComponent"));
 		setAttributes(new Attribute[]{
 			StdAttr.FACING, ATTR_HIGH, ATTR_LOW,
 			StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT
 		}, new Object[]{
-			Direction.EAST, 1, 1,
+			Direction.EAST, Integer.valueOf(1), Integer.valueOf(1),
 			"", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT
 		});
 		setFacingAttribute(StdAttr.FACING);
@@ -44,8 +43,8 @@ public class Clock extends InstanceFactory {
 	//
 	public static boolean tick(CircuitState circState, int ticks, Component comp) {
 		AttributeSet attrs = comp.getAttributeSet();
-		int durationHigh = attrs.getValue(ATTR_HIGH);
-		int durationLow = attrs.getValue(ATTR_LOW);
+		int durationHigh = attrs.getValue(ATTR_HIGH).intValue();
+		int durationLow = attrs.getValue(ATTR_LOW).intValue();
 		ClockState state = (ClockState) circState.getData(comp);
 		if (state == null) {
 			state = new ClockState();

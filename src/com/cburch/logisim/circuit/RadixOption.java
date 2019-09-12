@@ -9,14 +9,13 @@ import com.cburch.logisim.util.StringGetter;
 public abstract class RadixOption extends AttributeOption {
 	public static final RadixOption RADIX_2 = new Radix2();
 	public static final RadixOption RADIX_10_SIGNED = new Radix10Signed();
-	public static final Attribute<RadixOption> ATTRIBUTE
-		= Attributes.forOption("radix", Strings.getter("radixAttr"), OPTIONS);
 	private static final RadixOption RADIX_8 = new Radix8();
 	private static final RadixOption RADIX_10_UNSIGNED = new Radix10Unsigned();
 	private static final RadixOption RADIX_16 = new Radix16();
 	public static final RadixOption[] OPTIONS = {
 		RADIX_2, RADIX_8, RADIX_10_SIGNED, RADIX_10_UNSIGNED, RADIX_16
 	};
+	public static final Attribute<RadixOption> ATTRIBUTE = Attributes.forOption("radix", Strings.getter("radixAttr"), OPTIONS);
 	private final String saveName;
 	private final StringGetter displayGetter;
 

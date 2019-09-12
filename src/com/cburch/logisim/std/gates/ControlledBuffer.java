@@ -16,18 +16,14 @@ import javax.swing.*;
 import java.awt.*;
 
 class ControlledBuffer extends InstanceFactory {
-	public static final ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
-	public static final ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
-	private static final AttributeOption RIGHT_HANDED
-		= new AttributeOption("right", Strings.getter("controlledRightHanded"));
-	private static final AttributeOption LEFT_HANDED
-		= new AttributeOption("left", Strings.getter("controlledLeftHanded"));
-	private static final Attribute<AttributeOption> ATTR_CONTROL
-		= Attributes.forOption("control", Strings.getter("controlledControlOption"),
-		new AttributeOption[]{RIGHT_HANDED, LEFT_HANDED});
+	private static final AttributeOption RIGHT_HANDED = new AttributeOption("right", Strings.getter("controlledRightHanded"));
+	private static final AttributeOption LEFT_HANDED = new AttributeOption("left", Strings.getter("controlledLeftHanded"));
+	private static final Attribute<AttributeOption> ATTR_CONTROL = Attributes.forOption("control", Strings.getter("controlledControlOption"), new AttributeOption[]{RIGHT_HANDED, LEFT_HANDED});
 	private static final Icon ICON_BUFFER = Icons.getIcon("controlledBuffer.gif");
 	private static final Icon ICON_INVERTER = Icons.getIcon("controlledInverter.gif");
-	private final boolean isInverter;
+	static ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
+	static ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
+	private boolean isInverter;
 
 	private ControlledBuffer(boolean isInverter) {
 		super(isInverter ? "Controlled Inverter" : "Controlled Buffer",
@@ -141,7 +137,7 @@ class ControlledBuffer extends InstanceFactory {
 			PainterShaped.paintNot(painter);
 		} else {
 			GraphicsUtil.switchToWidth(g, 2);
-			int d = 0;
+			int d = isInverter ? 10 : 0;
 			int[] xp = new int[]{-d, -19 - d, -19 - d, -d};
 			int[] yp = new int[]{0, -7, 7, 0};
 			g.drawPolyline(xp, yp, 4);
