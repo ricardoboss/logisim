@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class JoinedAction extends Action {
-	Action[] todo;
+	private Action[] todo;
 
 	JoinedAction(Action... actions) {
 		todo = actions;

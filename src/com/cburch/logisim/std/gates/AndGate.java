@@ -13,7 +13,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class AndGate extends AbstractGate {
-	public static AndGate FACTORY = new AndGate();
+	public static final AndGate FACTORY = new AndGate();
 
 	private AndGate() {
 		super("AND Gate", Strings.getter("andGateComponent"));

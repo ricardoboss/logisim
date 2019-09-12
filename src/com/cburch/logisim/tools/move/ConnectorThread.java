@@ -6,16 +6,17 @@ package com.cburch.logisim.tools.move;
 import com.cburch.logisim.circuit.ReplacementMap;
 
 class ConnectorThread extends Thread {
-	private static ConnectorThread INSTANCE = new ConnectorThread();
+	private static final ConnectorThread INSTANCE = new ConnectorThread();
 
 	static {
 		INSTANCE.start();
 	}
 
-	private Object lock;
+	private final Object lock;
 	private transient boolean overrideRequest;
 	private MoveRequest nextRequest;
 	private MoveRequest processingRequest;
+
 	private ConnectorThread() {
 		lock = new Object();
 		overrideRequest = false;

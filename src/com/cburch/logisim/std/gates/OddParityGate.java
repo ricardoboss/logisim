@@ -14,7 +14,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class OddParityGate extends AbstractGate {
-	public static OddParityGate FACTORY = new OddParityGate();
+	public static final OddParityGate FACTORY = new OddParityGate();
 
 	private OddParityGate() {
 		super("Odd Parity", Strings.getter("oddParityComponent"));
@@ -28,7 +28,7 @@ class OddParityGate extends AbstractGate {
 	}
 
 	@Override
-	public void paintIconRectangular(InstancePainter painter) {
+	void paintIconRectangular(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		g.setColor(Color.black);
 		g.drawRect(1, 2, 16, 16);

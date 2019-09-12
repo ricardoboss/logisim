@@ -40,31 +40,27 @@ public class Frame extends LFrame implements LocaleListener {
 	public static final String VIEW_SIMULATION = "simulation";
 
 	private static final double[] ZOOM_OPTIONS = {20, 50, 75, 100, 133, 150, 200, 250, 300, 400};
-	private Project proj;
-	private MyProjectListener myProjectListener = new MyProjectListener();
-	// GUI elements shared between views
-	private LogisimMenuBar menubar;
-	private MenuListener menuListener;
-	private Toolbar toolbar;
-	private HorizontalSplitPane leftRegion;
-	private VerticalSplitPane mainRegion;
-	private JPanel mainPanelSuper;
-	private CardPanel mainPanel;
-	// left-side elements
-	private Toolbar projectToolbar;
-	private CardPanel explorerPane;
-	private Toolbox toolbox;
-	private SimulationExplorer simExplorer;
-	private AttrTable attrTable;
-	private ZoomControl zoom;
+	private final Project proj;
+	private final MyProjectListener myProjectListener = new MyProjectListener();
+	private final MenuListener menuListener;
+	private final Toolbar toolbar;
+	private final HorizontalSplitPane leftRegion;
+	private final VerticalSplitPane mainRegion;
+	private final JPanel mainPanelSuper;
+	private final CardPanel mainPanel;
+	private final CardPanel explorerPane;
+	private final Toolbox toolbox;
+	private final AttrTable attrTable;
+	private final ZoomControl zoom;
 	// for the Layout view
-	private LayoutToolbarModel layoutToolbarModel;
-	private Canvas layoutCanvas;
-	private ZoomModel layoutZoomModel;
-	private LayoutEditHandler layoutEditHandler;
-	private AttrTableSelectionModel attrTableSelectionModel;
+	private final LayoutToolbarModel layoutToolbarModel;
+	private final Canvas layoutCanvas;
+	private final ZoomModel layoutZoomModel;
+	private final LayoutEditHandler layoutEditHandler;
+	private final AttrTableSelectionModel attrTableSelectionModel;
 	// for the Appearance view
 	private AppearanceView appearance;
+
 	public Frame(Project proj) {
 		this.proj = proj;
 
@@ -88,7 +84,8 @@ public class Frame extends LFrame implements LocaleListener {
 		attrTableSelectionModel = new AttrTableSelectionModel(proj, this);
 
 		// set up menu bar and toolbar
-		menubar = new LogisimMenuBar(this, proj);
+		// GUI elements shared between views
+		LogisimMenuBar menubar = new LogisimMenuBar(this, proj);
 		menuListener = new MenuListener(this, menubar);
 		menuListener.setEditHandler(layoutEditHandler);
 		setJMenuBar(menubar);
@@ -96,9 +93,10 @@ public class Frame extends LFrame implements LocaleListener {
 
 		// set up the left-side components
 		ToolbarModel projectToolbarModel = new ExplorerToolbarModel(this, menuListener);
-		projectToolbar = new Toolbar(projectToolbarModel);
+		// left-side elements
+		Toolbar projectToolbar = new Toolbar(projectToolbarModel);
 		toolbox = new Toolbox(proj, menuListener);
-		simExplorer = new SimulationExplorer(proj, menuListener);
+		SimulationExplorer simExplorer = new SimulationExplorer(proj, menuListener);
 		explorerPane = new CardPanel();
 		explorerPane.addView(VIEW_TOOLBOX, toolbox);
 		explorerPane.addView(VIEW_SIMULATION, simExplorer);
@@ -126,21 +124,21 @@ public class Frame extends LFrame implements LocaleListener {
 		attrPanel.add(zoom, BorderLayout.SOUTH);
 
 		leftRegion = new HorizontalSplitPane(explPanel, attrPanel,
-			AppPreferences.WINDOW_LEFT_SPLIT.get().doubleValue());
+			AppPreferences.WINDOW_LEFT_SPLIT.get());
 		mainRegion = new VerticalSplitPane(leftRegion, mainPanelSuper,
-			AppPreferences.WINDOW_MAIN_SPLIT.get().doubleValue());
+			AppPreferences.WINDOW_MAIN_SPLIT.get());
 
 		getContentPane().add(mainRegion, BorderLayout.CENTER);
 
 		computeTitle();
 
-		this.setSize(AppPreferences.WINDOW_WIDTH.get().intValue(),
-			AppPreferences.WINDOW_HEIGHT.get().intValue());
+		this.setSize(AppPreferences.WINDOW_WIDTH.get(),
+			AppPreferences.WINDOW_HEIGHT.get());
 		Point prefPoint = getInitialLocation();
 		if (prefPoint != null) {
 			this.setLocation(prefPoint);
 		}
-		this.setExtendedState(AppPreferences.WINDOW_STATE.get().intValue());
+		this.setExtendedState(AppPreferences.WINDOW_STATE.get());
 
 		menuListener.register(mainPanel);
 		KeyboardToolSelection.register(toolbar);
@@ -222,7 +220,7 @@ public class Frame extends LFrame implements LocaleListener {
 		contents.remove(toolbar);
 		mainPanelSuper.remove(toolbar);
 		if (AppPreferences.TOOLBAR_HIDDEN.equals(loc)) {
-			; // don't place value anywhere
+			// don't place value anywhere
 		} else if (AppPreferences.TOOLBAR_DOWN_MIDDLE.equals(loc)) {
 			toolbar.setOrientation(Toolbar.VERTICAL);
 			mainPanelSuper.add(toolbar, BorderLayout.WEST);
@@ -376,19 +374,19 @@ public class Frame extends LFrame implements LocaleListener {
 	}
 
 	public void savePreferences() {
-		AppPreferences.TICK_FREQUENCY.set(Double.valueOf(proj.getSimulator().getTickFrequency()));
+		AppPreferences.TICK_FREQUENCY.set(proj.getSimulator().getTickFrequency());
 		AppPreferences.LAYOUT_SHOW_GRID.setBoolean(layoutZoomModel.getShowGrid());
-		AppPreferences.LAYOUT_ZOOM.set(Double.valueOf(layoutZoomModel.getZoomFactor()));
+		AppPreferences.LAYOUT_ZOOM.set(layoutZoomModel.getZoomFactor());
 		if (appearance != null) {
 			ZoomModel aZoom = appearance.getZoomModel();
 			AppPreferences.APPEARANCE_SHOW_GRID.setBoolean(aZoom.getShowGrid());
-			AppPreferences.APPEARANCE_ZOOM.set(Double.valueOf(aZoom.getZoomFactor()));
+			AppPreferences.APPEARANCE_ZOOM.set(aZoom.getZoomFactor());
 		}
 		int state = getExtendedState() & ~JFrame.ICONIFIED;
-		AppPreferences.WINDOW_STATE.set(Integer.valueOf(state));
+		AppPreferences.WINDOW_STATE.set(state);
 		Dimension dim = getSize();
-		AppPreferences.WINDOW_WIDTH.set(Integer.valueOf(dim.width));
-		AppPreferences.WINDOW_HEIGHT.set(Integer.valueOf(dim.height));
+		AppPreferences.WINDOW_WIDTH.set(dim.width);
+		AppPreferences.WINDOW_HEIGHT.set(dim.height);
 		Point loc;
 		try {
 			loc = getLocationOnScreen();
@@ -398,8 +396,8 @@ public class Frame extends LFrame implements LocaleListener {
 		if (loc != null) {
 			AppPreferences.WINDOW_LOCATION.set(loc.x + "," + loc.y);
 		}
-		AppPreferences.WINDOW_LEFT_SPLIT.set(Double.valueOf(leftRegion.getFraction()));
-		AppPreferences.WINDOW_MAIN_SPLIT.set(Double.valueOf(mainRegion.getFraction()));
+		AppPreferences.WINDOW_LEFT_SPLIT.set(leftRegion.getFraction());
+		AppPreferences.WINDOW_MAIN_SPLIT.set(mainRegion.getFraction());
 		AppPreferences.DIALOG_DIRECTORY.set(JFileChoosers.getCurrentDirectory());
 	}
 
@@ -421,11 +419,7 @@ public class Frame extends LFrame implements LocaleListener {
 		boolean ret;
 		if (result == 0) {
 			ret = ProjectActions.doSave(proj);
-		} else if (result == 1) {
-			ret = true;
-		} else {
-			ret = false;
-		}
+		} else ret = result == 1;
 		if (ret) {
 			dispose();
 		}
@@ -476,7 +470,7 @@ public class Frame extends LFrame implements LocaleListener {
 		private void enableSave() {
 			Project proj = getProject();
 			boolean ok = proj.isFileDirty();
-			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
+			getRootPane().putClientProperty("windowModified", ok);
 		}
 
 		public void attributeListChanged(AttributeEvent e) {

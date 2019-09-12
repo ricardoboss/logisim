@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.util.Locale;
 
 class Strings {
-	private static LocaleManager source
+	private static final LocaleManager source
 		= new LocaleManager("resources/logisim", "prefs");
 
 	public static String get(String key) {

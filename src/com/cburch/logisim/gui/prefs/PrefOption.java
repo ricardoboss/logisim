@@ -8,8 +8,8 @@ import com.cburch.logisim.util.StringGetter;
 import javax.swing.*;
 
 class PrefOption {
-	private Object value;
-	private StringGetter getter;
+	private final Object value;
+	private final StringGetter getter;
 
 	PrefOption(String value, StringGetter getter) {
 		this.value = value;

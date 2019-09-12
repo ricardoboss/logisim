@@ -6,6 +6,8 @@ package com.cburch.logisim.tools.move;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 
+import java.util.Objects;
+
 class SearchNode implements Comparable<SearchNode> {
 	private static final int CROSSING_PENALTY = 20;
 	private static final int TURN_PENALTY = 50;
@@ -13,11 +15,11 @@ class SearchNode implements Comparable<SearchNode> {
 	private final Location loc;
 	private final Direction dir;
 	private final Location dest;
-	private ConnectionData conn;
-	private int dist;
-	private int heur;
-	private boolean extendsWire;
-	private SearchNode prev;
+	private final ConnectionData conn;
+	private final int dist;
+	private final int heur;
+	private final boolean extendsWire;
+	private final SearchNode prev;
 
 	public SearchNode(ConnectionData conn, Location src,
 					  Direction srcDir, Location dst) {
@@ -144,7 +146,7 @@ class SearchNode implements Comparable<SearchNode> {
 		if (other instanceof SearchNode) {
 			SearchNode o = (SearchNode) other;
 			return this.loc.equals(o.loc)
-				&& (this.dir == null ? o.dir == null : this.dir.equals(o.dir))
+				&& (Objects.equals(this.dir, o.dir))
 				&& this.dest.equals(o.dest);
 		} else {
 			return false;

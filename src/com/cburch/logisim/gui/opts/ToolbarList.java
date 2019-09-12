@@ -17,8 +17,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 class ToolbarList extends JList {
-	private ToolbarData base;
-	private Model model;
+	private final ToolbarData base;
+	private final Model model;
 
 	public ToolbarList(ToolbarData base) {
 		this.base = base;
@@ -38,7 +38,7 @@ class ToolbarList extends JList {
 	}
 
 	private static class ToolIcon implements Icon {
-		private Tool tool;
+		private final Tool tool;
 
 		ToolIcon(Tool tool) {
 			this.tool = tool;

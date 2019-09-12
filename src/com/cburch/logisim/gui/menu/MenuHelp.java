@@ -16,11 +16,11 @@ import java.net.URL;
 import java.util.Locale;
 
 class MenuHelp extends JMenu implements ActionListener {
-	private LogisimMenuBar menubar;
-	private JMenuItem tutorial = new JMenuItem();
-	private JMenuItem guide = new JMenuItem();
-	private JMenuItem library = new JMenuItem();
-	private JMenuItem about = new JMenuItem();
+	private final LogisimMenuBar menubar;
+	private final JMenuItem tutorial = new JMenuItem();
+	private final JMenuItem guide = new JMenuItem();
+	private final JMenuItem library = new JMenuItem();
+	private final JMenuItem about = new JMenuItem();
 	private HelpSet helpSet;
 	private String helpSetUrl = "";
 	private JHelp helpComponent;
@@ -103,7 +103,6 @@ class MenuHelp extends JMenu implements ActionListener {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(menubar.getParentWindow(),
 					Strings.get("helpUnavailableError"));
-				return;
 			}
 		}
 	}

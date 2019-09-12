@@ -16,18 +16,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 class MinimizedTab extends AnalyzerTab {
-	private OutputSelector selector;
-	private KarnaughMapPanel karnaughMap;
-	private JLabel formatLabel = new JLabel();
-	private JComboBox formatChoice = new JComboBox(new FormatModel());
-	private ExpressionView minimizedExpr = new ExpressionView();
-	private JButton setAsExpr = new JButton();
-	private MyListener myListener = new MyListener();
-	private AnalyzerModel model;
-	private OutputExpressions outputExprs;
+	private final OutputSelector selector;
+	private final KarnaughMapPanel karnaughMap;
+	private final JLabel formatLabel = new JLabel();
+	private final JComboBox formatChoice = new JComboBox(new FormatModel());
+	private final ExpressionView minimizedExpr = new ExpressionView();
+	private final JButton setAsExpr = new JButton();
+	private final OutputExpressions outputExprs;
+
 	public MinimizedTab(AnalyzerModel model) {
-		this.model = model;
 		this.outputExprs = model.getOutputExpressions();
+		MyListener myListener = new MyListener();
 		outputExprs.addOutputExpressionsListener(myListener);
 
 		selector = new OutputSelector(model);
@@ -71,7 +70,7 @@ class MinimizedTab extends AnalyzerTab {
 
 		String selected = selector.getSelectedOutput();
 		setAsExpr.setEnabled(selected != null
-			&& !outputExprs.isExpressionMinimal(selected));
+			&& outputExprs.isExpressionMinimal(selected));
 	}
 
 	private void addRow(GridBagLayout gb, GridBagConstraints gc,
@@ -109,7 +108,7 @@ class MinimizedTab extends AnalyzerTab {
 		int format = outputExprs.getMinimizedFormat(output);
 		formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
 		minimizedExpr.setExpression(outputExprs.getMinimalExpression(output));
-		setAsExpr.setEnabled(output != null && !outputExprs.isExpressionMinimal(output));
+		setAsExpr.setEnabled(output != null && outputExprs.isExpressionMinimal(output));
 	}
 
 	private String getCurrentVariable() {
@@ -118,8 +117,9 @@ class MinimizedTab extends AnalyzerTab {
 
 	private static class FormatModel extends AbstractListModel
 		implements ComboBoxModel {
-		private String[] choices;
+		private final String[] choices;
 		private int selected;
+
 		private FormatModel() {
 			selected = 0;
 			choices = new String[2];
@@ -127,12 +127,7 @@ class MinimizedTab extends AnalyzerTab {
 		}
 
 		static int getFormatIndex(int choice) {
-			switch (choice) {
-				case AnalyzerModel.FORMAT_PRODUCT_OF_SUMS:
-					return 1;
-				default:
-					return 0;
-			}
+			return choice == AnalyzerModel.FORMAT_PRODUCT_OF_SUMS ? 1 : 0;
 		}
 
 		void localeChanged() {
@@ -142,12 +137,7 @@ class MinimizedTab extends AnalyzerTab {
 		}
 
 		int getSelectedFormat() {
-			switch (selected) {
-				case 1:
-					return AnalyzerModel.FORMAT_PRODUCT_OF_SUMS;
-				default:
-					return AnalyzerModel.FORMAT_SUM_OF_PRODUCTS;
-			}
+			return selected == 1 ? AnalyzerModel.FORMAT_PRODUCT_OF_SUMS : AnalyzerModel.FORMAT_SUM_OF_PRODUCTS;
 		}
 
 		public int getSize() {
@@ -180,7 +170,7 @@ class MinimizedTab extends AnalyzerTab {
 				minimizedExpr.setExpression(outputExprs.getMinimalExpression(output));
 				MinimizedTab.this.validate();
 			}
-			setAsExpr.setEnabled(output != null && !outputExprs.isExpressionMinimal(output));
+			setAsExpr.setEnabled(output != null && outputExprs.isExpressionMinimal(output));
 			int format = outputExprs.getMinimizedFormat(output);
 			formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
 		}

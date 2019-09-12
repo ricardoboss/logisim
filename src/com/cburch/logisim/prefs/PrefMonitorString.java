@@ -3,11 +3,12 @@
 
 package com.cburch.logisim.prefs;
 
+import java.util.Objects;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.Preferences;
 
 class PrefMonitorString extends AbstractPrefMonitor<String> {
-	private String dflt;
+	private final String dflt;
 	private String value;
 
 	PrefMonitorString(String name, String dflt) {
@@ -19,7 +20,7 @@ class PrefMonitorString extends AbstractPrefMonitor<String> {
 	}
 
 	private static boolean isSame(String a, String b) {
-		return a == null ? b == null : a.equals(b);
+		return !Objects.equals(a, b);
 	}
 
 	public String get() {
@@ -28,7 +29,7 @@ class PrefMonitorString extends AbstractPrefMonitor<String> {
 
 	public void set(String newValue) {
 		String oldValue = value;
-		if (!isSame(oldValue, newValue)) {
+		if (isSame(oldValue, newValue)) {
 			value = newValue;
 			AppPreferences.getPrefs().put(getIdentifier(), newValue);
 		}
@@ -41,7 +42,7 @@ class PrefMonitorString extends AbstractPrefMonitor<String> {
 		if (prop.equals(name)) {
 			String oldValue = value;
 			String newValue = prefs.get(name, dflt);
-			if (!isSame(oldValue, newValue)) {
+			if (isSame(oldValue, newValue)) {
 				value = newValue;
 				AppPreferences.firePropertyChange(name, oldValue, newValue);
 			}

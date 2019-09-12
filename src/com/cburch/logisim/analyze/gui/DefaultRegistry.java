@@ -8,7 +8,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 class DefaultRegistry {
-	private JRootPane rootPane;
+	private final JRootPane rootPane;
 
 	public DefaultRegistry(JRootPane rootPane) {
 		this.rootPane = rootPane;
@@ -20,7 +20,7 @@ class DefaultRegistry {
 	}
 
 	private class MyListener implements FocusListener {
-		JButton defaultButton;
+		final JButton defaultButton;
 
 		MyListener(JButton defaultButton) {
 			this.defaultButton = defaultButton;

@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CanvasActionAdapter extends com.cburch.logisim.proj.Action {
-	private Circuit circuit;
-	private Action canvasAction;
+	private final Circuit circuit;
+	private final Action canvasAction;
 	private boolean wasDefault;
 
 	public CanvasActionAdapter(Circuit circuit, Action action) {
@@ -64,7 +64,7 @@ public class CanvasActionAdapter extends com.cburch.logisim.proj.Action {
 	}
 
 	private class ActionTransaction extends CircuitTransaction {
-		private boolean forward;
+		private final boolean forward;
 
 		ActionTransaction(boolean forward) {
 			this.forward = forward;
@@ -72,7 +72,7 @@ public class CanvasActionAdapter extends com.cburch.logisim.proj.Action {
 
 		@Override
 		protected Map<Circuit, Integer> getAccessedCircuits() {
-			Map<Circuit, Integer> accessMap = new HashMap<Circuit, Integer>();
+			Map<Circuit, Integer> accessMap = new HashMap<>();
 			for (Circuit supercirc : circuit.getCircuitsUsingThis()) {
 				accessMap.put(supercirc, READ_WRITE);
 			}

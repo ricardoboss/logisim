@@ -16,7 +16,7 @@ import java.util.Random;
 public abstract class AppearanceElement extends AbstractCanvasObject {
 	private Location location;
 
-	public AppearanceElement(Location location) {
+	AppearanceElement(Location location) {
 		this.location = location;
 	}
 
@@ -64,7 +64,7 @@ public abstract class AppearanceElement extends AbstractCanvasObject {
 		location = location.translate(dx, dy);
 	}
 
-	protected boolean isInCircle(Location loc, int radius) {
+	boolean isInCircle(Location loc, int radius) {
 		int dx = loc.getX() - location.getX();
 		int dy = loc.getY() - location.getY();
 		return dx * dx + dy * dy < radius * radius;
@@ -75,7 +75,7 @@ public abstract class AppearanceElement extends AbstractCanvasObject {
 		return null; // this is only used to determine what lies on top of what - but the elements will always be on top anyway
 	}
 
-	protected Bounds getBounds(int radius) {
+	Bounds getBounds(int radius) {
 		return Bounds.create(location.getX() - radius, location.getY() - radius,
 			2 * radius, 2 * radius);
 	}

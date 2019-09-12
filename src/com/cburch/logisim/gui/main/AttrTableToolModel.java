@@ -9,8 +9,8 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Tool;
 
 public class AttrTableToolModel extends AttributeSetTableModel {
-	Project proj;
-	Tool tool;
+	private final Project proj;
+	private final Tool tool;
 
 	public AttrTableToolModel(Project proj, Tool tool) {
 		super(tool.getAttributeSet());

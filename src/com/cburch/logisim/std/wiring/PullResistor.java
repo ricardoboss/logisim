@@ -26,7 +26,7 @@ public class PullResistor extends InstanceFactory {
 	private static final Icon ICON_SHAPED = Icons.getIcon("pullshap.gif");
 	private static final Icon ICON_RECTANGULAR = Icons.getIcon("pullrect.gif");
 
-	public PullResistor() {
+	private PullResistor() {
 		super("Pull Resistor", Strings.getter("pullComponent"));
 		setAttributes(new Attribute[]{StdAttr.FACING, ATTR_PULL_TYPE},
 			new Object[]{Direction.SOUTH, ATTR_PULL_TYPE.parse("0")});
@@ -157,6 +157,6 @@ public class PullResistor extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		; // nothing to do - handled by CircuitWires
+		// nothing to do - handled by CircuitWires
 	}
 }

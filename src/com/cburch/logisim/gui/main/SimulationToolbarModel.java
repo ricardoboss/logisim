@@ -16,23 +16,21 @@ import java.util.List;
 
 class SimulationToolbarModel extends AbstractToolbarModel
 	implements ChangeListener {
-	private Project project;
-	private LogisimToolbarItem simEnable;
-	private LogisimToolbarItem simStep;
-	private LogisimToolbarItem tickEnable;
-	private LogisimToolbarItem tickStep;
-	private List<ToolbarItem> items;
+	private final Project project;
+	private final LogisimToolbarItem simEnable;
+	private final LogisimToolbarItem tickEnable;
+	private final List<ToolbarItem> items;
 
 	public SimulationToolbarModel(Project project, MenuListener menu) {
 		this.project = project;
 
 		simEnable = new LogisimToolbarItem(menu, "simplay.png", LogisimMenuBar.SIMULATE_ENABLE,
 			Strings.getter("simulateEnableStepsTip"));
-		simStep = new LogisimToolbarItem(menu, "simstep.png", LogisimMenuBar.SIMULATE_STEP,
+		LogisimToolbarItem simStep = new LogisimToolbarItem(menu, "simstep.png", LogisimMenuBar.SIMULATE_STEP,
 			Strings.getter("simulateStepTip"));
 		tickEnable = new LogisimToolbarItem(menu, "simtplay.png", LogisimMenuBar.TICK_ENABLE,
 			Strings.getter("simulateEnableTicksTip"));
-		tickStep = new LogisimToolbarItem(menu, "simtstep.png", LogisimMenuBar.TICK_STEP,
+		LogisimToolbarItem tickStep = new LogisimToolbarItem(menu, "simtstep.png", LogisimMenuBar.TICK_STEP,
 			Strings.getter("simulateTickTip"));
 
 		items = UnmodifiableList.create(new ToolbarItem[]{

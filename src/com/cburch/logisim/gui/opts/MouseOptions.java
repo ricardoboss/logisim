@@ -25,18 +25,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 class MouseOptions extends OptionsPanel {
-	private MyListener listener = new MyListener();
+	private final MappingsModel model;
+	private final JPanel addArea = new AddArea();
+	private final JTable mappings = new JTable();
+	private final AttrTable attrTable;
+	private final JButton remove = new JButton();
 	private Tool curTool = null;
-	private MappingsModel model;
-	private ProjectExplorer explorer;
-	private JPanel addArea = new AddArea();
-	private JTable mappings = new JTable();
-	private AttrTable attrTable;
-	private JButton remove = new JButton();
+
 	public MouseOptions(OptionsFrame window) {
 		super(window, new GridLayout(1, 3));
 
-		explorer = new ProjectExplorer(getProject());
+		ProjectExplorer explorer = new ProjectExplorer(getProject());
+		MyListener listener = new MyListener();
 		explorer.setListener(listener);
 
 		// Area for adding mappings
@@ -128,7 +128,7 @@ class MouseOptions extends OptionsPanel {
 	}
 
 	private class AddArea extends JPanel {
-		public AddArea() {
+		AddArea() {
 			setPreferredSize(new Dimension(75, 60));
 			setMinimumSize(new Dimension(75, 60));
 			setBorder(BorderFactory.createCompoundBorder(
@@ -200,7 +200,7 @@ class MouseOptions extends OptionsPanel {
 		public void mousePressed(MouseEvent e) {
 			if (e.getSource() == addArea && curTool != null) {
 				Tool t = curTool.cloneTool();
-				Integer mods = Integer.valueOf(e.getModifiersEx());
+				Integer mods = e.getModifiersEx();
 				getProject().doAction(OptionsActions.setMapping(getOptions().getMouseMappings(), mods, t));
 				setSelectedRow(model.getRow(mods));
 			}
@@ -275,7 +275,7 @@ class MouseOptions extends OptionsPanel {
 		// AbstractTableModel methods
 		@Override
 		public void fireTableStructureChanged() {
-			cur_keys = new ArrayList<Integer>(getOptions().getMouseMappings().getMappedModifiers());
+			cur_keys = new ArrayList<>(getOptions().getMouseMappings().getMappedModifiers());
 			Collections.sort(cur_keys);
 			super.fireTableStructureChanged();
 		}
@@ -291,7 +291,7 @@ class MouseOptions extends OptionsPanel {
 		public Object getValueAt(int row, int column) {
 			Integer key = cur_keys.get(row);
 			if (column == 0) {
-				return InputEventUtil.toDisplayString(key.intValue());
+				return InputEventUtil.toDisplayString(key);
 			} else {
 				Tool tool = getOptions().getMouseMappings().getToolFor(key);
 				return tool.getDisplayName();

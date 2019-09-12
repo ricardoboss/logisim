@@ -26,7 +26,7 @@ public class BitExtender extends InstanceFactory {
 			new AttributeOption("input", "input", Strings.getter("extenderInputType")),
 		});
 
-	public BitExtender() {
+	private BitExtender() {
 		super("Bit Extender", Strings.getter("extenderComponent"));
 		setIconName("extender.gif");
 		setAttributes(new Attribute[]{
@@ -54,11 +54,23 @@ public class BitExtender extends InstanceFactory {
 
 		String s0;
 		String type = getType(painter.getAttributeSet());
-		if (type.equals("zero")) s0 = Strings.get("extenderZeroLabel");
-		else if (type.equals("one")) s0 = Strings.get("extenderOneLabel");
-		else if (type.equals("sign")) s0 = Strings.get("extenderSignLabel");
-		else if (type.equals("input")) s0 = Strings.get("extenderInputLabel");
-		else s0 = "???"; // should never happen
+		switch (type) {
+			case "zero":
+				s0 = Strings.get("extenderZeroLabel");
+				break;
+			case "one":
+				s0 = Strings.get("extenderOneLabel");
+				break;
+			case "sign":
+				s0 = Strings.get("extenderSignLabel");
+				break;
+			case "input":
+				s0 = Strings.get("extenderInputLabel");
+				break;
+			default:
+				s0 = "???"; // should never happen
+				break;
+		}
 		String s1 = Strings.get("extenderMainLabel");
 		Bounds bds = painter.getBounds();
 		int x = bds.getX() + bds.getWidth() / 2;
@@ -112,16 +124,21 @@ public class BitExtender extends InstanceFactory {
 		BitWidth wout = state.getAttributeValue(ATTR_OUT_WIDTH);
 		String type = getType(state.getAttributeSet());
 		Value extend;
-		if (type.equals("one")) {
-			extend = Value.TRUE;
-		} else if (type.equals("sign")) {
-			int win = in.getWidth();
-			extend = win > 0 ? in.get(win - 1) : Value.ERROR;
-		} else if (type.equals("input")) {
-			extend = state.getPort(2);
-			if (extend.getWidth() != 1) extend = Value.ERROR;
-		} else {
-			extend = Value.FALSE;
+		switch (type) {
+			case "one":
+				extend = Value.TRUE;
+				break;
+			case "sign":
+				int win = in.getWidth();
+				extend = win > 0 ? in.get(win - 1) : Value.ERROR;
+				break;
+			case "input":
+				extend = state.getPort(2);
+				if (extend.getWidth() != 1) extend = Value.ERROR;
+				break;
+			default:
+				extend = Value.FALSE;
+				break;
 		}
 
 		Value out = in.extendWidth(wout.getWidth(), extend);

@@ -20,14 +20,12 @@ import java.util.Map;
 public class Constant extends InstanceFactory {
 	public static final Attribute<Integer> ATTR_VALUE
 		= Attributes.forHexInteger("value", Strings.getter("constantValueAttr"));
+	public static final InstanceFactory FACTORY = new Constant();
 	private static final Color BACKGROUND_COLOR = new Color(230, 230, 230);
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, StdAttr.WIDTH, ATTR_VALUE
-	});
-	public static InstanceFactory FACTORY = new Constant();
+		= Arrays.asList(StdAttr.FACING, StdAttr.WIDTH, ATTR_VALUE);
 
-	public Constant() {
+	private Constant() {
 		super("Constant", Strings.getter("constantComponent"));
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(JoinedConfigurator.create(
@@ -72,7 +70,7 @@ public class Constant extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
-		int value = state.getAttributeValue(ATTR_VALUE).intValue();
+		int value = state.getAttributeValue(ATTR_VALUE);
 		state.setPort(0, Value.createKnown(width, value), 1);
 	}
 
@@ -86,8 +84,6 @@ public class Constant extends InstanceFactory {
 		if (facing == Direction.EAST) {
 			switch (chars) {
 				case 1:
-					ret = Bounds.create(-16, -8, 16, 16);
-					break;
 				case 2:
 					ret = Bounds.create(-16, -8, 16, 16);
 					break;
@@ -113,8 +109,6 @@ public class Constant extends InstanceFactory {
 		} else if (facing == Direction.WEST) {
 			switch (chars) {
 				case 1:
-					ret = Bounds.create(0, -8, 16, 16);
-					break;
 				case 2:
 					ret = Bounds.create(0, -8, 16, 16);
 					break;
@@ -140,8 +134,6 @@ public class Constant extends InstanceFactory {
 		} else if (facing == Direction.SOUTH) {
 			switch (chars) {
 				case 1:
-					ret = Bounds.create(-8, -16, 16, 16);
-					break;
 				case 2:
 					ret = Bounds.create(-8, -16, 16, 16);
 					break;
@@ -167,8 +159,6 @@ public class Constant extends InstanceFactory {
 		} else if (facing == Direction.NORTH) {
 			switch (chars) {
 				case 1:
-					ret = Bounds.create(-8, 0, 16, 16);
-					break;
 				case 2:
 					ret = Bounds.create(-8, 0, 16, 16);
 					break;
@@ -221,7 +211,7 @@ public class Constant extends InstanceFactory {
 
 		Graphics g = painter.getGraphics();
 		if (w == 1) {
-			int v = painter.getAttributeValue(ATTR_VALUE).intValue();
+			int v = painter.getAttributeValue(ATTR_VALUE);
 			Value val = v == 1 ? Value.TRUE : Value.FALSE;
 			g.setColor(val.getColor());
 			GraphicsUtil.drawCenteredText(g, "" + v, 10, 9);
@@ -234,7 +224,7 @@ public class Constant extends InstanceFactory {
 
 	@Override
 	public void paintGhost(InstancePainter painter) {
-		int v = painter.getAttributeValue(ATTR_VALUE).intValue();
+		int v = painter.getAttributeValue(ATTR_VALUE);
 		String vStr = Integer.toHexString(v);
 		Bounds bds = getOffsetBounds(painter.getAttributeSet());
 
@@ -249,7 +239,7 @@ public class Constant extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getOffsetBounds();
 		BitWidth width = painter.getAttributeValue(StdAttr.WIDTH);
-		int intValue = painter.getAttributeValue(ATTR_VALUE).intValue();
+		int intValue = painter.getAttributeValue(ATTR_VALUE);
 		Value v = Value.createKnown(width, intValue);
 		Location loc = painter.getLocation();
 		int x = loc.getX();
@@ -276,7 +266,6 @@ public class Constant extends InstanceFactory {
 
 	private static class ConstantAttributes extends AbstractAttributeSet {
 		private Direction facing = Direction.EAST;
-		;
 		private BitWidth width = BitWidth.ONE;
 		private Value value = Value.TRUE;
 
@@ -311,7 +300,7 @@ public class Constant extends InstanceFactory {
 				this.value = this.value.extendWidth(width.getWidth(),
 					this.value.get(this.value.getWidth() - 1));
 			} else if (attr == ATTR_VALUE) {
-				int val = ((Integer) value).intValue();
+				int val = (Integer) value;
 				this.value = Value.createKnown(width, val);
 			} else {
 				throw new IllegalArgumentException("unknown attribute " + attr);
@@ -321,15 +310,15 @@ public class Constant extends InstanceFactory {
 	}
 
 	private static class ConstantExpression implements ExpressionComputer {
-		private Instance instance;
+		private final Instance instance;
 
-		public ConstantExpression(Instance instance) {
+		ConstantExpression(Instance instance) {
 			this.instance = instance;
 		}
 
 		public void computeExpression(Map<Location, Expression> expressionMap) {
 			AttributeSet attrs = instance.getAttributeSet();
-			int intValue = attrs.getValue(ATTR_VALUE).intValue();
+			int intValue = attrs.getValue(ATTR_VALUE);
 
 			expressionMap.put(instance.getLocation(),
 				Expressions.constant(intValue));

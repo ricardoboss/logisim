@@ -57,7 +57,7 @@ abstract class CircuitDetermination {
 	static class Gate extends CircuitDetermination {
 		private ComponentFactory factory;
 		private ArrayList<CircuitDetermination> inputs
-			= new ArrayList<CircuitDetermination>();
+			= new ArrayList<>();
 
 		private Gate(ComponentFactory factory) {
 			this.factory = factory;
@@ -127,7 +127,6 @@ abstract class CircuitDetermination {
 				notAllInputs(); // the order of these two lines is significant
 				notOutput();
 			} else if (factory == NandGate.FACTORY) {
-				;
 			} else {
 				throw new IllegalArgumentException("Cannot handle " + factory.getDisplayName());
 			}
@@ -137,7 +136,7 @@ abstract class CircuitDetermination {
 		private void notOutput() {
 			Gate sub = new Gate(NandGate.FACTORY);
 			sub.inputs = this.inputs;
-			this.inputs = new ArrayList<CircuitDetermination>();
+			this.inputs = new ArrayList<>();
 			inputs.add(sub);
 			inputs.add(sub);
 		}
@@ -169,7 +168,7 @@ abstract class CircuitDetermination {
 			if (num > GateAttributes.MAX_INPUTS) {
 				int newNum = (num + GateAttributes.MAX_INPUTS - 1) / GateAttributes.MAX_INPUTS;
 				ArrayList<CircuitDetermination> oldInputs = inputs;
-				inputs = new ArrayList<CircuitDetermination>();
+				inputs = new ArrayList<>();
 
 				ComponentFactory subFactory = factory;
 				if (subFactory == NandGate.FACTORY) subFactory = AndGate.FACTORY;
@@ -206,7 +205,7 @@ abstract class CircuitDetermination {
 	}
 
 	static class Input extends CircuitDetermination {
-		private String name;
+		private final String name;
 
 		private Input(String name) {
 			this.name = name;
@@ -218,7 +217,7 @@ abstract class CircuitDetermination {
 	}
 
 	static class Value extends CircuitDetermination {
-		private int value;
+		private final int value;
 
 		private Value(int value) {
 			this.value = value;

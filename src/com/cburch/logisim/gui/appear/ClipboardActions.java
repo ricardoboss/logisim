@@ -17,21 +17,22 @@ import java.util.Map;
 
 public class ClipboardActions extends Action {
 
-	private boolean remove;
-	private AppearanceCanvas canvas;
-	private CanvasModel canvasModel;
+	private final boolean remove;
+	private final AppearanceCanvas canvas;
+	private final CanvasModel canvasModel;
+	private final Map<CanvasObject, Integer> affected;
+	private final ClipboardContents newClipboard;
 	private ClipboardContents oldClipboard;
-	private Map<CanvasObject, Integer> affected;
-	private ClipboardContents newClipboard;
+
 	private ClipboardActions(boolean remove, AppearanceCanvas canvas) {
 		this.remove = remove;
 		this.canvas = canvas;
 		this.canvasModel = canvas.getModel();
 
-		ArrayList<CanvasObject> contents = new ArrayList<CanvasObject>();
+		ArrayList<CanvasObject> contents = new ArrayList<>();
 		Direction anchorFacing = null;
 		Location anchorLocation = null;
-		ArrayList<CanvasObject> aff = new ArrayList<CanvasObject>();
+		ArrayList<CanvasObject> aff = new ArrayList<>();
 		for (CanvasObject o : canvas.getSelection().getSelected()) {
 			if (o.canRemove()) {
 				aff.add(o);

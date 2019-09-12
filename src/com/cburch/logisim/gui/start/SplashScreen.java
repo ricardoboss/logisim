@@ -22,7 +22,11 @@ public class SplashScreen extends JWindow implements ActionListener {
 
 	private static final int PROGRESS_MAX = 3568;
 	private static final boolean PRINT_TIMES = false;
-	Marker[] markers = new Marker[]{
+	private final JProgressBar progress = new JProgressBar(0, PROGRESS_MAX);
+	private final JButton close = new JButton(Strings.get("startupCloseButton"));
+	private final JButton cancel = new JButton(Strings.get("startupQuitButton"));
+	private final long startTime = System.currentTimeMillis();
+	private Marker[] markers = new Marker[]{
 		new Marker(377, Strings.get("progressLibraries")),
 		new Marker(990, Strings.get("progressTemplateCreate")),
 		new Marker(1002, Strings.get("progressTemplateOpen")),
@@ -34,11 +38,8 @@ public class SplashScreen extends JWindow implements ActionListener {
 		new Marker(2383, Strings.get("progressProjectCreate")),
 		new Marker(2519, Strings.get("progressFrameCreate")),
 	};
-	boolean inClose = false; // for avoiding mutual recursion
-	JProgressBar progress = new JProgressBar(0, PROGRESS_MAX);
-	JButton close = new JButton(Strings.get("startupCloseButton"));
-	JButton cancel = new JButton(Strings.get("startupQuitButton"));
-	long startTime = System.currentTimeMillis();
+	private boolean inClose = false; // for avoiding mutual recursion
+
 	public SplashScreen() {
 		JPanel imagePanel = About.getImagePanel();
 		imagePanel.setBorder(null);
@@ -67,11 +68,9 @@ public class SplashScreen extends JWindow implements ActionListener {
 	public void setProgress(int markerId) {
 		final Marker marker = markers == null ? null : markers[markerId];
 		if (marker != null) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					progress.setString(marker.message);
-					progress.setValue(marker.count);
-				}
+			SwingUtilities.invokeLater(() -> {
+				progress.setString(marker.message);
+				progress.setValue(marker.count);
 			});
 			if (PRINT_TIMES) {
 				System.err.println((System.currentTimeMillis() - startTime) //OK
@@ -118,8 +117,8 @@ public class SplashScreen extends JWindow implements ActionListener {
 	}
 
 	private static class Marker {
-		int count;
-		String message;
+		final int count;
+		final String message;
 
 		Marker(int count, String message) {
 			this.count = count;

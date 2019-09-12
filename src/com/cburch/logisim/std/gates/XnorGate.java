@@ -16,7 +16,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class XnorGate extends AbstractGate {
-	public static XnorGate FACTORY = new XnorGate();
+	public static final XnorGate FACTORY = new XnorGate();
 
 	private XnorGate() {
 		super("XNOR Gate", Strings.getter("xnorGateComponent"), true);

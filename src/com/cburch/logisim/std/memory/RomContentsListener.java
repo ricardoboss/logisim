@@ -9,13 +9,14 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 
 class RomContentsListener implements HexModelListener {
-	Project proj;
-	boolean enabled = true;
+	private final Project proj;
+	private boolean enabled = true;
+
 	RomContentsListener(Project proj) {
 		this.proj = proj;
 	}
 
-	void setEnabled(boolean value) {
+	private void setEnabled(boolean value) {
 		enabled = value;
 	}
 
@@ -38,11 +39,11 @@ class RomContentsListener implements HexModelListener {
 	}
 
 	private static class Change extends Action {
-		private RomContentsListener source;
-		private MemContents contents;
-		private long start;
-		private int[] oldValues;
-		private int[] newValues;
+		private final RomContentsListener source;
+		private final MemContents contents;
+		private final long start;
+		private final int[] oldValues;
+		private final int[] newValues;
 		private boolean completed = true;
 
 		Change(RomContentsListener source, MemContents contents,

@@ -28,11 +28,11 @@ public class EditTool extends Tool {
 	private static final int CACHE_MAX_SIZE = 32;
 	private static final Location NULL_LOCATION
 		= Location.create(Integer.MIN_VALUE, Integer.MIN_VALUE);
-	private Listener listener;
-	private SelectTool select;
-	private WiringTool wiring;
+	private final Listener listener;
+	private final SelectTool select;
+	private final WiringTool wiring;
+	private final LinkedHashMap<Location, Boolean> cache;
 	private Tool current;
-	private LinkedHashMap<Location, Boolean> cache;
 	private Canvas lastCanvas;
 	private int lastRawX;
 	private int lastRawY;
@@ -42,12 +42,13 @@ public class EditTool extends Tool {
 	private Location wireLoc; // coordinates where to draw wiring indicator, if
 	private int pressX; // last coordinate where mouse was pressed
 	private int pressY; // (used to determine when a short wire has been clicked)
+
 	public EditTool(SelectTool select, WiringTool wiring) {
 		this.listener = new Listener();
 		this.select = select;
 		this.wiring = wiring;
 		this.current = select;
-		this.cache = new LinkedHashMap<Location, Boolean>();
+		this.cache = new LinkedHashMap<>();
 		this.lastX = -1;
 		this.wireLoc = NULL_LOCATION;
 		this.pressX = -1;
@@ -158,7 +159,7 @@ public class EditTool extends Tool {
 			for (Wire w : circ.getWires()) {
 				if (selected.contains(w)) {
 					if (w.contains(oldWireLoc)) {
-						if (suppress == null) suppress = new ArrayList<Component>();
+						if (suppress == null) suppress = new ArrayList<>();
 						suppress.add(w);
 					}
 				}
@@ -259,12 +260,12 @@ public class EditTool extends Tool {
 		} else {
 			Location snap = Location.create(snapx, snapy);
 			if (modsSame) {
-				Object o = cache.get(snap);
+				Boolean o = cache.get(snap);
 				if (o != null) {
 					lastX = snapx;
 					lastY = snapy;
 					canvas.repaint();
-					boolean ret = ((Boolean) o).booleanValue();
+					boolean ret = o;
 					wireLoc = ret ? snap : NULL_LOCATION;
 					return ret;
 				}
@@ -274,7 +275,7 @@ public class EditTool extends Tool {
 
 			boolean ret = isEligible && isWiringPoint(canvas, snap, mods);
 			wireLoc = ret ? snap : NULL_LOCATION;
-			cache.put(snap, Boolean.valueOf(ret));
+			cache.put(snap, ret);
 			int toRemove = cache.size() - CACHE_MAX_SIZE;
 			Iterator<Location> it = cache.keySet().iterator();
 			while (it.hasNext() && toRemove > 0) {
@@ -368,13 +369,11 @@ public class EditTool extends Tool {
 
 	@Override
 	public void keyReleased(Canvas canvas, KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_ALT:
-				updateLocation(canvas, e);
-				e.consume();
-				break;
-			default:
-				select.keyReleased(canvas, e);
+		if (e.getKeyCode() == KeyEvent.VK_ALT) {
+			updateLocation(canvas, e);
+			e.consume();
+		} else {
+			select.keyReleased(canvas, e);
 		}
 	}
 
@@ -392,7 +391,7 @@ public class EditTool extends Tool {
 					}
 				}
 			}
-			if (!act.isEmpty()) {
+			if (act.isEmpty()) {
 				canvas.getProject().doAction(act);
 				e.consume();
 			}

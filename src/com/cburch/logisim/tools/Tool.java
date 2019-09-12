@@ -20,7 +20,7 @@ import java.util.Set;
 // DRAWING TOOLS
 //
 public abstract class Tool implements AttributeDefaultProvider {
-	private static Cursor dflt_cursor
+	private static final Cursor dflt_cursor
 		= Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 
 	public abstract String getName();
@@ -41,7 +41,7 @@ public abstract class Tool implements AttributeDefaultProvider {
 		return null;
 	}
 
-	public void setAttributeSet(AttributeSet attrs) {
+	void setAttributeSet(AttributeSet attrs) {
 	}
 
 	public AttributeSet getAttributeSet(Canvas canvas) {
@@ -66,7 +66,7 @@ public abstract class Tool implements AttributeDefaultProvider {
 
 	// This was the draw method until 2.0.4 - As of 2.0.5, you should
 	// use the other draw method.
-	public void draw(ComponentDrawContext context) {
+	private void draw(ComponentDrawContext context) {
 	}
 
 	public void draw(Canvas canvas, ComponentDrawContext context) {

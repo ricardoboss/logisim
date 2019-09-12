@@ -15,7 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 public class RegisterPoker extends InstancePoker {
-	private int initValue;
 	private int curValue;
 
 	@Override
@@ -25,8 +24,7 @@ public class RegisterPoker extends InstancePoker {
 			data = new RegisterData();
 			state.setData(data);
 		}
-		initValue = data.value;
-		curValue = initValue;
+		curValue = data.value;
 		return true;
 	}
 

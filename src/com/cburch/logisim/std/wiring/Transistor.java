@@ -1,8 +1,8 @@
 /* Copyright (c) 2011, Carl Burch. License information is located in the
  * com.cburch.logisim.Main source code and at www.cburch.com/logisim/. */
 
-/**
- * Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
+/*
+  Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
  */
 
 package com.cburch.logisim.std.wiring;
@@ -11,7 +11,6 @@ import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.WireRepair;
-import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
@@ -20,17 +19,17 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Transistor extends InstanceFactory {
-	static final AttributeOption TYPE_P
+	private static final AttributeOption TYPE_P
 		= new AttributeOption("p", Strings.getter("transistorTypeP"));
-	static final AttributeOption TYPE_N
+	private static final AttributeOption TYPE_N
 		= new AttributeOption("n", Strings.getter("transistorTypeN"));
-	static final Attribute<AttributeOption> ATTR_TYPE
+	private static final Attribute<AttributeOption> ATTR_TYPE
 		= Attributes.forOption("type", Strings.getter("transistorTypeAttr"),
 		new AttributeOption[]{TYPE_P, TYPE_N});
 
-	static final int OUTPUT = 0;
-	static final int INPUT = 1;
-	static final int GATE = 2;
+	private static final int OUTPUT = 0;
+	private static final int INPUT = 1;
+	private static final int GATE = 2;
 
 	private static final Icon ICON_N = Icons.getIcon("trans1.gif");
 	private static final Icon ICON_P = Icons.getIcon("trans0.gif");
@@ -96,11 +95,7 @@ public class Transistor extends InstanceFactory {
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == WireRepair.class) {
-			return new WireRepair() {
-				public boolean shouldRepairWire(WireRepairData data) {
-					return true;
-				}
-			};
+			return (WireRepair) data -> true;
 		}
 		return super.getInstanceFeature(instance, key);
 	}

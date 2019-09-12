@@ -7,96 +7,97 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Toolbar extends JPanel {
-    public static final Object VERTICAL = new Object();
-    public static final Object HORIZONTAL = new Object();
-    private ToolbarModel model;
-    private JPanel subpanel;
-    private Object orientation;
-    private MyListener myListener;
-    private ToolbarButton curPressed;
-    public Toolbar(ToolbarModel model) {
-        super(new BorderLayout());
-        this.subpanel = new JPanel();
-        this.model = model;
-        this.orientation = HORIZONTAL;
-        this.myListener = new MyListener();
-        this.curPressed = null;
+	public static final Object VERTICAL = new Object();
+	public static final Object HORIZONTAL = new Object();
+	private final JPanel subpanel;
+	private final MyListener myListener;
+	private ToolbarModel model;
+	private Object orientation;
+	private ToolbarButton curPressed;
 
-        this.add(new JPanel(), BorderLayout.CENTER);
-        setOrientation(HORIZONTAL);
+	public Toolbar(ToolbarModel model) {
+		super(new BorderLayout());
+		this.subpanel = new JPanel();
+		this.model = model;
+		this.orientation = HORIZONTAL;
+		this.myListener = new MyListener();
+		this.curPressed = null;
 
-        computeContents();
-        if (model != null) model.addToolbarModelListener(myListener);
-    }
+		this.add(new JPanel(), BorderLayout.CENTER);
+		setOrientation(HORIZONTAL);
 
-    public ToolbarModel getToolbarModel() {
-        return model;
-    }
+		computeContents();
+		if (model != null) model.addToolbarModelListener(myListener);
+	}
 
-    public void setToolbarModel(ToolbarModel value) {
-        ToolbarModel oldValue = model;
-        if (value != oldValue) {
-            if (oldValue != null) oldValue.removeToolbarModelListener(myListener);
-            if (value != null) value.addToolbarModelListener(myListener);
-            model = value;
-            computeContents();
-        }
-    }
+	public ToolbarModel getToolbarModel() {
+		return model;
+	}
 
-    private void computeContents() {
-        subpanel.removeAll();
-        ToolbarModel m = model;
-        if (m != null) {
-            for (ToolbarItem item : m.getItems()) {
-                subpanel.add(new ToolbarButton(this, item));
-            }
-            subpanel.add(Box.createGlue());
-        }
-        revalidate();
-    }
+	public void setToolbarModel(ToolbarModel value) {
+		ToolbarModel oldValue = model;
+		if (value != oldValue) {
+			if (oldValue != null) oldValue.removeToolbarModelListener(myListener);
+			if (value != null) value.addToolbarModelListener(myListener);
+			model = value;
+			computeContents();
+		}
+	}
 
-    ToolbarButton getPressed() {
-        return curPressed;
-    }
+	private void computeContents() {
+		subpanel.removeAll();
+		ToolbarModel m = model;
+		if (m != null) {
+			for (ToolbarItem item : m.getItems()) {
+				subpanel.add(new ToolbarButton(this, item));
+			}
+			subpanel.add(Box.createGlue());
+		}
+		revalidate();
+	}
 
-    void setPressed(ToolbarButton value) {
-        ToolbarButton oldValue = curPressed;
-        if (oldValue != value) {
-            curPressed = value;
-            if (oldValue != null) oldValue.repaint();
-            if (value != null) value.repaint();
-        }
-    }
+	ToolbarButton getPressed() {
+		return curPressed;
+	}
 
-    Object getOrientation() {
-        return orientation;
-    }
+	void setPressed(ToolbarButton value) {
+		ToolbarButton oldValue = curPressed;
+		if (oldValue != value) {
+			curPressed = value;
+			if (oldValue != null) oldValue.repaint();
+			if (value != null) value.repaint();
+		}
+	}
 
-    public void setOrientation(Object value) {
-        int axis;
-        String position;
-        if (value == HORIZONTAL) {
-            axis = BoxLayout.X_AXIS;
-            position = BorderLayout.LINE_START;
-        } else if (value == VERTICAL) {
-            axis = BoxLayout.Y_AXIS;
-            position = BorderLayout.NORTH;
-        } else {
-            throw new IllegalArgumentException();
-        }
-        this.remove(subpanel);
-        subpanel.setLayout(new BoxLayout(subpanel, axis));
-        this.add(subpanel, position);
-        this.orientation = value;
-    }
+	Object getOrientation() {
+		return orientation;
+	}
 
-    private class MyListener implements ToolbarModelListener {
-        public void toolbarAppearanceChanged(ToolbarModelEvent event) {
-            repaint();
-        }
+	public void setOrientation(Object value) {
+		int axis;
+		String position;
+		if (value == HORIZONTAL) {
+			axis = BoxLayout.X_AXIS;
+			position = BorderLayout.LINE_START;
+		} else if (value == VERTICAL) {
+			axis = BoxLayout.Y_AXIS;
+			position = BorderLayout.NORTH;
+		} else {
+			throw new IllegalArgumentException();
+		}
+		this.remove(subpanel);
+		subpanel.setLayout(new BoxLayout(subpanel, axis));
+		this.add(subpanel, position);
+		this.orientation = value;
+	}
 
-        public void toolbarContentsChanged(ToolbarModelEvent event) {
-            computeContents();
-        }
-    }
+	private class MyListener implements ToolbarModelListener {
+		public void toolbarAppearanceChanged(ToolbarModelEvent event) {
+			repaint();
+		}
+
+		public void toolbarContentsChanged(ToolbarModelEvent event) {
+			computeContents();
+		}
+	}
 }

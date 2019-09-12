@@ -11,43 +11,43 @@ import java.util.Collection;
 import java.util.Collections;
 
 public abstract class ModelAction extends Action {
-    private CanvasModel model;
+	private final CanvasModel model;
 
-    public ModelAction(CanvasModel model) {
-        this.model = model;
-    }
+	ModelAction(CanvasModel model) {
+		this.model = model;
+	}
 
-    static String getShapesName(Collection<CanvasObject> coll) {
-        if (coll.size() != 1) {
-            return Strings.get("shapeMultiple");
-        } else {
-            CanvasObject shape = coll.iterator().next();
-            return shape.getDisplayName();
-        }
-    }
+	static String getShapesName(Collection<CanvasObject> coll) {
+		if (coll.size() != 1) {
+			return Strings.get("shapeMultiple");
+		} else {
+			CanvasObject shape = coll.iterator().next();
+			return shape.getDisplayName();
+		}
+	}
 
-    public Collection<CanvasObject> getObjects() {
-        return Collections.emptySet();
-    }
+	public Collection<CanvasObject> getObjects() {
+		return Collections.emptySet();
+	}
 
-    @Override
-    public abstract String getName();
+	@Override
+	public abstract String getName();
 
-    abstract void doSub(CanvasModel model);
+	abstract void doSub(CanvasModel model);
 
-    abstract void undoSub(CanvasModel model);
+	abstract void undoSub(CanvasModel model);
 
-    @Override
-    public final void doIt() {
-        doSub(model);
-    }
+	@Override
+	public final void doIt() {
+		doSub(model);
+	}
 
-    @Override
-    public final void undo() {
-        undoSub(model);
-    }
+	@Override
+	public final void undo() {
+		undoSub(model);
+	}
 
-    public CanvasModel getModel() {
-        return model;
-    }
+	CanvasModel getModel() {
+		return model;
+	}
 }

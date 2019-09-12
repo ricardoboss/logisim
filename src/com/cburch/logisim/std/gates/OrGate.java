@@ -15,7 +15,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class OrGate extends AbstractGate {
-	public static OrGate FACTORY = new OrGate();
+	public static final OrGate FACTORY = new OrGate();
 
 	private OrGate() {
 		super("OR Gate", Strings.getter("orGateComponent"));
@@ -51,8 +51,7 @@ class OrGate extends AbstractGate {
 
 	@Override
 	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
-		boolean ret = !data.getPoint().equals(instance.getLocation());
-		return ret;
+		return !data.getPoint().equals(instance.getLocation());
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class XorGate extends AbstractGate {
-	public static XorGate FACTORY = new XorGate();
+	public static final XorGate FACTORY = new XorGate();
 
 	private XorGate() {
 		super("XOR Gate", Strings.getter("xorGateComponent"), true);
@@ -25,7 +25,7 @@ class XorGate extends AbstractGate {
 		setPaintInputLines(true);
 	}
 
-	protected static Expression xorExpression(Expression[] inputs, int numInputs) {
+	static Expression xorExpression(Expression[] inputs, int numInputs) {
 		if (numInputs > 2) {
 			throw new UnsupportedOperationException("XorGate");
 		}
@@ -42,8 +42,8 @@ class XorGate extends AbstractGate {
 		boolean isOdd = false;
 		Object behavior = attrs.getValue(GateAttributes.ATTR_XOR);
 		if (behavior == GateAttributes.XOR_ODD) {
-			Object inputs = attrs.getValue(GateAttributes.ATTR_INPUTS);
-			if (inputs == null || ((Integer) inputs).intValue() != 2) {
+			Integer inputs = attrs.getValue(GateAttributes.ATTR_INPUTS);
+			if (inputs == null || inputs != 2) {
 				isOdd = true;
 			}
 		}

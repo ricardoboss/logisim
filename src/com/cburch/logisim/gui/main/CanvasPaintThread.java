@@ -8,8 +8,8 @@ import java.awt.*;
 class CanvasPaintThread extends Thread {
 	private static final int REPAINT_TIMESPAN = 50; // 50 ms between repaints
 
-	private Canvas canvas;
-	private Object lock;
+	private final Canvas canvas;
+	private final Object lock;
 	private boolean repaintRequested;
 	private long nextRepaint;
 	private boolean alive;
@@ -67,7 +67,7 @@ class CanvasPaintThread extends Thread {
 						} else {
 							lock.wait();
 						}
-					} catch (InterruptedException e) {
+					} catch (InterruptedException ignored) {
 					}
 					now = System.currentTimeMillis();
 					wait = nextRepaint - now;

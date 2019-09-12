@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class Joystick extends InstanceFactory {
-	static final Attribute<BitWidth> ATTR_WIDTH = Attributes.forBitWidth("bits",
+	private static final Attribute<BitWidth> ATTR_WIDTH = Attributes.forBitWidth("bits",
 		Strings.getter("ioBitWidthAttr"), 2, 5);
 
 	public Joystick() {
@@ -94,7 +94,7 @@ public class Joystick extends InstanceFactory {
 		private int xPos;
 		private int yPos;
 
-		public State(int x, int y) {
+		State(int x, int y) {
 			xPos = x;
 			yPos = y;
 		}

@@ -7,8 +7,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class TableLayout implements LayoutManager2 {
-	private int colCount;
-	private ArrayList<Component[]> contents;
+	private final int colCount;
+	private final ArrayList<Component[]> contents;
 	private int curRow;
 	private int curCol;
 	private Dimension prefs;
@@ -18,7 +18,7 @@ public class TableLayout implements LayoutManager2 {
 
 	public TableLayout(int colCount) {
 		this.colCount = colCount;
-		this.contents = new ArrayList<Component[]>();
+		this.contents = new ArrayList<>();
 		this.curRow = 0;
 		this.curCol = 0;
 	}
@@ -62,8 +62,7 @@ public class TableLayout implements LayoutManager2 {
 	}
 
 	public void removeLayoutComponent(Component comp) {
-		for (int i = 0, n = contents.size(); i < n; i++) {
-			Component[] row = contents.get(i);
+		for (Component[] row : contents) {
 			for (int j = 0; j < row.length; j++) {
 				if (row[j] == comp) {
 					row[j] = null;
@@ -93,8 +92,8 @@ public class TableLayout implements LayoutManager2 {
 				height += rowHeight;
 			}
 			int width = 0;
-			for (int i = 0; i < prefCol.length; i++) {
-				width += prefCol[i];
+			for (int value : prefCol) {
+				width += value;
 			}
 			this.prefs = new Dimension(width, height);
 			this.prefRow = prefRow;

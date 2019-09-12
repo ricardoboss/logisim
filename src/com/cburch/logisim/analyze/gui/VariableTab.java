@@ -18,21 +18,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class VariableTab extends AnalyzerTab implements TabInterface {
-	private VariableList data;
-	private MyListener myListener = new MyListener();
-	private JList list = new JList();
-	private JTextField field = new JTextField();
-	private JButton remove = new JButton();
-	private JButton moveUp = new JButton();
-	private JButton moveDown = new JButton();
-	private JButton add = new JButton();
-	private JButton rename = new JButton();
-	private JLabel error = new JLabel(" ");
+	private final VariableList data;
+	private final JList list = new JList();
+	private final JTextField field = new JTextField();
+	private final JButton remove = new JButton();
+	private final JButton moveUp = new JButton();
+	private final JButton moveDown = new JButton();
+	private final JButton add = new JButton();
+	private final JButton rename = new JButton();
+	private final JLabel error = new JLabel(" ");
+
 	VariableTab(VariableList data) {
 		this.data = data;
 
 		list.setModel(new VariableListModel(data));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		MyListener myListener = new MyListener();
 		list.addListSelectionListener(myListener);
 		remove.addActionListener(myListener);
 		moveUp.addActionListener(myListener);
@@ -121,7 +122,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		boolean selected = index >= 0 && index < max;
 		remove.setEnabled(selected);
 		moveUp.setEnabled(selected && index > 0);
-		moveDown.setEnabled(selected && index < max);
+		moveDown.setEnabled(selected);
 
 		boolean ok = validateInput();
 		add.setEnabled(ok && data.size() < data.getMaximumSize());
@@ -189,10 +190,10 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 
 	private static class VariableListModel extends AbstractListModel
 		implements VariableListListener {
-		private VariableList list;
+		private final VariableList list;
 		private String[] listCopy;
 
-		public VariableListModel(VariableList list) {
+		VariableListModel(VariableList list) {
 			this.list = list;
 			updateCopy();
 			list.addVariableListListener(this);
@@ -229,16 +230,15 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 					fireIntervalAdded(this, index, index);
 					return;
 				case VariableListEvent.REMOVE:
-					index = ((Integer) event.getData()).intValue();
+					index = (Integer) event.getData();
 					fireIntervalRemoved(this, index, index);
 					return;
 				case VariableListEvent.MOVE:
 					fireContentsChanged(this, 0, getSize());
 					return;
 				case VariableListEvent.REPLACE:
-					index = ((Integer) event.getData()).intValue();
+					index = (Integer) event.getData();
 					fireContentsChanged(this, index, index);
-					return;
 			}
 		}
 	}
@@ -306,7 +306,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 					break;
 				case VariableListEvent.REMOVE:
 					if (event.getVariable().equals(list.getSelectedValue())) {
-						int index = ((Integer) event.getData()).intValue();
+						int index = (Integer) event.getData();
 						if (index >= data.size()) {
 							if (data.isEmpty()) {
 								list.setSelectedIndices(new int[0]);

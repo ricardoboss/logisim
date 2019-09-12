@@ -11,6 +11,7 @@ package com.cburch.logisim.data;
 public class Size {
 	private final int wid;
 	private final int ht;
+
 	private Size(int wid, int ht) {
 		this.wid = wid;
 		this.ht = ht;
@@ -49,7 +50,7 @@ public class Size {
 		return contains(p.getX(), p.getY());
 	}
 
-	public boolean contains(int x, int y) {
+	private boolean contains(int x, int y) {
 		return x >= 0 && y >= 0 && x < this.wid && y < this.ht;
 	}
 

@@ -1,8 +1,8 @@
 /* Copyright (c) 2011, Carl Burch. License information is located in the
  * com.cburch.logisim.Main source code and at www.cburch.com/logisim/. */
 
-/**
- * Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
+/*
+  Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
  */
 
 package com.cburch.logisim.std.wiring;

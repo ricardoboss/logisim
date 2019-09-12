@@ -14,15 +14,14 @@ import java.awt.*;
 public class Counter extends InstanceFactory {
 	static final AttributeOption ON_GOAL_WRAP = new AttributeOption("wrap",
 		"wrap", Strings.getter("counterGoalWrap"));
-	static final AttributeOption ON_GOAL_STAY = new AttributeOption("stay",
-		"stay", Strings.getter("counterGoalStay"));
-	static final AttributeOption ON_GOAL_CONT = new AttributeOption("continue",
-		"continue", Strings.getter("counterGoalContinue"));
-	static final AttributeOption ON_GOAL_LOAD = new AttributeOption("load",
-		"load", Strings.getter("counterGoalLoad"));
-
 	static final Attribute<Integer> ATTR_MAX = Attributes.forHexInteger("max",
 		Strings.getter("counterMaxAttr"));
+	private static final AttributeOption ON_GOAL_STAY = new AttributeOption("stay",
+		"stay", Strings.getter("counterGoalStay"));
+	private static final AttributeOption ON_GOAL_CONT = new AttributeOption("continue",
+		"continue", Strings.getter("counterGoalContinue"));
+	private static final AttributeOption ON_GOAL_LOAD = new AttributeOption("load",
+		"load", Strings.getter("counterGoalLoad"));
 	static final Attribute<AttributeOption> ATTR_ON_GOAL = Attributes.forOption("ongoal",
 		Strings.getter("counterGoalAttr"),
 		new AttributeOption[]{ON_GOAL_WRAP, ON_GOAL_STAY, ON_GOAL_CONT,
@@ -86,7 +85,7 @@ public class Counter extends InstanceFactory {
 
 		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
 		Object triggerType = state.getAttributeValue(StdAttr.EDGE_TRIGGER);
-		int max = state.getAttributeValue(ATTR_MAX).intValue();
+		int max = state.getAttributeValue(ATTR_MAX);
 		Value clock = state.getPort(CK);
 		boolean triggered = data.updateClock(clock, triggerType);
 

@@ -31,7 +31,7 @@ public class Plexers extends Library {
 
 	public static final Attribute<Boolean> ATTR_ENABLE
 		= Attributes.forBoolean("enable", Strings.getter("plexerEnableAttr"));
-	protected static final int DELAY = 3;
+	static final int DELAY = 3;
 	static final AttributeOption SELECT_BOTTOM_LEFT
 		= new AttributeOption("bl", Strings.getter("plexerSelectBottomLeftOption"));
 	static final AttributeOption SELECT_TOP_RIGHT
@@ -39,7 +39,7 @@ public class Plexers extends Library {
 	static final Attribute<AttributeOption> ATTR_SELECT_LOC = Attributes.forOption("selloc",
 		Strings.getter("plexerSelectLocAttr"),
 		new AttributeOption[]{SELECT_BOTTOM_LEFT, SELECT_TOP_RIGHT});
-	private static FactoryDescription[] DESCRIPTIONS = {
+	private static final FactoryDescription[] DESCRIPTIONS = {
 		new FactoryDescription("Multiplexer", Strings.getter("multiplexerComponent"),
 			"multiplexer.gif", "Multiplexer"),
 		new FactoryDescription("Demultiplexer", Strings.getter("demultiplexerComponent"),

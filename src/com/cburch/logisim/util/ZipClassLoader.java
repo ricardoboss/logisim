@@ -27,13 +27,15 @@ public class ZipClassLoader extends ClassLoader {
 
 	private static final int REQUEST_FIND = 0;
 	private static final int REQUEST_LOAD = 1;
-	private File zipPath;
-	private HashMap<String, Object> classes = new HashMap<String, Object>();
-	private Object bgLock = new Object();
+	private final File zipPath;
+	private final HashMap<String, Object> classes = new HashMap<>();
+	private final Object bgLock = new Object();
 	private WorkThread bgThread = null;
+
 	public ZipClassLoader(String zipFileName) {
 		this(new File(zipFileName));
 	}
+
 	public ZipClassLoader(File zipFile) {
 		zipPath = zipFile;
 	}
@@ -51,7 +53,7 @@ public class ZipClassLoader extends ClassLoader {
 
 	@Override
 	public Class<?> findClass(String className) throws ClassNotFoundException {
-		boolean found = false;
+		boolean found;
 		Object result = null;
 
 		// check whether we have loaded this class before
@@ -108,8 +110,8 @@ public class ZipClassLoader extends ClassLoader {
 	}
 
 	private static class Request {
-		int action;
-		String resource;
+		final int action;
+		final String resource;
 		boolean responseSent;
 		Object response;
 
@@ -146,7 +148,7 @@ public class ZipClassLoader extends ClassLoader {
 				while (!responseSent) {
 					try {
 						this.wait(1000);
-					} catch (InterruptedException e) {
+					} catch (InterruptedException ignored) {
 					}
 				}
 				return response;
@@ -163,7 +165,7 @@ public class ZipClassLoader extends ClassLoader {
 	}
 
 	private class WorkThread extends Thread {
-		private LinkedList<Request> requests = new LinkedList<Request>();
+		private final LinkedList<Request> requests = new LinkedList<>();
 		private ZipFile zipFile = null;
 
 		@Override
@@ -217,7 +219,7 @@ public class ZipClassLoader extends ClassLoader {
 					}
 					try {
 						bgLock.wait(OPEN_TIME);
-					} catch (InterruptedException e) {
+					} catch (InterruptedException ignored) {
 					}
 				}
 				return requests.removeFirst();

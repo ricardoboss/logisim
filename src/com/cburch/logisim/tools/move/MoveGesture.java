@@ -13,22 +13,21 @@ import com.cburch.logisim.data.Location;
 import java.util.*;
 
 public class MoveGesture {
-	private MoveRequestListener listener;
-	private Circuit circuit;
-	private HashSet<Component> selected;
-
+	private final MoveRequestListener listener;
+	private final Circuit circuit;
+	private final HashSet<Component> selected;
+	private final HashMap<MoveRequest, MoveResult> cachedResults;
 	private transient Set<ConnectionData> connections;
 	private transient AvoidanceMap initAvoid;
-	private HashMap<MoveRequest, MoveResult> cachedResults;
 
 	public MoveGesture(MoveRequestListener listener, Circuit circuit,
 					   Collection<Component> selected) {
 		this.listener = listener;
 		this.circuit = circuit;
-		this.selected = new HashSet<Component>(selected);
+		this.selected = new HashSet<>(selected);
 		this.connections = null;
 		this.initAvoid = null;
-		this.cachedResults = new HashMap<MoveRequest, MoveResult>();
+		this.cachedResults = new HashMap<>();
 	}
 
 	private static Set<ConnectionData> computeConnections(Circuit circuit,
@@ -36,7 +35,7 @@ public class MoveGesture {
 		if (selected == null || selected.isEmpty()) return Collections.emptySet();
 
 		// first identify locations that might be connected
-		Set<Location> locs = new HashSet<Location>();
+		Set<Location> locs = new HashSet<>();
 		for (Component comp : selected) {
 			for (EndData end : comp.getEnds()) {
 				locs.add(end.getLocation());
@@ -44,7 +43,7 @@ public class MoveGesture {
 		}
 
 		// now see which of them require connection
-		Set<ConnectionData> conns = new HashSet<ConnectionData>();
+		Set<ConnectionData> conns = new HashSet<>();
 		for (Location loc : locs) {
 			boolean found = false;
 			for (Component comp : circuit.getComponents(loc)) {
@@ -61,7 +60,7 @@ public class MoveGesture {
 					wirePath = Collections.emptyList();
 					wirePathStart = loc;
 				} else {
-					wirePath = new ArrayList<Wire>();
+					wirePath = new ArrayList<>();
 					Location cur = loc;
 					for (Wire w = lastOnPath; w != null;
 						 w = findWire(circuit, cur, selected, w)) {
@@ -111,7 +110,7 @@ public class MoveGesture {
 	AvoidanceMap getFixedAvoidanceMap() {
 		AvoidanceMap ret = initAvoid;
 		if (ret == null) {
-			HashSet<Component> comps = new HashSet<Component>(circuit.getNonWires());
+			HashSet<Component> comps = new HashSet<>(circuit.getNonWires());
 			comps.addAll(circuit.getWires());
 			comps.removeAll(selected);
 			ret = AvoidanceMap.create(comps, 0, 0);
@@ -153,7 +152,7 @@ public class MoveGesture {
 		MoveRequest request = new MoveRequest(this, dx, dy);
 		ConnectorThread.enqueueRequest(request, true);
 		synchronized (cachedResults) {
-			Object result = cachedResults.get(request);
+			MoveResult result = cachedResults.get(request);
 			while (result == null) {
 				try {
 					cachedResults.wait();
@@ -163,7 +162,7 @@ public class MoveGesture {
 				}
 				result = cachedResults.get(request);
 			}
-			return (MoveResult) result;
+			return result;
 		}
 	}
 

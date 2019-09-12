@@ -28,15 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LogFrame extends LFrame {
-	private Project project;
+	private final Project project;
+	private final Map<CircuitState, Model> modelMap = new HashMap<>();
+	private final MyListener myListener = new MyListener();
+	private final WindowMenuManager windowManager;
+	private final LogPanel[] panels;
+	private final JTabbedPane tabbedPane;
+	private final JButton close = new JButton();
 	private Simulator curSimulator = null;
 	private Model curModel;
-	private Map<CircuitState, Model> modelMap = new HashMap<CircuitState, Model>();
-	private MyListener myListener = new MyListener();
-	private WindowMenuManager windowManager;
-	private LogPanel[] panels;
-	private JTabbedPane tabbedPane;
-	private JButton close = new JButton();
+
 	public LogFrame(Project project) {
 		this.project = project;
 		this.windowManager = new WindowMenuManager();
@@ -52,8 +53,7 @@ public class LogFrame extends LFrame {
 			new FilePanel(this),
 		};
 		tabbedPane = new JTabbedPane();
-		for (int index = 0; index < panels.length; index++) {
-			LogPanel panel = panels[index];
+		for (LogPanel panel : panels) {
 			tabbedPane.addTab(panel.getTitle(), null, panel, panel.getToolTipText());
 		}
 
@@ -112,8 +112,8 @@ public class LogFrame extends LFrame {
 		if (curModel != null) curModel.setSelected(this, true);
 		setTitle(computeTitle(curModel, project));
 		if (panels != null) {
-			for (int i = 0; i < panels.length; i++) {
-				panels[i].modelChanged(oldModel, curModel);
+			for (LogPanel panel : panels) {
+				panel.modelChanged(oldModel, curModel);
 			}
 		}
 	}

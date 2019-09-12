@@ -12,7 +12,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 public class BitSelector extends InstanceFactory {
-	public static final Attribute<BitWidth> GROUP_ATTR
+	private static final Attribute<BitWidth> GROUP_ATTR
 		= Attributes.forBitWidth("group", Strings.getter("bitSelectorGroupAttr"));
 
 	public BitSelector() {

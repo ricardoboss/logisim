@@ -24,7 +24,7 @@ public class ProjectLibraryActions {
 	public static void doLoadBuiltinLibrary(Project proj) {
 		LogisimFile file = proj.getLogisimFile();
 		List<Library> baseBuilt = file.getLoader().getBuiltin().getLibraries();
-		ArrayList<Library> builtins = new ArrayList<Library>(baseBuilt);
+		ArrayList<Library> builtins = new ArrayList<>(baseBuilt);
 		builtins.removeAll(file.getLibraries());
 		if (builtins.isEmpty()) {
 			JOptionPane.showMessageDialog(proj.getFrame(),
@@ -72,20 +72,11 @@ public class ProjectLibraryActions {
 			// try to retrieve the class name from the "Library-Class"
 			// attribute in the manifest. This section of code was contributed
 			// by Christophe Jacquet (Request Tracker #2024431).
-			JarFile jarFile = null;
-			try {
-				jarFile = new JarFile(f);
+			try (JarFile jarFile = new JarFile(f)) {
 				Manifest manifest = jarFile.getManifest();
 				className = manifest.getMainAttributes().getValue("Library-Class");
 			} catch (IOException e) {
 				// if opening the JAR file failed, do nothing
-			} finally {
-				if (jarFile != null) {
-					try {
-						jarFile.close();
-					} catch (IOException e) {
-					}
-				}
 			}
 
 			// if the class name was not found, go back to the good old dialog
@@ -107,7 +98,7 @@ public class ProjectLibraryActions {
 
 	public static void doUnloadLibraries(Project proj) {
 		LogisimFile file = proj.getLogisimFile();
-		ArrayList<Library> canUnload = new ArrayList<Library>();
+		ArrayList<Library> canUnload = new ArrayList<>();
 		for (Library lib : file.getLibraries()) {
 			String message = file.getUnloadLibraryMessage(lib);
 			if (message == null) canUnload.add(lib);
@@ -141,7 +132,7 @@ public class ProjectLibraryActions {
 	}
 
 	private static class BuiltinOption {
-		Library lib;
+		final Library lib;
 
 		BuiltinOption(Library lib) {
 			this.lib = lib;
@@ -155,7 +146,7 @@ public class ProjectLibraryActions {
 
 	private static class LibraryJList extends JList {
 		LibraryJList(List<Library> libraries) {
-			ArrayList<BuiltinOption> options = new ArrayList<BuiltinOption>();
+			ArrayList<BuiltinOption> options = new ArrayList<>();
 			for (Library lib : libraries) {
 				options.add(new BuiltinOption(lib));
 			}

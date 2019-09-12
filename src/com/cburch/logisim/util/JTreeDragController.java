@@ -26,10 +26,10 @@ import java.awt.*;
  * it is too encapsulated.
  */
 
-public interface JTreeDragController {
-	public boolean canPerformAction(JTree target, Object draggedNode,
-									int action, Point location);
+interface JTreeDragController {
+	boolean canPerformAction(JTree target, Object draggedNode,
+							 int action, Point location);
 
-	public boolean executeDrop(JTree tree, Object draggedNode,
-							   Object newParentNode, int action);
+	boolean executeDrop(JTree tree, Object draggedNode,
+						Object newParentNode, int action);
 }

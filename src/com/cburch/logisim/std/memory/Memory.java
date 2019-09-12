@@ -10,9 +10,9 @@ import com.cburch.logisim.tools.Tool;
 import java.util.List;
 
 public class Memory extends Library {
-	protected static final int DELAY = 5;
+	static final int DELAY = 5;
 
-	private static FactoryDescription[] DESCRIPTIONS = {
+	private static final FactoryDescription[] DESCRIPTIONS = {
 		new FactoryDescription("D Flip-Flop", Strings.getter("dFlipFlopComponent"),
 			"dFlipFlop.gif", "DFlipFlop"),
 		new FactoryDescription("T Flip-Flop", Strings.getter("tFlipFlopComponent"),

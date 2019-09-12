@@ -6,7 +6,6 @@ package com.cburch.logisim.gui.appear;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.circuit.appear.AppearancePort;
-import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.instance.Instance;
@@ -18,7 +17,7 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 
-public class LayoutThumbnail extends JComponent {
+class LayoutThumbnail extends JComponent {
 	private static final int BORDER = 10;
 
 	private CircuitState circuitState;
@@ -61,7 +60,7 @@ public class LayoutThumbnail extends JComponent {
 				circuitState, g, gCopy);
 			context.setShowState(false);
 			context.setShowColor(false);
-			circuit.draw(context, Collections.<Component>emptySet());
+			circuit.draw(context, Collections.emptySet());
 			if (ports != null) {
 				gCopy.setColor(AppearancePort.COLOR);
 				int width = Math.max(4, (int) ((2 / scale) + 0.5));

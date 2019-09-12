@@ -1,8 +1,8 @@
 /* Copyright (c) 2011, Carl Burch. License information is located in the
  * com.cburch.logisim.Main source code and at www.cburch.com/logisim/. */
 
-/**
- * Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
+/*
+  Based on PUCTools (v0.9 beta) by CRC - PUC - Minas (pucmg.crc at gmail.com)
  */
 
 package com.cburch.logisim.std.wiring;
@@ -11,17 +11,16 @@ import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.WireRepair;
-import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 
 import java.awt.*;
 
 public class TransmissionGate extends InstanceFactory {
-	static final int OUTPUT = 0;
-	static final int INPUT = 1;
-	static final int GATE0 = 2;
-	static final int GATE1 = 3;
+	private static final int OUTPUT = 0;
+	private static final int INPUT = 1;
+	private static final int GATE0 = 2;
+	private static final int GATE1 = 3;
 
 	public TransmissionGate() {
 		super("Transmission Gate", Strings.getter("transmissionGateComponent"));
@@ -82,11 +81,7 @@ public class TransmissionGate extends InstanceFactory {
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == WireRepair.class) {
-			return new WireRepair() {
-				public boolean shouldRepairWire(WireRepairData data) {
-					return true;
-				}
-			};
+			return (WireRepair) data -> true;
 		}
 		return super.getInstanceFeature(instance, key);
 	}

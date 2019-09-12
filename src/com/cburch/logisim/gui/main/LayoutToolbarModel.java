@@ -26,15 +26,15 @@ import java.util.Collections;
 import java.util.List;
 
 class LayoutToolbarModel extends AbstractToolbarModel {
-	private Frame frame;
-	private Project proj;
-	private MyListener myListener;
+	private final Frame frame;
+	private final Project proj;
 	private List<ToolbarItem> items;
 	private Tool haloedTool;
+
 	public LayoutToolbarModel(Frame frame, Project proj) {
 		this.frame = frame;
 		this.proj = proj;
-		myListener = new MyListener();
+		MyListener myListener = new MyListener();
 		items = Collections.emptyList();
 		haloedTool = null;
 		buildContents();
@@ -90,7 +90,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 
 	private void buildContents() {
 		List<ToolbarItem> oldItems = items;
-		List<ToolbarItem> newItems = new ArrayList<ToolbarItem>();
+		List<ToolbarItem> newItems = new ArrayList<>();
 		int pos = -1;
 		ToolbarData data = proj.getLogisimFile().getOptions().getToolbarData();
 		for (Tool tool : data.getContents()) {
@@ -111,7 +111,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 	}
 
 	private class ToolItem implements ToolbarItem {
-		private Tool tool;
+		private final Tool tool;
 
 		ToolItem(Tool tool) {
 			this.tool = tool;
@@ -146,7 +146,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			}
 			if (index <= 10) {
 				if (index == 10) index = 0;
-				int mask = frame.getToolkit().getMenuShortcutKeyMask();
+				int mask = frame.getToolkit().getMenuShortcutKeyMaskEx();
 				ret += " (" + InputEventUtil.toKeyDisplayString(mask)
 					+ "-" + index + ")";
 			}

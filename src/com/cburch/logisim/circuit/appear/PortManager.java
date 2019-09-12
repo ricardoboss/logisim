@@ -13,7 +13,7 @@ import com.cburch.logisim.instance.StdAttr;
 import java.util.*;
 
 class PortManager {
-	private CircuitAppearance appearance;
+	private final CircuitAppearance appearance;
 	private boolean doingUpdate;
 
 	PortManager(CircuitAppearance appearance) {
@@ -25,8 +25,8 @@ class PortManager {
 												   Instance pin, Map<Instance, AppearancePort> others) {
 		// Determine which locations are being used in canvas, and look for
 		// which instances facing the same way in layout
-		Set<Location> usedLocs = new HashSet<Location>();
-		List<Instance> sameWay = new ArrayList<Instance>();
+		Set<Location> usedLocs = new HashSet<>();
+		List<Instance> sameWay = new ArrayList<>();
 		Direction facing = pin.getAttributeValue(StdAttr.FACING);
 		for (Map.Entry<Instance, AppearancePort> entry : others.entrySet()) {
 			Instance pin2 = entry.getKey();
@@ -57,9 +57,9 @@ class PortManager {
 			int dy;
 			if (facing == Direction.EAST || facing == Direction.WEST) {
 				dx = 0;
-				dy = isFirst ? -10 : 10;
+				dy = 10;
 			} else {
-				dx = isFirst ? -10 : 10;
+				dx = 10;
 				dy = 0;
 			}
 			Location loc = others.get(neighbor).getLocation();
@@ -131,7 +131,7 @@ class PortManager {
 							   Map<Instance, Instance> replaces, Collection<Instance> allPins) {
 		// Find the current objects corresponding to pins
 		Map<Instance, AppearancePort> oldObjects;
-		oldObjects = new HashMap<Instance, AppearancePort>();
+		oldObjects = new HashMap<>();
 		AppearanceAnchor anchor = null;
 		for (CanvasObject o : appearance.getObjectsFromBottom()) {
 			if (o instanceof AppearancePort) {
@@ -158,9 +158,9 @@ class PortManager {
 
 		// Compute how the ports should change
 		ArrayList<AppearancePort> portRemoves;
-		portRemoves = new ArrayList<AppearancePort>(removes.size());
+		portRemoves = new ArrayList<>(removes.size());
 		ArrayList<AppearancePort> portAdds;
-		portAdds = new ArrayList<AppearancePort>(adds.size());
+		portAdds = new ArrayList<>(adds.size());
 
 		// handle removals
 		for (Instance pin : removes) {
@@ -170,7 +170,7 @@ class PortManager {
 			}
 		}
 		// handle replacements
-		ArrayList<Instance> addsCopy = new ArrayList<Instance>(adds);
+		ArrayList<Instance> addsCopy = new ArrayList<>(adds);
 		for (Map.Entry<Instance, Instance> entry : replaces.entrySet()) {
 			AppearancePort port = oldObjects.remove(entry.getKey());
 			if (port != null) {

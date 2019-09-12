@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Gates extends Library {
-	private List<Tool> tools = null;
+	private List<Tool> tools;
 
 	public Gates() {
 		tools = Arrays.asList(new Tool[]{

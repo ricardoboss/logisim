@@ -20,22 +20,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 public class LogisimFile extends Library implements LibraryEventSource {
-	private EventSourceWeakSupport<LibraryListener> listeners
-		= new EventSourceWeakSupport<LibraryListener>();
+	private final EventSourceWeakSupport<LibraryListener> listeners
+		= new EventSourceWeakSupport<>();
+	private final LinkedList<String> messages = new LinkedList<>();
+	private final Options options = new Options();
+	private final LinkedList<AddTool> tools = new LinkedList<>();
+	private final LinkedList<Library> libraries = new LinkedList<>();
 	private Loader loader;
-	private LinkedList<String> messages = new LinkedList<String>();
-	private Options options = new Options();
-	private LinkedList<AddTool> tools = new LinkedList<AddTool>();
-	private LinkedList<Library> libraries = new LinkedList<Library>();
 	private Circuit main = null;
 	private String name;
 	private boolean dirty = false;
+
 	LogisimFile(Loader loader) {
 		this.loader = loader;
 
@@ -65,7 +67,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	public static LogisimFile load(File file, Loader loader)
 		throws IOException {
 		InputStream in = new FileInputStream(file);
-		Throwable firstExcept = null;
+		Throwable firstExcept;
 		try {
 			return loadSub(in, loader);
 		} catch (Throwable t) {
@@ -74,21 +76,19 @@ public class LogisimFile extends Library implements LibraryEventSource {
 			in.close();
 		}
 
-		if (firstExcept != null) {
-			// We'll now try to do it using a reader. This is to work around
-			// Logisim versions prior to 2.5.1, when files were not saved using
-			// UTF-8 as the encoding (though the XML file reported otherwise).
+		// We'll now try to do it using a reader. This is to work around
+		// Logisim versions prior to 2.5.1, when files were not saved using
+		// UTF-8 as the encoding (though the XML file reported otherwise).
+		try {
+			in = new ReaderInputStream(new FileReader(file), "UTF8");
+			return loadSub(in, loader);
+		} catch (Throwable t) {
+			loader.showError(StringUtil.format(
+				Strings.get("xmlFormatError"), firstExcept.toString()));
+		} finally {
 			try {
-				in = new ReaderInputStream(new FileReader(file), "UTF8");
-				return loadSub(in, loader);
-			} catch (Throwable t) {
-				loader.showError(StringUtil.format(
-					Strings.get("xmlFormatError"), firstExcept.toString()));
-			} finally {
-				try {
-					in.close();
-				} catch (Throwable t) {
-				}
+				in.close();
+			} catch (Throwable ignored) {
 			}
 		}
 
@@ -106,15 +106,13 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 	}
 
-	public static LogisimFile loadSub(InputStream in, Loader loader)
+	private static LogisimFile loadSub(InputStream in, Loader loader)
 		throws IOException, SAXException {
 		// fetch first line and then reset
 		BufferedInputStream inBuffered = new BufferedInputStream(in);
 		String firstLine = getFirstLine(inBuffered);
 
-		if (firstLine == null) {
-			throw new IOException("File is empty");
-		} else if (firstLine.equals("Logisim v1.0")) {
+		if (firstLine.equals("Logisim v1.0")) {
 			// if this is a 1.0 file, then set up a pipe to translate to
 			// 2.0 and then interpret as a 2.0 file
 			throw new IOException("Version 1.0 files no longer supported");
@@ -139,7 +137,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 				lineBreak = i;
 			}
 		}
-		return new String(first, 0, lineBreak, "UTF-8");
+		return new String(first, 0, lineBreak, StandardCharsets.UTF_8);
 	}
 
 	//
@@ -213,7 +211,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	}
 
 	public List<Circuit> getCircuits() {
-		List<Circuit> ret = new ArrayList<Circuit>(tools.size());
+		List<Circuit> ret = new ArrayList<>(tools.size());
 		for (AddTool tool : tools) {
 			SubcircuitFactory factory = (SubcircuitFactory) tool.getFactory();
 			ret.add(factory.getSubcircuit());
@@ -322,7 +320,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	}
 
 	public String getUnloadLibraryMessage(Library lib) {
-		HashSet<ComponentFactory> factories = new HashSet<ComponentFactory>();
+		HashSet<ComponentFactory> factories = new HashSet<>();
 		for (Tool tool : lib.getTools()) {
 			if (tool instanceof AddTool) {
 				factories.add(((AddTool) tool).getFactory());
@@ -355,7 +353,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	//
 	// other methods
 	//
-	void write(OutputStream out, LibraryLoader loader) throws IOException {
+	void write(OutputStream out, LibraryLoader loader) {
 		try {
 			XmlWriter.write(this, out, loader);
 		} catch (TransformerConfigurationException e) {
@@ -406,8 +404,8 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	}
 
 	private static class WritingThread extends Thread {
-		OutputStream out;
-		LogisimFile file;
+		final OutputStream out;
+		final LogisimFile file;
 
 		WritingThread(OutputStream out, LogisimFile file) {
 			this.out = out;

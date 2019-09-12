@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.List;
 
 public abstract class AbstractComponent implements Component {
-	protected AbstractComponent() {
+	AbstractComponent() {
 	}
 
 	//

@@ -24,17 +24,16 @@ public class Analyzer extends LFrame {
 	public static final int OUTPUTS_TAB = 1;
 	public static final int TABLE_TAB = 2;
 	public static final int EXPRESSION_TAB = 3;
-	public static final int MINIMIZED_TAB = 4;
-	private MyListener myListener = new MyListener();
-	private EditListener editListener = new EditListener();
-	private AnalyzerModel model = new AnalyzerModel();
+	private static final int MINIMIZED_TAB = 4;
+	private final AnalyzerModel model = new AnalyzerModel();
+	private final VariableTab inputsPanel;
+	private final VariableTab outputsPanel;
+	private final TableTab truthTablePanel;
+	private final ExpressionTab expressionPanel;
+	private final MinimizedTab minimizedPanel;
+	private final BuildCircuitButton buildCircuit;
 	private JTabbedPane tabbedPane = new JTabbedPane();
-	private VariableTab inputsPanel;
-	private VariableTab outputsPanel;
-	private TableTab truthTablePanel;
-	private ExpressionTab expressionPanel;
-	private MinimizedTab minimizedPanel;
-	private BuildCircuitButton buildCircuit;
+
 	Analyzer() {
 		inputsPanel = new VariableTab(model.getInputs());
 		outputsPanel = new VariableTab(model.getOutputs());
@@ -69,11 +68,13 @@ public class Analyzer extends LFrame {
 		outputsPanel.registerDefaultButtons(registry);
 		expressionPanel.registerDefaultButtons(registry);
 
+		MyListener myListener = new MyListener();
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 
 		LogisimMenuBar menubar = new LogisimMenuBar(this, null);
 		setJMenuBar(menubar);
+		EditListener editListener = new EditListener();
 		editListener.register(menubar);
 	}
 

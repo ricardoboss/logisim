@@ -9,14 +9,15 @@ import java.awt.event.WindowListener;
 import java.util.HashMap;
 
 public abstract class WindowMenuItemManager {
-	private MyListener myListener = new MyListener();
+	private final MyListener myListener = new MyListener();
+	private final boolean persistent;
+	private final HashMap<WindowMenu, JRadioButtonMenuItem> menuItems
+		= new HashMap<>();
 	private String text;
-	private boolean persistent;
 	private boolean listenerAdded = false;
 	private boolean inManager = false;
-	private HashMap<WindowMenu, JRadioButtonMenuItem> menuItems
-		= new HashMap<WindowMenu, JRadioButtonMenuItem>();
-	public WindowMenuItemManager(String text, boolean persistent) {
+
+	protected WindowMenuItemManager(String text, boolean persistent) {
 		this.text = text;
 		this.persistent = persistent;
 		if (persistent) {
@@ -67,7 +68,7 @@ public abstract class WindowMenuItemManager {
 		return text;
 	}
 
-	public void setText(String value) {
+	protected void setText(String value) {
 		text = value;
 		for (JRadioButtonMenuItem menuItem : menuItems.values()) {
 			menuItem.setText(text);

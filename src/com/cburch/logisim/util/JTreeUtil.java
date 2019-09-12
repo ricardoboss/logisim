@@ -34,7 +34,7 @@ import java.util.Arrays;
  */
 
 
-public class JTreeUtil {
+class JTreeUtil {
 	private static final Insets DEFAULT_INSETS = new Insets(20, 20, 20, 20);
 	private static final DataFlavor NODE_FLAVOR = new DataFlavor(
 		DataFlavor.javaJVMLocalObjectMimeType, "Node");
@@ -62,10 +62,10 @@ public class JTreeUtil {
 	}
 
 	private static class TransferableNode implements Transferable {
-		private Object node;
-		private DataFlavor[] flavors = {NODE_FLAVOR};
+		private final Object node;
+		private final DataFlavor[] flavors = {NODE_FLAVOR};
 
-		public TransferableNode(Object nd) {
+		TransferableNode(Object nd) {
 			node = nd;
 		}
 
@@ -98,14 +98,14 @@ public class JTreeUtil {
 	 */
 	private static class TreeTransferHandler implements
 		DragGestureListener, DragSourceListener, DropTargetListener {
-		private JTree tree;
-		private JTreeDragController controller;
-		private DragSource dragSource; // dragsource
-		private Rectangle rect2D = new Rectangle();
-		private boolean drawImage;
+		private final JTree tree;
+		private final JTreeDragController controller;
+		private final DragSource dragSource; // dragsource
+		private final Rectangle rect2D = new Rectangle();
+		private final boolean drawImage;
 
-		protected TreeTransferHandler(JTree tree, JTreeDragController controller,
-									  int action, boolean drawIcon) {
+		TreeTransferHandler(JTree tree, JTreeDragController controller,
+							int action, boolean drawIcon) {
 			this.tree = tree;
 			this.controller = controller;
 			drawImage = drawIcon;
@@ -304,7 +304,7 @@ public class JTreeUtil {
 			}
 		}
 
-		private final void paintImage(Point pt) {
+		private void paintImage(Point pt) {
 			tree.paintImmediately(rect2D.getBounds());
 			rect2D.setRect((int) pt.getX(), (int) pt.getY(), image.getWidth(),
 				image.getHeight());
@@ -312,7 +312,7 @@ public class JTreeUtil {
 				(int) pt.getY(), tree);
 		}
 
-		private final void clearImage() {
+		private void clearImage() {
 			tree.paintImmediately(rect2D.getBounds());
 		}
 	}

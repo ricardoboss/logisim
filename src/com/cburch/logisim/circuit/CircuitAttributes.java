@@ -36,13 +36,11 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		"", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
 	};
 	private static final List<Attribute<?>> INSTANCE_ATTRS
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR,
+		= Arrays.asList(StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR,
 		StdAttr.LABEL_FONT,
 		CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
-		CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR,
-	});
-	private Circuit source;
+		CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR);
+	private final Circuit source;
 	private Instance subcircInstance;
 	private Direction facing;
 	private String label;
@@ -50,6 +48,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	private Font labelFont;
 	private MyListener listener;
 	private Instance[] pinInstances;
+
 	public CircuitAttributes(Circuit source) {
 		this.source = source;
 		subcircInstance = null;
@@ -97,9 +96,8 @@ public class CircuitAttributes extends AbstractAttributeSet {
 
 	@Override
 	public boolean isToSave(Attribute<?> attr) {
-		Attribute<?>[] statics = STATIC_ATTRS;
-		for (int i = 0; i < statics.length; i++) {
-			if (statics[i] == attr) return false;
+		for (Attribute<?> aStatic : STATIC_ATTRS) {
+			if (aStatic == attr) return false;
 		}
 		return true;
 	}
@@ -147,7 +145,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	}
 
 	private static class StaticListener implements AttributeListener {
-		private Circuit source;
+		private final Circuit source;
 
 		private StaticListener(Circuit s) {
 			source = s;

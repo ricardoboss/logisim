@@ -13,11 +13,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 class PrefOptionList implements ActionListener, PropertyChangeListener {
-	private PrefMonitor<String> pref;
-	private StringGetter labelStr;
+	private final PrefMonitor<String> pref;
+	private final StringGetter labelStr;
 
-	private JLabel label;
-	private JComboBox combo;
+	private final JLabel label;
+	private final JComboBox combo;
 
 	public PrefOptionList(PrefMonitor<String> pref, StringGetter labelStr,
 						  PrefOption[] options) {

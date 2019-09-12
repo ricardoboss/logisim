@@ -36,28 +36,29 @@ import java.beans.PropertyChangeListener;
 public class ProjectExplorer extends JTree implements LocaleListener {
 	public static final Color MAGNIFYING_INTERIOR = new Color(200, 200, 255, 64);
 	private static final String DIRTY_MARKER = "*";
-	private Project proj;
-	private MyListener myListener = new MyListener();
-	private MyCellRenderer renderer = new MyCellRenderer();
-	private DeleteAction deleteAction = new DeleteAction();
+	private final Project proj;
 	private ProjectExplorerListener listener = null;
 	private Tool haloedTool = null;
+
 	public ProjectExplorer(Project proj) {
 		super();
 		this.proj = proj;
 
 		setModel(new ProjectExplorerModel(proj));
 		setRootVisible(true);
+		MyListener myListener = new MyListener();
 		addMouseListener(myListener);
 		ToolTipManager.sharedInstance().registerComponent(this);
 
 		MySelectionModel selector = new MySelectionModel();
 		selector.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		setSelectionModel(selector);
+		MyCellRenderer renderer = new MyCellRenderer();
 		setCellRenderer(renderer);
 		addTreeSelectionListener(myListener);
 
 		InputMap imap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		DeleteAction deleteAction = new DeleteAction();
 		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), deleteAction);
 		ActionMap amap = getActionMap();
 		amap.put(deleteAction, deleteAction);
@@ -95,8 +96,57 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 		model.fireStructureChanged();
 	}
 
+	private static class MySelectionModel extends DefaultTreeSelectionModel {
+		@Override
+		public void addSelectionPath(TreePath path) {
+			if (isPathValid(path)) super.addSelectionPath(path);
+		}
+
+		@Override
+		public void setSelectionPath(TreePath path) {
+			if (isPathValid(path)) super.setSelectionPath(path);
+		}
+
+		@Override
+		public void addSelectionPaths(TreePath[] paths) {
+			paths = getValidPaths(paths);
+			if (paths != null) super.addSelectionPaths(paths);
+		}
+
+		@Override
+		public void setSelectionPaths(TreePath[] paths) {
+			paths = getValidPaths(paths);
+			if (paths != null) super.setSelectionPaths(paths);
+		}
+
+		private TreePath[] getValidPaths(TreePath[] paths) {
+			int count = 0;
+			for (TreePath treePath : paths) {
+				if (isPathValid(treePath)) ++count;
+			}
+			if (count == 0) {
+				return null;
+			} else if (count == paths.length) {
+				return paths;
+			} else {
+				TreePath[] ret = new TreePath[count];
+				int j = 0;
+				for (TreePath path : paths) {
+					if (isPathValid(path)) ret[j++] = path;
+				}
+				return ret;
+			}
+		}
+
+		private boolean isPathValid(TreePath path) {
+			if (path == null || path.getPathCount() > 3) return false;
+			Object last = path.getLastPathComponent();
+			return last instanceof ProjectExplorerToolNode;
+		}
+	}
+
 	private class ToolIcon implements Icon {
-		Tool tool;
+		final Tool tool;
 		Circuit circ = null;
 
 		ToolIcon(Tool tool) {
@@ -179,55 +229,6 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 				}
 			}
 			return ret;
-		}
-	}
-
-	private class MySelectionModel extends DefaultTreeSelectionModel {
-		@Override
-		public void addSelectionPath(TreePath path) {
-			if (isPathValid(path)) super.addSelectionPath(path);
-		}
-
-		@Override
-		public void setSelectionPath(TreePath path) {
-			if (isPathValid(path)) super.setSelectionPath(path);
-		}
-
-		@Override
-		public void addSelectionPaths(TreePath[] paths) {
-			paths = getValidPaths(paths);
-			if (paths != null) super.addSelectionPaths(paths);
-		}
-
-		@Override
-		public void setSelectionPaths(TreePath[] paths) {
-			paths = getValidPaths(paths);
-			if (paths != null) super.setSelectionPaths(paths);
-		}
-
-		private TreePath[] getValidPaths(TreePath[] paths) {
-			int count = 0;
-			for (int i = 0; i < paths.length; i++) {
-				if (isPathValid(paths[i])) ++count;
-			}
-			if (count == 0) {
-				return null;
-			} else if (count == paths.length) {
-				return paths;
-			} else {
-				TreePath[] ret = new TreePath[count];
-				int j = 0;
-				for (int i = 0; i < paths.length; i++) {
-					if (isPathValid(paths[i])) ret[j++] = paths[i];
-				}
-				return ret;
-			}
-		}
-
-		private boolean isPathValid(TreePath path) {
-			if (path == null || path.getPathCount() > 3) return false;
-			Object last = path.getLastPathComponent();
-			return last instanceof ProjectExplorerToolNode;
 		}
 	}
 

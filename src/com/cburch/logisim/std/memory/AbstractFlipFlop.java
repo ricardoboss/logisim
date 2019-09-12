@@ -14,10 +14,10 @@ import java.awt.event.MouseEvent;
 abstract class AbstractFlipFlop extends InstanceFactory {
 	private static final int STD_PORTS = 6;
 
-	private Attribute<AttributeOption> triggerAttribute;
+	private final Attribute<AttributeOption> triggerAttribute;
 
-	protected AbstractFlipFlop(String name, String iconName, StringGetter desc,
-							   int numInputs, boolean allowLevelTriggers) {
+	AbstractFlipFlop(String name, String iconName, StringGetter desc,
+					 int numInputs, boolean allowLevelTriggers) {
 		super(name, desc);
 		setIconName(iconName);
 		triggerAttribute = allowLevelTriggers ? StdAttr.TRIGGER : StdAttr.EDGE_TRIGGER;
@@ -89,10 +89,8 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		boolean triggered = data.updateClock(state.getPort(n), triggerType);
 
 		if (state.getPort(n + 3) == Value.TRUE) { // clear requested
-			changed |= data.curValue != Value.FALSE;
 			data.curValue = Value.FALSE;
 		} else if (state.getPort(n + 4) == Value.TRUE) { // preset requested
-			changed |= data.curValue != Value.TRUE;
 			data.curValue = Value.TRUE;
 		} else if (triggered && state.getPort(n + 5) != Value.FALSE) {
 			// Clock has triggered and flip-flop is enabled: Update the state
@@ -103,7 +101,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 
 			Value newVal = computeValue(inputs, data.curValue);
 			if (newVal == Value.TRUE || newVal == Value.FALSE) {
-				changed |= data.curValue != newVal;
 				data.curValue = newVal;
 			}
 		}

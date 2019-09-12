@@ -8,34 +8,34 @@ import com.cburch.logisim.data.*;
 import java.awt.*;
 
 public interface StdAttr {
-	public static final Attribute<Direction> FACING
+	Attribute<Direction> FACING
 		= Attributes.forDirection("facing", Strings.getter("stdFacingAttr"));
 
-	public static final Attribute<BitWidth> WIDTH
+	Attribute<BitWidth> WIDTH
 		= Attributes.forBitWidth("width", Strings.getter("stdDataWidthAttr"));
 
-	public static final AttributeOption TRIG_RISING
+	AttributeOption TRIG_RISING
 		= new AttributeOption("rising", Strings.getter("stdTriggerRising"));
-	public static final AttributeOption TRIG_FALLING
+	AttributeOption TRIG_FALLING
 		= new AttributeOption("falling", Strings.getter("stdTriggerFalling"));
-	public static final AttributeOption TRIG_HIGH
+	AttributeOption TRIG_HIGH
 		= new AttributeOption("high", Strings.getter("stdTriggerHigh"));
-	public static final AttributeOption TRIG_LOW
+	AttributeOption TRIG_LOW
 		= new AttributeOption("low", Strings.getter("stdTriggerLow"));
-	public static final Attribute<AttributeOption> TRIGGER
+	Attribute<AttributeOption> TRIGGER
 		= Attributes.forOption("trigger", Strings.getter("stdTriggerAttr"),
 		new AttributeOption[]{
 			TRIG_RISING, TRIG_FALLING, TRIG_HIGH, TRIG_LOW
 		});
-	public static final Attribute<AttributeOption> EDGE_TRIGGER
+	Attribute<AttributeOption> EDGE_TRIGGER
 		= Attributes.forOption("trigger", Strings.getter("stdTriggerAttr"),
 		new AttributeOption[]{TRIG_RISING, TRIG_FALLING});
 
-	public static final Attribute<String> LABEL
+	Attribute<String> LABEL
 		= Attributes.forString("label", Strings.getter("stdLabelAttr"));
 
-	public static final Attribute<Font> LABEL_FONT
+	Attribute<Font> LABEL_FONT
 		= Attributes.forFont("labelfont", Strings.getter("stdLabelFontAttr"));
-	public static final Font DEFAULT_LABEL_FONT
+	Font DEFAULT_LABEL_FONT
 		= new Font("SansSerif", Font.PLAIN, 12);
 }

@@ -45,7 +45,7 @@ public abstract class EditHandler {
 
 	public abstract void removeControlPoint();
 
-	public static interface Listener {
+	public interface Listener {
 		void enableChanged(EditHandler handler, LogisimMenuItem action, boolean value);
 	}
 }

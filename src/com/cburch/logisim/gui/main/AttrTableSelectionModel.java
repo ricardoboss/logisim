@@ -16,8 +16,8 @@ import com.cburch.logisim.tools.SetAttributeAction;
 
 class AttrTableSelectionModel extends AttributeSetTableModel
 	implements Selection.Listener {
-	private Project project;
-	private Frame frame;
+	private final Project project;
+	private final Frame frame;
 
 	public AttrTableSelectionModel(Project project, Frame frame) {
 		super(frame.getCanvas().getSelection().getAttributeSet());

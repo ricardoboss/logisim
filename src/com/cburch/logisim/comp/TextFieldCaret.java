@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 class TextFieldCaret implements Caret, TextFieldListener {
-	private LinkedList<CaretListener> listeners = new LinkedList<CaretListener>();
-	private TextField field;
-	private Graphics g;
+	private final LinkedList<CaretListener> listeners = new LinkedList<>();
+	private final TextField field;
+	private final Graphics g;
 	private String oldText;
 	private String curText;
 	private int pos;
@@ -148,7 +148,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		CaretEvent e = new CaretEvent(this, oldText, oldText);
 		curText = oldText;
 		pos = curText.length();
-		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
+		for (CaretListener l : new ArrayList<>(listeners)) {
 			l.editingCanceled(e);
 		}
 		field.removeTextFieldListener(this);
@@ -157,7 +157,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	public void stopEditing() {
 		CaretEvent e = new CaretEvent(this, oldText, curText);
 		field.setText(curText);
-		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
+		for (CaretListener l : new ArrayList<>(listeners)) {
 			l.editingStopped(e);
 		}
 		field.removeTextFieldListener(this);
@@ -180,7 +180,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	public void keyPressed(KeyEvent e) {
 		int ign = InputEvent.ALT_MASK | InputEvent.CTRL_MASK
 			| InputEvent.META_MASK;
-		if ((e.getModifiers() & ign) != 0) return;
+		if ((e.getModifiersEx() & ign) != 0) return;
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
 			case KeyEvent.VK_KP_LEFT:
@@ -227,7 +227,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 				//TODO: enhance label editing
 				break;
 			default:
-				; // ignore
+				// ignore
 		}
 	}
 
@@ -237,7 +237,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	public void keyTyped(KeyEvent e) {
 		int ign = InputEvent.ALT_MASK | InputEvent.CTRL_MASK
 			| InputEvent.META_MASK;
-		if ((e.getModifiers() & ign) != 0) return;
+		if ((e.getModifiersEx() & ign) != 0) return;
 
 		char c = e.getKeyChar();
 		if (c == '\n') {

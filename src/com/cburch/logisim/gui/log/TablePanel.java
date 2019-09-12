@@ -17,13 +17,14 @@ class TablePanel extends LogPanel {
 	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
 	private static final int COLUMN_SEP = 8;
 	private static final int HEADER_SEP = 4;
-	private MyListener myListener = new MyListener();
+	private final MyListener myListener = new MyListener();
+	private final VerticalScrollBar vsb;
 	private int cellWidth = 25; // reasonable start values
 	private int cellHeight = 15;
 	private int rowCount = 0;
 	private int tableWidth;
 	private int tableHeight;
-	private VerticalScrollBar vsb;
+
 	public TablePanel(LogFrame frame) {
 		super(frame);
 		vsb = new VerticalScrollBar();
@@ -205,7 +206,7 @@ class TablePanel extends LogPanel {
 		private int oldMaximum = -1;
 		private int oldExtent = -1;
 
-		public VerticalScrollBar() {
+		VerticalScrollBar() {
 			getModel().addChangeListener(this);
 		}
 

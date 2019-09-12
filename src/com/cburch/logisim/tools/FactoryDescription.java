@@ -21,15 +21,16 @@ import java.util.List;
  * no-arguments constructor.
  */
 public class FactoryDescription {
-	private String name;
-	private StringGetter displayName;
+	private final String name;
+	private final StringGetter displayName;
+	private final String factoryClassName;
 	private String iconName;
 	private boolean iconLoadAttempted;
 	private Icon icon;
-	private String factoryClassName;
 	private boolean factoryLoadAttempted;
 	private ComponentFactory factory;
 	private StringGetter toolTip;
+
 	public FactoryDescription(String name, StringGetter displayName,
 							  String iconName, String factoryClassName) {
 		this(name, displayName, factoryClassName);
@@ -46,8 +47,8 @@ public class FactoryDescription {
 		this.icon = icon;
 	}
 
-	public FactoryDescription(String name, StringGetter displayName,
-							  String factoryClassName) {
+	private FactoryDescription(String name, StringGetter displayName,
+							   String factoryClassName) {
 		this.name = name;
 		this.displayName = displayName;
 		this.iconName = "???";

@@ -22,25 +22,27 @@ import com.cburch.logisim.util.SmallSet;
 
 import java.util.*;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class CircuitState implements InstanceData {
 	private static int lastId = 0;
-	HashMap<Location, SetData> causes = new HashMap<Location, SetData>();
-	private MyCircuitListener myCircuitListener = new MyCircuitListener();
+	final HashMap<Location, SetData> causes = new HashMap<>();
+	private final Project proj; // project where circuit lies
+	private final Circuit circuit; // circuit being simulated
+	private final HashMap<Component, Object> componentData = new HashMap<>();
+	private final Map<Location, Value> values = new HashMap<>();
+	private final SmallSet<Location> dirtyPoints = new SmallSet<>();
+	private final int id = lastId++;
 	private Propagator base = null; // base of tree of CircuitStates
-	private Project proj; // project where circuit lies
-	private Circuit circuit; // circuit being simulated
 	private CircuitState parentState = null; // parent in tree of CircuitStates
 	private Component parentComp = null; // subcircuit component containing this state
-	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();
+	private ArraySet<CircuitState> substates = new ArraySet<>();
 	private CircuitWires.State wireData = null;
-	private HashMap<Component, Object> componentData = new HashMap<Component, Object>();
-	private Map<Location, Value> values = new HashMap<Location, Value>();
-	private SmallSet<Component> dirtyComponents = new SmallSet<Component>();
-	private SmallSet<Location> dirtyPoints = new SmallSet<Location>();
-	private int id = lastId++;
+	private SmallSet<Component> dirtyComponents = new SmallSet<>();
+
 	public CircuitState(Project proj, Circuit circuit) {
 		this.proj = proj;
 		this.circuit = circuit;
+		MyCircuitListener myCircuitListener = new MyCircuitListener();
 		circuit.addCircuitListener(myCircuitListener);
 	}
 
@@ -69,8 +71,8 @@ public class CircuitState implements InstanceData {
 		this.base = base;
 		this.parentComp = src.parentComp;
 		this.parentState = src.parentState;
-		HashMap<CircuitState, CircuitState> substateData = new HashMap<CircuitState, CircuitState>();
-		this.substates = new ArraySet<CircuitState>();
+		HashMap<CircuitState, CircuitState> substateData = new HashMap<>();
+		this.substates = new ArraySet<>();
 		for (CircuitState oldSub : src.substates) {
 			CircuitState newSub = new CircuitState(src.proj, oldSub.circuit);
 			newSub.copyFrom(oldSub, base);
@@ -157,7 +159,7 @@ public class CircuitState implements InstanceData {
 					oldState.parentState = null;
 					oldState.parentComp = null;
 				}
-				if (newState != null && newState.parentState != this) {
+				if (newState.parentState != this) {
 					// this is the first time I've heard about this CircuitState
 					substates.add(newState);
 					newState.base = this.base;
@@ -182,11 +184,11 @@ public class CircuitState implements InstanceData {
 		if (base != null) base.setValue(this, pt, val, cause, delay);
 	}
 
-	public void markComponentAsDirty(Component comp) {
+	private void markComponentAsDirty(Component comp) {
 		try {
 			dirtyComponents.add(comp);
 		} catch (RuntimeException e) {
-			SmallSet<Component> set = new SmallSet<Component>();
+			SmallSet<Component> set = new SmallSet<>();
 			set.add(comp);
 			dirtyComponents = set;
 		}
@@ -210,9 +212,9 @@ public class CircuitState implements InstanceData {
 	}
 
 	public InstanceState getInstanceState(Instance instance) {
-		Object factory = instance.getFactory();
+		InstanceFactory factory = instance.getFactory();
 		if (factory instanceof InstanceFactory) {
-			return ((InstanceFactory) factory).createInstanceState(this, instance);
+			return factory.createInstanceState(this, instance);
 		} else {
 			throw new RuntimeException("getInstanceState requires instance component");
 		}
@@ -222,7 +224,7 @@ public class CircuitState implements InstanceData {
 	// methods for other classes within package
 	//
 	public boolean isSubstate() {
-		return parentState != null;
+		return parentState == null;
 	}
 
 	void processDirtyComponents() {
@@ -238,8 +240,7 @@ public class CircuitState implements InstanceData {
 				} catch (RuntimeException e) {
 					if (firstException == null) firstException = e;
 					if (tries == 0) {
-						toProcess = new Object[0];
-						dirtyComponents = new SmallSet<Component>();
+						dirtyComponents = new SmallSet<>();
 						throw firstException;
 					}
 				}
@@ -264,7 +265,7 @@ public class CircuitState implements InstanceData {
 	}
 
 	void processDirtyPoints() {
-		HashSet<Location> dirty = new HashSet<Location>(dirtyPoints);
+		HashSet<Location> dirty = new HashSet<>(dirtyPoints);
 		dirtyPoints.clear();
 		if (circuit.wires.isMapVoided()) {
 			for (int i = 3; i >= 0; i--) {
@@ -275,7 +276,7 @@ public class CircuitState implements InstanceData {
 					// try again...
 					try {
 						Thread.sleep(1);
-					} catch (InterruptedException e2) {
+					} catch (InterruptedException ignored) {
 					}
 					if (i == 0) e.printStackTrace();
 				}
@@ -293,10 +294,7 @@ public class CircuitState implements InstanceData {
 
 	void reset() {
 		wireData = null;
-		for (Iterator<Component> it = componentData.keySet().iterator(); it.hasNext(); ) {
-			Component comp = it.next();
-			if (!(comp.getFactory() instanceof SubcircuitFactory)) it.remove();
-		}
+		componentData.keySet().removeIf(comp -> !(comp.getFactory() instanceof SubcircuitFactory));
 		values.clear();
 		dirtyComponents.clear();
 		dirtyPoints.clear();

@@ -5,11 +5,11 @@ package com.cburch.logisim.circuit;
 
 import com.cburch.logisim.util.StringUtil;
 
-public class AnalyzeException extends Exception {
-	public AnalyzeException() {
+class AnalyzeException extends Exception {
+	AnalyzeException() {
 	}
 
-	public AnalyzeException(String message) {
+	AnalyzeException(String message) {
 		super(message);
 	}
 

@@ -10,14 +10,14 @@ import javax.swing.*;
 import java.awt.*;
 
 class IntlOptions extends OptionsPanel {
-	private JLabel localeLabel = new RestrictedLabel();
-	private JComponent locale;
-	private PrefBoolean replAccents;
-	private PrefOptionList gateShape;
+	private final JLabel localeLabel = new RestrictedLabel();
+	private final PrefBoolean replAccents;
+	private final PrefOptionList gateShape;
+
 	public IntlOptions(PreferencesFrame window) {
 		super(window);
 
-		locale = Strings.createLocaleSelector();
+		JComponent locale = Strings.createLocaleSelector();
 		replAccents = new PrefBoolean(AppPreferences.ACCENTS_REPLACE,
 			Strings.getter("intlReplaceAccents"));
 		gateShape = new PrefOptionList(AppPreferences.GATE_SHAPE,

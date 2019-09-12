@@ -19,19 +19,18 @@ import java.util.List;
 import java.util.*;
 
 public class CircuitAppearance extends Drawing {
-	private Circuit circuit;
-	private EventSourceWeakSupport<CircuitAppearanceListener> listeners;
-	private PortManager portManager;
-	private CircuitPins circuitPins;
-	private MyListener myListener;
+	private final Circuit circuit;
+	private final EventSourceWeakSupport<CircuitAppearanceListener> listeners;
+	private final CircuitPins circuitPins;
 	private boolean isDefault;
 	private boolean suppressRecompute;
+
 	public CircuitAppearance(Circuit circuit) {
 		this.circuit = circuit;
-		listeners = new EventSourceWeakSupport<CircuitAppearanceListener>();
-		portManager = new PortManager(this);
+		listeners = new EventSourceWeakSupport<>();
+		PortManager portManager = new PortManager(this);
 		circuitPins = new CircuitPins(portManager);
-		myListener = new MyListener();
+		MyListener myListener = new MyListener();
 		suppressRecompute = false;
 		addCanvasModelListener(myListener);
 		setDefaultAppearance(true);
@@ -49,7 +48,7 @@ public class CircuitAppearance extends Drawing {
 		listeners.remove(l);
 	}
 
-	void fireCircuitAppearanceChanged(int affected) {
+	private void fireCircuitAppearanceChanged(int affected) {
 		CircuitAppearanceEvent event;
 		event = new CircuitAppearanceEvent(circuit, affected);
 		for (CircuitAppearanceListener listener : listeners) {
@@ -113,7 +112,7 @@ public class CircuitAppearance extends Drawing {
 	public void setObjectsForce(List<? extends CanvasObject> shapesBase) {
 		// This shouldn't ever be an issue, but just to make doubly sure, we'll
 		// check that the anchor and all ports are in their proper places.
-		List<CanvasObject> shapes = new ArrayList<CanvasObject>(shapesBase);
+		List<CanvasObject> shapes = new ArrayList<>(shapesBase);
 		int n = shapes.size();
 		int ports = 0;
 		for (int i = n - 1; i >= 0; i--) { // count ports, move anchor to end
@@ -138,7 +137,7 @@ public class CircuitAppearance extends Drawing {
 
 		try {
 			suppressRecompute = true;
-			super.removeObjects(new ArrayList<CanvasObject>(getObjectsFromBottom()));
+			super.removeObjects(new ArrayList<>(getObjectsFromBottom()));
 			super.addObjects(0, shapes);
 		} finally {
 			suppressRecompute = false;
@@ -245,7 +244,7 @@ public class CircuitAppearance extends Drawing {
 	public SortedMap<Location, Instance> getPortOffsets(Direction facing) {
 		Location anchor = null;
 		Direction defaultFacing = Direction.EAST;
-		List<AppearancePort> ports = new ArrayList<AppearancePort>();
+		List<AppearancePort> ports = new ArrayList<>();
 		for (CanvasObject shape : getObjectsFromBottom()) {
 			if (shape instanceof AppearancePort) {
 				ports.add((AppearancePort) shape);
@@ -256,7 +255,7 @@ public class CircuitAppearance extends Drawing {
 			}
 		}
 
-		SortedMap<Location, Instance> ret = new TreeMap<Location, Instance>();
+		SortedMap<Location, Instance> ret = new TreeMap<>();
 		for (AppearancePort port : ports) {
 			Location loc = port.getLocation();
 			if (anchor != null) {

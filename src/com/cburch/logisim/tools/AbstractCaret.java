@@ -13,11 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class AbstractCaret implements Caret {
-	private ArrayList<CaretListener> listeners = new ArrayList<CaretListener>();
-	private List<CaretListener> listenersView;
+	private final ArrayList<CaretListener> listeners = new ArrayList<>();
+	private final List<CaretListener> listenersView;
 	private Bounds bds = Bounds.EMPTY_BOUNDS;
 
-	public AbstractCaret() {
+	protected AbstractCaret() {
 		listenersView = Collections.unmodifiableList(listeners);
 	}
 

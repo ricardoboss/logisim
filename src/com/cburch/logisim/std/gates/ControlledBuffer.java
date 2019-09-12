@@ -8,7 +8,6 @@ import com.cburch.logisim.data.*;
 import com.cburch.logisim.file.Options;
 import com.cburch.logisim.instance.*;
 import com.cburch.logisim.tools.WireRepair;
-import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
@@ -17,6 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 
 class ControlledBuffer extends InstanceFactory {
+	public static final ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
+	public static final ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
 	private static final AttributeOption RIGHT_HANDED
 		= new AttributeOption("right", Strings.getter("controlledRightHanded"));
 	private static final AttributeOption LEFT_HANDED
@@ -26,9 +27,7 @@ class ControlledBuffer extends InstanceFactory {
 		new AttributeOption[]{RIGHT_HANDED, LEFT_HANDED});
 	private static final Icon ICON_BUFFER = Icons.getIcon("controlledBuffer.gif");
 	private static final Icon ICON_INVERTER = Icons.getIcon("controlledInverter.gif");
-	public static ComponentFactory FACTORY_BUFFER = new ControlledBuffer(false);
-	public static ComponentFactory FACTORY_INVERTER = new ControlledBuffer(true);
-	private boolean isInverter;
+	private final boolean isInverter;
 
 	private ControlledBuffer(boolean isInverter) {
 		super(isInverter ? "Controlled Inverter" : "Controlled Buffer",
@@ -142,7 +141,7 @@ class ControlledBuffer extends InstanceFactory {
 			PainterShaped.paintNot(painter);
 		} else {
 			GraphicsUtil.switchToWidth(g, 2);
-			int d = isInverter ? 10 : 0;
+			int d = 0;
 			int[] xp = new int[]{-d, -19 - d, -19 - d, -d};
 			int[] yp = new int[]{0, -7, 7, 0};
 			g.drawPolyline(xp, yp, 4);
@@ -208,7 +207,7 @@ class ControlledBuffer extends InstanceFactory {
 			state.setPort(0, Value.createError(width), GateAttributes.DELAY);
 		} else {
 			Value out;
-			if (control == Value.UNKNOWN || control == Value.NIL) {
+			if (control == Value.NIL) {
 				AttributeSet opts = state.getProject().getOptions().getAttributeSet();
 				if (opts.getValue(Options.ATTR_GATE_UNDEFINED)
 					.equals(Options.GATE_UNDEFINED_ERROR)) {
@@ -226,11 +225,9 @@ class ControlledBuffer extends InstanceFactory {
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == WireRepair.class) {
-			return new WireRepair() {
-				public boolean shouldRepairWire(WireRepairData data) {
-					Location port2 = instance.getPortLocation(2);
-					return data.getPoint().equals(port2);
-				}
+			return (WireRepair) data -> {
+				Location port2 = instance.getPortLocation(2);
+				return data.getPoint().equals(port2);
 			};
 		}
 		return super.getInstanceFeature(instance, key);

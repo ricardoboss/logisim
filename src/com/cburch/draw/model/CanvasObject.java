@@ -12,43 +12,43 @@ import java.awt.*;
 import java.util.List;
 
 public interface CanvasObject {
-    public abstract CanvasObject clone();
+	CanvasObject clone();
 
-    public abstract String getDisplayName();
+	String getDisplayName();
 
-    public abstract AttributeSet getAttributeSet();
+	AttributeSet getAttributeSet();
 
-    public abstract <V> V getValue(Attribute<V> attr);
+	<V> V getValue(Attribute<V> attr);
 
-    public abstract Bounds getBounds();
+	Bounds getBounds();
 
-    public abstract boolean matches(CanvasObject other);
+	boolean matches(CanvasObject other);
 
-    public abstract int matchesHashCode();
+	int matchesHashCode();
 
-    public abstract boolean contains(Location loc, boolean assumeFilled);
+	boolean contains(Location loc, boolean assumeFilled);
 
-    public abstract boolean overlaps(CanvasObject other);
+	boolean overlaps(CanvasObject other);
 
-    public abstract List<Handle> getHandles(HandleGesture gesture);
+	List<Handle> getHandles(HandleGesture gesture);
 
-    public abstract boolean canRemove();
+	boolean canRemove();
 
-    public abstract boolean canMoveHandle(Handle handle);
+	boolean canMoveHandle(Handle handle);
 
-    public abstract Handle canInsertHandle(Location desired);
+	Handle canInsertHandle(Location desired);
 
-    public abstract Handle canDeleteHandle(Location desired);
+	Handle canDeleteHandle(Location desired);
 
-    public abstract void paint(Graphics g, HandleGesture gesture);
+	void paint(Graphics g, HandleGesture gesture);
 
-    public Handle moveHandle(HandleGesture gesture);
+	Handle moveHandle(HandleGesture gesture);
 
-    public void insertHandle(Handle desired, Handle previous);
+	void insertHandle(Handle desired, Handle previous);
 
-    public Handle deleteHandle(Handle handle);
+	Handle deleteHandle(Handle handle);
 
-    public void translate(int dx, int dy);
+	void translate(int dx, int dy);
 
-    public <V> void setValue(Attribute<V> attr, V value);
+	<V> void setValue(Attribute<V> attr, V value);
 }

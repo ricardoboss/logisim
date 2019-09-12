@@ -40,8 +40,8 @@ public class Expressions {
 	}
 
 	private static abstract class Binary extends Expression {
-		protected final Expression a;
-		protected final Expression b;
+		final Expression a;
+		final Expression b;
 
 		Binary(Expression a, Expression b) {
 			this.a = a;
@@ -142,7 +142,7 @@ public class Expressions {
 	}
 
 	private static class Not extends Expression {
-		private Expression a;
+		private final Expression a;
 
 		Not(Expression a) {
 			this.a = a;
@@ -182,7 +182,7 @@ public class Expressions {
 	}
 
 	private static class Variable extends Expression {
-		private String name;
+		private final String name;
 
 		Variable(String name) {
 			this.name = name;
@@ -222,7 +222,7 @@ public class Expressions {
 	}
 
 	private static class Constant extends Expression {
-		private int value;
+		private final int value;
 
 		Constant(int value) {
 			this.value = value;

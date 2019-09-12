@@ -17,14 +17,15 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 class SelectionPanel extends LogPanel {
-	private Listener listener = new Listener();
-	private ComponentSelector selector;
-	private JButton addTool;
-	private JButton changeBase;
-	private JButton moveUp;
-	private JButton moveDown;
-	private JButton remove;
-	private SelectionList list;
+	private final Listener listener = new Listener();
+	private final ComponentSelector selector;
+	private final JButton addTool;
+	private final JButton changeBase;
+	private final JButton moveUp;
+	private final JButton moveDown;
+	private final JButton remove;
+	private final SelectionList list;
+
 	public SelectionPanel(LogFrame window) {
 		super(window);
 		selector = new ComponentSelector(getModel());
@@ -118,7 +119,7 @@ class SelectionPanel extends LogPanel {
 		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() == 2) {
 				TreePath path = selector.getPathForLocation(e.getX(), e.getY());
-				if (path != null && listener != null) {
+				if (path != null) {
 					doAdd(selector.getSelectedItems());
 				}
 			}
@@ -151,8 +152,8 @@ class SelectionPanel extends LogPanel {
 				Selection sel = getSelection();
 				Object[] toRemove = list.getSelectedValues();
 				boolean changed = false;
-				for (int i = 0; i < toRemove.length; i++) {
-					int index = sel.indexOf((SelectionItem) toRemove[i]);
+				for (Object o : toRemove) {
+					int index = sel.indexOf((SelectionItem) o);
 					if (index >= 0) {
 						sel.remove(index);
 						changed = true;

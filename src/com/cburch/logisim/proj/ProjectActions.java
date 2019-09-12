@@ -38,14 +38,12 @@ public class ProjectActions {
 		LogisimFile file = null;
 		try {
 			file = loader.openLogisimFile(templReader);
-		} catch (IOException ex) {
-			displayException(monitor, ex);
-		} catch (LoadFailedException ex) {
+		} catch (IOException | LoadFailedException ex) {
 			displayException(monitor, ex);
 		} finally {
 			try {
 				templReader.close();
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 			}
 		}
 		if (file == null) file = createEmptyFile(loader);
@@ -70,7 +68,7 @@ public class ProjectActions {
 		} finally {
 			try {
 				templReader.close();
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 			}
 		}
 		return file;
@@ -96,14 +94,14 @@ public class ProjectActions {
 			displayException(baseProject.getFrame(), ex);
 			file = createEmptyFile(loader);
 		} catch (LoadFailedException ex) {
-			if (!ex.isShown()) {
+			if (ex.isShown()) {
 				displayException(baseProject.getFrame(), ex);
 			}
 			file = createEmptyFile(loader);
 		} finally {
 			try {
 				templReader.close();
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 			}
 		}
 		return file;
@@ -165,10 +163,9 @@ public class ProjectActions {
 	public static Project doOpen(Component parent,
 								 Project baseProject, File f) {
 		Project proj = Projects.findProjectFor(f);
-		Loader loader = null;
+		Loader loader;
 		if (proj != null) {
 			proj.getFrame().toFront();
-			loader = proj.getLogisimFile().getLoader();
 			if (proj.isFileDirty()) {
 				String message = StringUtil.format(Strings.get("openAlreadyMessage"),
 					proj.getLogisimFile().getName());
@@ -182,7 +179,7 @@ public class ProjectActions {
 					JOptionPane.QUESTION_MESSAGE, null,
 					options, options[2]);
 				if (result == 0) {
-					; // keep proj as is, so that load happens into the window
+					// keep proj as is, so that load happens into the window
 				} else if (result == 1) {
 					proj = null; // we'll create a new project
 				} else {
@@ -209,7 +206,7 @@ public class ProjectActions {
 				proj.setLogisimFile(lib);
 			}
 		} catch (LoadFailedException ex) {
-			if (!ex.isShown()) {
+			if (ex.isShown()) {
 				JOptionPane.showMessageDialog(parent,
 					StringUtil.format(Strings.get("fileOpenError"),
 						ex.toString()),
@@ -306,18 +303,18 @@ public class ProjectActions {
 		Frame top = Projects.getTopFrame();
 		top.savePreferences();
 
-		for (Project proj : new ArrayList<Project>(Projects.getOpenProjects())) {
+		for (Project proj : new ArrayList<>(Projects.getOpenProjects())) {
 			if (!proj.confirmClose(Strings.get("confirmQuitTitle"))) return;
 		}
 		System.exit(0);
 	}
 
 	private static class CreateFrame implements Runnable {
-		private Loader loader;
-		private Project proj;
-		private boolean isStartupScreen;
+		private final Loader loader;
+		private final Project proj;
+		private final boolean isStartupScreen;
 
-		public CreateFrame(Loader loader, Project proj, boolean isStartup) {
+		CreateFrame(Loader loader, Project proj, boolean isStartup) {
 			this.loader = loader;
 			this.proj = proj;
 			this.isStartupScreen = isStartup;

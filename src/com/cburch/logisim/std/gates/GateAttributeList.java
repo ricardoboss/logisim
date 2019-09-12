@@ -16,7 +16,7 @@ class GateAttributeList extends AbstractList<Attribute<?>> {
 		GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT,
 	};
 
-	private GateAttributes attrs;
+	private final GateAttributes attrs;
 
 	public GateAttributeList(GateAttributes attrs) {
 		this.attrs = attrs;

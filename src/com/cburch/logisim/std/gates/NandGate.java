@@ -13,7 +13,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class NandGate extends AbstractGate {
-	public static NandGate FACTORY = new NandGate();
+	public static final NandGate FACTORY = new NandGate();
 
 	private NandGate() {
 		super("NAND Gate", Strings.getter("nandGateComponent"));

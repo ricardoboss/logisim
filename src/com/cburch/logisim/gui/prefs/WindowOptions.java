@@ -10,8 +10,8 @@ import com.cburch.logisim.util.TableLayout;
 import javax.swing.*;
 
 class WindowOptions extends OptionsPanel {
-	private PrefBoolean[] checks;
-	private PrefOptionList toolbarPlacement;
+	private final PrefBoolean[] checks;
+	private final PrefOptionList toolbarPlacement;
 
 	public WindowOptions(PreferencesFrame window) {
 		super(window);
@@ -42,8 +42,8 @@ class WindowOptions extends OptionsPanel {
 		panel.add(toolbarPlacement.getJComboBox());
 
 		setLayout(new TableLayout(1));
-		for (int i = 0; i < checks.length; i++) {
-			add(checks[i]);
+		for (PrefBoolean check : checks) {
+			add(check);
 		}
 		add(panel);
 	}
@@ -60,8 +60,8 @@ class WindowOptions extends OptionsPanel {
 
 	@Override
 	public void localeChanged() {
-		for (int i = 0; i < checks.length; i++) {
-			checks[i].localeChanged();
+		for (PrefBoolean check : checks) {
+			check.localeChanged();
 		}
 		toolbarPlacement.localeChanged();
 	}

@@ -29,8 +29,8 @@ import java.util.List;
  * there is only one ComponentFactory created for any particular category.
  */
 public abstract class InstanceFactory extends AbstractComponentFactory {
-	private String name;
-	private StringGetter displayName;
+	private final String name;
+	private final StringGetter displayName;
 	private StringGetter defaultToolTip;
 	private String iconName;
 	private Icon icon;
@@ -45,11 +45,11 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 	private Class<? extends InstancePoker> pokerClass;
 	private Class<? extends InstanceLogger> loggerClass;
 
-	public InstanceFactory(String name) {
+	protected InstanceFactory(String name) {
 		this(name, StringUtil.constantGetter(name));
 	}
 
-	public InstanceFactory(String name, StringGetter displayName) {
+	protected InstanceFactory(String name, StringGetter displayName) {
 		this.name = name;
 		this.displayName = displayName;
 		this.iconName = null;
@@ -78,12 +78,12 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return displayName;
 	}
 
-	public void setIconName(String value) {
+	protected void setIconName(String value) {
 		iconName = value;
 		icon = null;
 	}
 
-	public void setIcon(Icon value) {
+	protected void setIcon(Icon value) {
 		iconName = "";
 		icon = value;
 	}
@@ -104,7 +104,8 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 				String n = iconName;
 				if (n != null) {
 					i = Icons.getIcon(n);
-					if (i == null) n = null;
+					if (i == null) {
+					}
 				}
 			}
 			if (i != null) {
@@ -122,7 +123,7 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return ret;
 	}
 
-	public void setOffsetBounds(Bounds value) {
+	protected void setOffsetBounds(Bounds value) {
 		bounds = value;
 	}
 
@@ -147,7 +148,7 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return facingAttribute;
 	}
 
-	public void setFacingAttribute(Attribute<Direction> value) {
+	protected void setFacingAttribute(Attribute<Direction> value) {
 		facingAttribute = value;
 	}
 
@@ -155,11 +156,11 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return keyConfigurator;
 	}
 
-	public void setKeyConfigurator(KeyConfigurator value) {
+	protected void setKeyConfigurator(KeyConfigurator value) {
 		keyConfigurator = value;
 	}
 
-	public void setAttributes(Attribute<?>[] attrs, Object[] defaults) {
+	protected void setAttributes(Attribute<?>[] attrs, Object[] defaults) {
 		this.attrs = attrs;
 		this.defaults = defaults;
 	}
@@ -167,8 +168,7 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 	@Override
 	public AttributeSet createAttributeSet() {
 		Attribute<?>[] as = attrs;
-		AttributeSet ret = as == null ? AttributeSets.EMPTY : AttributeSets.fixedSet(as, defaults);
-		return ret;
+		return as == null ? AttributeSets.EMPTY : AttributeSets.fixedSet(as, defaults);
 	}
 
 	@Override
@@ -195,8 +195,8 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return portList;
 	}
 
-	public void setPorts(Port[] ports) {
-		portList = new UnmodifiableList<Port>(ports);
+	protected void setPorts(Port[] ports) {
+		portList = new UnmodifiableList<>(ports);
 	}
 
 	public void setPorts(List<Port> ports) {
@@ -207,24 +207,24 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return defaultToolTip;
 	}
 
-	public void setDefaultToolTip(StringGetter value) {
+	protected void setDefaultToolTip(StringGetter value) {
 		defaultToolTip = value;
 	}
 
-	public void setInstancePoker(Class<? extends InstancePoker> pokerClass) {
+	protected void setInstancePoker(Class<? extends InstancePoker> pokerClass) {
 		if (isClassOk(pokerClass, InstancePoker.class)) {
 			this.pokerClass = pokerClass;
 		}
 	}
 
-	public void setInstanceLogger(Class<? extends InstanceLogger> loggerClass) {
+	protected void setInstanceLogger(Class<? extends InstanceLogger> loggerClass) {
 		if (isClassOk(loggerClass, InstanceLogger.class)) {
 			this.loggerClass = loggerClass;
 		}
 	}
 
-	public void setShouldSnap(boolean value) {
-		shouldSnap = Boolean.valueOf(value);
+	protected void setShouldSnap(boolean value) {
+		shouldSnap = value;
 	}
 
 	private boolean isClassOk(Class<?> sub, Class<?> sup) {
@@ -234,7 +234,7 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 			return false;
 		}
 		try {
-			sub.getConstructor(new Class[0]);
+			sub.getConstructor();
 			return true;
 		} catch (SecurityException e) {
 			System.err.println(sub.getName() + " needs its no-args constructor to be public"); //OK
@@ -267,11 +267,11 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		}
 	}
 
-	public void paintIcon(InstancePainter painter) {
+	protected void paintIcon(InstancePainter painter) {
 		painter.setFactory(null, null);
 	}
 
-	public void paintGhost(InstancePainter painter) {
+	protected void paintGhost(InstancePainter painter) {
 		painter.setFactory(null, null);
 	}
 

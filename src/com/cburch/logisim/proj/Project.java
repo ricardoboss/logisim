@@ -23,26 +23,27 @@ import java.util.LinkedList;
 
 public class Project {
 	private static final int MAX_UNDO_SIZE = 64;
-	private Simulator simulator = new Simulator();
+	private final Simulator simulator = new Simulator();
+	private final HashMap<Circuit, CircuitState> stateMap
+		= new HashMap<>();
+	private final LinkedList<ActionData> undoLog = new LinkedList<>();
+	private final EventSourceWeakSupport<ProjectListener> projectListeners
+		= new EventSourceWeakSupport<>();
+	private final EventSourceWeakSupport<LibraryListener> fileListeners
+		= new EventSourceWeakSupport<>();
+	private final EventSourceWeakSupport<CircuitListener> circuitListeners
+		= new EventSourceWeakSupport<>();
+	private final MyListener myListener = new MyListener();
 	private LogisimFile file;
 	private CircuitState circuitState;
-	private HashMap<Circuit, CircuitState> stateMap
-		= new HashMap<Circuit, CircuitState>();
 	private Frame frame = null;
 	private OptionsFrame optionsFrame = null;
 	private LogFrame logFrame = null;
 	private Tool tool = null;
-	private LinkedList<ActionData> undoLog = new LinkedList<ActionData>();
 	private int undoMods = 0;
-	private EventSourceWeakSupport<ProjectListener> projectListeners
-		= new EventSourceWeakSupport<ProjectListener>();
-	private EventSourceWeakSupport<LibraryListener> fileListeners
-		= new EventSourceWeakSupport<LibraryListener>();
-	private EventSourceWeakSupport<CircuitListener> circuitListeners
-		= new EventSourceWeakSupport<CircuitListener>();
 	private Dependencies depends;
-	private MyListener myListener = new MyListener();
 	private boolean startupScreen = false;
+
 	public Project(LogisimFile file) {
 		addLibraryListener(myListener);
 		setLogisimFile(file);
@@ -331,7 +332,7 @@ public class Project {
 	}
 
 	public void undoAction() {
-		if (undoLog != null && undoLog.size() > 0) {
+		if (undoLog.size() > 0) {
 			ActionData data = undoLog.removeLast();
 			setCircuitState(data.circuitState);
 			Action action = data.action;
@@ -356,10 +357,10 @@ public class Project {
 	}
 
 	private static class ActionData {
-		CircuitState circuitState;
-		Action action;
+		final CircuitState circuitState;
+		final Action action;
 
-		public ActionData(CircuitState circuitState, Action action) {
+		ActionData(CircuitState circuitState, Action action) {
 			this.circuitState = circuitState;
 			this.action = action;
 		}

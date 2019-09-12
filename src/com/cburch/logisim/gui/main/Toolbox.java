@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 
 class Toolbox extends JPanel {
-	private ProjectExplorer toolbox;
+	private final ProjectExplorer toolbox;
 
 	Toolbox(Project proj, MenuListener menu) {
 		super(new BorderLayout());

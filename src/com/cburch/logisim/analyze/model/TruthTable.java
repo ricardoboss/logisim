@@ -7,12 +7,13 @@ import java.util.*;
 
 public class TruthTable {
 	private static final Entry DEFAULT_ENTRY = Entry.DONT_CARE;
-	private MyListener myListener = new MyListener();
-	private List<TruthTableListener> listeners = new ArrayList<TruthTableListener>();
-	private AnalyzerModel model;
-	private HashMap<String, Entry[]> outputColumns = new HashMap<String, Entry[]>();
+	private final List<TruthTableListener> listeners = new ArrayList<>();
+	private final AnalyzerModel model;
+	private final HashMap<String, Entry[]> outputColumns = new HashMap<>();
+
 	public TruthTable(AnalyzerModel model) {
 		this.model = model;
+		MyListener myListener = new MyListener();
 		model.getInputs().addVariableListListener(myListener);
 		model.getOutputs().addVariableListListener(myListener);
 	}
@@ -93,7 +94,7 @@ public class TruthTable {
 			String outputName = model.getOutputs().get(column);
 			Entry[] columnData = outputColumns.get(outputName);
 			if (columnData == null) return DEFAULT_ENTRY;
-			if (row < 0 || row >= columnData.length) return Entry.DONT_CARE;
+			if (row >= columnData.length) return Entry.DONT_CARE;
 			return columnData[row];
 		}
 	}
@@ -183,7 +184,7 @@ public class TruthTable {
 					outputColumns.put(output, newColumn);
 				}
 			} else if (action == VariableListEvent.REMOVE) {
-				int index = ((Integer) event.getData()).intValue();
+				int index = (Integer) event.getData();
 				for (Map.Entry<String, Entry[]> curEntry : outputColumns.entrySet()) {
 					String output = curEntry.getKey();
 					Entry[] column = curEntry.getValue();
@@ -191,7 +192,7 @@ public class TruthTable {
 					outputColumns.put(output, newColumn);
 				}
 			} else if (action == VariableListEvent.MOVE) {
-				int delta = ((Integer) event.getData()).intValue();
+				int delta = (Integer) event.getData();
 				int newIndex = model.getInputs().indexOf(event.getVariable());
 				for (Map.Entry<String, Entry[]> curEntry : outputColumns.entrySet()) {
 					String output = curEntry.getKey();
@@ -211,7 +212,7 @@ public class TruthTable {
 			} else if (action == VariableListEvent.REPLACE) {
 				Entry[] column = outputColumns.remove(event.getVariable());
 				if (column != null) {
-					int index = ((Integer) event.getData()).intValue();
+					int index = (Integer) event.getData();
 					String newVariable = model.getOutputs().get(index);
 					outputColumns.put(newVariable, column);
 				}

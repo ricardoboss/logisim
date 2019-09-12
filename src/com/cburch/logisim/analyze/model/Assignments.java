@@ -7,17 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 class Assignments {
-	private Map<String, Boolean> map = new HashMap<String, Boolean>();
+	private final Map<String, Boolean> map = new HashMap<>();
 
 	public Assignments() {
 	}
 
 	public boolean get(String variable) {
 		Boolean value = map.get(variable);
-		return value != null ? value.booleanValue() : false;
+		return value != null && value;
 	}
 
 	public void put(String variable, boolean value) {
-		map.put(variable, Boolean.valueOf(value));
+		map.put(variable, value);
 	}
 }

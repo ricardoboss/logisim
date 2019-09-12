@@ -26,13 +26,14 @@ public class Loader implements LibraryLoader {
 	public static final String LOGISIM_EXTENSION = ".circ";
 	public static final FileFilter LOGISIM_FILTER = new LogisimFileFilter();
 	public static final FileFilter JAR_FILTER = new JarFileFilter();
+	private final Builtin builtin = new Builtin();
+	private final Stack<File> filesOpening = new Stack<>();
 	// fixed
 	private Component parent;
-	private Builtin builtin = new Builtin();
 	// to be cleared with each new file
 	private File mainFile = null;
-	private Stack<File> filesOpening = new Stack<File>();
-	private Map<File, File> substitutions = new HashMap<File, File>();
+	private Map<File, File> substitutions = new HashMap<>();
+
 	public Loader(Component parent) {
 		this.parent = parent;
 		clear();
@@ -101,7 +102,7 @@ public class Loader implements LibraryLoader {
 	//
 	// more substantive methods accessed from outside this package
 	//
-	public void clear() {
+	private void clear() {
 		filesOpening.clear();
 		mainFile = null;
 	}
@@ -128,8 +129,8 @@ public class Loader implements LibraryLoader {
 	}
 
 	public LogisimFile openLogisimFile(InputStream reader)
-		throws LoadFailedException, IOException {
-		LogisimFile ret = null;
+		throws IOException {
+		LogisimFile ret;
 		try {
 			ret = LogisimFile.load(reader, this);
 		} catch (LoaderException e) {
@@ -175,7 +176,7 @@ public class Loader implements LibraryLoader {
 		try {
 			try {
 				MacCompatibility.setFileCreatorAndType(dest, "LGSM", "circ");
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 			}
 			fwrite = new FileOutputStream(dest);
 			file.write(fwrite, this);
@@ -211,7 +212,7 @@ public class Loader implements LibraryLoader {
 		}
 
 		if (!dest.exists() || dest.length() == 0) {
-			if (backupCreated && backup != null && backup.exists()) {
+			if (backupCreated && backup.exists()) {
 				recoverBackup(backup, dest);
 			} else {
 				dest.delete();
@@ -241,7 +242,7 @@ public class Loader implements LibraryLoader {
 			}
 		}
 
-		LogisimFile ret = null;
+		LogisimFile ret;
 		filesOpening.push(actual);
 		try {
 			ret = LogisimFile.load(actual, this);

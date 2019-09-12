@@ -11,30 +11,30 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class ModelInsertHandleAction extends ModelAction {
-    private Handle desired;
+	private final Handle desired;
 
-    public ModelInsertHandleAction(CanvasModel model, Handle desired) {
-        super(model);
-        this.desired = desired;
-    }
+	public ModelInsertHandleAction(CanvasModel model, Handle desired) {
+		super(model);
+		this.desired = desired;
+	}
 
-    @Override
-    public Collection<CanvasObject> getObjects() {
-        return Collections.singleton(desired.getObject());
-    }
+	@Override
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(desired.getObject());
+	}
 
-    @Override
-    public String getName() {
-        return Strings.get("actionInsertHandle");
-    }
+	@Override
+	public String getName() {
+		return Strings.get("actionInsertHandle");
+	}
 
-    @Override
-    void doSub(CanvasModel model) {
-        model.insertHandle(desired, null);
-    }
+	@Override
+	void doSub(CanvasModel model) {
+		model.insertHandle(desired, null);
+	}
 
-    @Override
-    void undoSub(CanvasModel model) {
-        model.deleteHandle(desired);
-    }
+	@Override
+	void undoSub(CanvasModel model) {
+		model.deleteHandle(desired);
+	}
 }

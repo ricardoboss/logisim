@@ -35,8 +35,8 @@ class ToolbarActions {
 	}
 
 	private static class AddTool extends Action {
-		ToolbarData toolbar;
-		Tool tool;
+		final ToolbarData toolbar;
+		final Tool tool;
 		int pos;
 
 		AddTool(ToolbarData toolbar, Tool tool) {
@@ -62,9 +62,9 @@ class ToolbarActions {
 	}
 
 	private static class RemoveTool extends Action {
-		ToolbarData toolbar;
+		final ToolbarData toolbar;
+		final int which;
 		Object removed;
-		int which;
 
 		RemoveTool(ToolbarData toolbar, int which) {
 			this.toolbar = toolbar;
@@ -92,9 +92,9 @@ class ToolbarActions {
 	}
 
 	private static class MoveTool extends Action {
-		ToolbarData toolbar;
-		int oldpos;
-		int dest;
+		final ToolbarData toolbar;
+		final int oldpos;
+		final int dest;
 
 		MoveTool(ToolbarData toolbar, int oldpos, int dest) {
 			this.toolbar = toolbar;
@@ -142,8 +142,8 @@ class ToolbarActions {
 	}
 
 	private static class AddSeparator extends Action {
-		ToolbarData toolbar;
-		int pos;
+		final ToolbarData toolbar;
+		final int pos;
 
 		AddSeparator(ToolbarData toolbar, int pos) {
 			this.toolbar = toolbar;
@@ -167,8 +167,8 @@ class ToolbarActions {
 	}
 
 	private static class RemoveSeparator extends Action {
-		ToolbarData toolbar;
-		int pos;
+		final ToolbarData toolbar;
+		final int pos;
 
 		RemoveSeparator(ToolbarData toolbar, int pos) {
 			this.toolbar = toolbar;

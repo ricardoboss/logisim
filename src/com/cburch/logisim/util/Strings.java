@@ -4,7 +4,7 @@
 package com.cburch.logisim.util;
 
 class Strings {
-	static LocaleManager source
+	static final LocaleManager source
 		= new LocaleManager("resources/logisim", "util");
 
 	public static LocaleManager getLocaleManager() {

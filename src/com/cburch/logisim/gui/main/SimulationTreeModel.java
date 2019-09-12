@@ -13,13 +13,13 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 
-public class SimulationTreeModel implements TreeModel {
-	private ArrayList<TreeModelListener> listeners;
-	private SimulationTreeCircuitNode root;
+class SimulationTreeModel implements TreeModel {
+	private final ArrayList<TreeModelListener> listeners;
+	private final SimulationTreeCircuitNode root;
 	private CircuitState currentView;
 
 	public SimulationTreeModel(CircuitState rootState) {
-		this.listeners = new ArrayList<TreeModelListener>();
+		this.listeners = new ArrayList<>();
 		this.root = new SimulationTreeCircuitNode(this, null,
 			rootState, null);
 		this.currentView = null;
@@ -57,7 +57,7 @@ public class SimulationTreeModel implements TreeModel {
 
 	public TreePath mapToPath(CircuitState state) {
 		if (state == null) return null;
-		ArrayList<CircuitState> path = new ArrayList<CircuitState>();
+		ArrayList<CircuitState> path = new ArrayList<>();
 		CircuitState current = state;
 		CircuitState parent = current.getParentState();
 		while (parent != null && parent != state) {
@@ -92,7 +92,7 @@ public class SimulationTreeModel implements TreeModel {
 		return new TreePath(pathNodes);
 	}
 
-	protected SimulationTreeNode mapComponentToNode(Component comp) {
+	SimulationTreeNode mapComponentToNode(Component comp) {
 		return null;
 	}
 
@@ -104,14 +104,14 @@ public class SimulationTreeModel implements TreeModel {
 		listeners.remove(l);
 	}
 
-	protected void fireNodeChanged(Object node) {
+	void fireNodeChanged(Object node) {
 		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
 		for (TreeModelListener l : listeners) {
 			l.treeNodesChanged(e);
 		}
 	}
 
-	protected void fireStructureChanged(Object node) {
+	void fireStructureChanged(Object node) {
 		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(e);
@@ -119,7 +119,7 @@ public class SimulationTreeModel implements TreeModel {
 	}
 
 	private TreePath findPath(Object node) {
-		ArrayList<Object> path = new ArrayList<Object>();
+		ArrayList<Object> path = new ArrayList<>();
 		Object current = node;
 		while (current instanceof TreeNode) {
 			path.add(0, current);

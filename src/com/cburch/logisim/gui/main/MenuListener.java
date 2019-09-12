@@ -29,17 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MenuListener {
-	private Frame frame;
-	private LogisimMenuBar menubar;
-	private ArrayList<EnabledListener> listeners;
-	private FileListener fileListener = new FileListener();
-	private EditListener editListener = new EditListener();
-	private ProjectMenuListener projectListener = new ProjectMenuListener();
-	private SimulateMenuListener simulateListener = new SimulateMenuListener();
+	private final Frame frame;
+	private final LogisimMenuBar menubar;
+	private final ArrayList<EnabledListener> listeners;
+	private final FileListener fileListener = new FileListener();
+	private final EditListener editListener = new EditListener();
+	private final ProjectMenuListener projectListener = new ProjectMenuListener();
+	private final SimulateMenuListener simulateListener = new SimulateMenuListener();
+
 	public MenuListener(Frame frame, LogisimMenuBar menubar) {
 		this.frame = frame;
 		this.menubar = menubar;
-		this.listeners = new ArrayList<EnabledListener>();
+		this.listeners = new ArrayList<>();
 	}
 
 	LogisimMenuBar getMenuBar() {
@@ -80,7 +81,7 @@ class MenuListener {
 	}
 
 	interface EnabledListener {
-		public void menuEnableChanged(MenuListener source);
+		void menuEnableChanged(MenuListener source);
 	}
 
 	private class FileListener implements ActionListener {

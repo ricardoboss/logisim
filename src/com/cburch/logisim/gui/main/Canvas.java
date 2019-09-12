@@ -49,21 +49,22 @@ public class Canvas extends JPanel
 
 	private static final Color TICK_RATE_COLOR = new Color(0, 0, 92, 92);
 	private static final Font TICK_RATE_FONT = new Font("serif", Font.BOLD, 12);
-	private Project proj;
+	private final Project proj;
+	private final Selection selection;
+	private final MyListener myListener = new MyListener();
+	private final MyViewport viewport = new MyViewport();
+	private final MyProjectListener myProjectListener = new MyProjectListener();
+	private final TickCounter tickCounter;
+	private final CanvasPaintThread paintThread;
+	private final CanvasPainter painter;
+	private final Object repaintLock = new Object(); // for waitForRepaintDone
 	private Tool drag_tool;
-	private Selection selection;
 	private MouseMappings mappings;
 	private CanvasPane canvasPane;
 	private Bounds oldPreferredSize;
-	private MyListener myListener = new MyListener();
-	private MyViewport viewport = new MyViewport();
-	private MyProjectListener myProjectListener = new MyProjectListener();
-	private TickCounter tickCounter;
-	private CanvasPaintThread paintThread;
-	private CanvasPainter painter;
 	private boolean paintDirty = false; // only for within paintComponent
 	private boolean inPaint = false; // only for within paintComponent
-	private Object repaintLock = new Object(); // for waitForRepaintDone
+
 	public Canvas(Project proj) {
 		this.proj = proj;
 		this.selection = new Selection(proj, this);
@@ -250,7 +251,7 @@ public class Canvas extends JPanel
 				while (inPaint) {
 					repaintLock.wait();
 				}
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignored) {
 			}
 		}
 	}
@@ -386,7 +387,7 @@ public class Canvas extends JPanel
 			ComponentUserEvent e = null;
 			for (Component comp : getCircuit().getAllContaining(loc)) {
 				Object makerObj = comp.getFeature(ToolTipMaker.class);
-				if (makerObj != null && makerObj instanceof ToolTipMaker) {
+				if (makerObj instanceof ToolTipMaker) {
 					ToolTipMaker maker = (ToolTipMaker) makerObj;
 					if (e == null) {
 						e = new ComponentUserEvent(this, loc.getX(), loc.getY());
@@ -926,7 +927,6 @@ public class Canvas extends JPanel
 			if (x < 0) x = 0;
 			g.drawString(msg, x, getHeight() - 23);
 			g.setFont(old);
-			return;
 		}
 	}
 }

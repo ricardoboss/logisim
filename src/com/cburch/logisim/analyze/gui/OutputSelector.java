@@ -12,10 +12,11 @@ import javax.swing.*;
 import java.awt.event.ItemListener;
 
 class OutputSelector {
-	private VariableList source;
-	private JLabel label = new JLabel();
-	private JComboBox select = new JComboBox();
+	private final VariableList source;
+	private final JLabel label = new JLabel();
+	private final JComboBox select = new JComboBox();
 	private String prototypeValue = null;
+
 	public OutputSelector(AnalyzerModel model) {
 		this.source = model.getOutputs();
 
@@ -131,7 +132,7 @@ class OutputSelector {
 				case VariableListEvent.REMOVE:
 					variable = event.getVariable();
 					if (variable.equals(prototypeValue)) computePrototypeValue();
-					index = ((Integer) event.getData()).intValue();
+					index = (Integer) event.getData();
 					fireIntervalRemoved(this, index, index);
 					selection = select.getSelectedItem();
 					if (selection != null && selection.equals(variable)) {
@@ -145,7 +146,7 @@ class OutputSelector {
 				case VariableListEvent.REPLACE:
 					variable = event.getVariable();
 					if (variable.equals(prototypeValue)) computePrototypeValue();
-					index = ((Integer) event.getData()).intValue();
+					index = (Integer) event.getData();
 					fireContentsChanged(this, index, index);
 					selection = select.getSelectedItem();
 					if (selection != null && selection.equals(variable)) {

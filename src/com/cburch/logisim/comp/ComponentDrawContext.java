@@ -20,16 +20,16 @@ public class ComponentDrawContext {
 	private static final int PIN_OFFS = 2;
 	private static final int PIN_RAD = 4;
 
-	private java.awt.Component dest;
-	private Circuit circuit;
-	private CircuitState circuitState;
-	private Graphics base;
+	private final java.awt.Component dest;
+	private final Circuit circuit;
+	private final CircuitState circuitState;
+	private final Graphics base;
+	private final boolean printView;
+	private final InstancePainter instancePainter;
 	private Graphics g;
 	private boolean showState;
 	private boolean showColor;
-	private boolean printView;
 	private WireSet highlightedWires;
-	private InstancePainter instancePainter;
 
 	public ComponentDrawContext(java.awt.Component dest,
 								Circuit circuit, CircuitState circuitState,
@@ -124,7 +124,7 @@ public class ComponentDrawContext {
 		drawRectangle(comp, "");
 	}
 
-	public void drawRectangle(Component comp, String label) {
+	private void drawRectangle(Component comp, String label) {
 		Bounds bds = comp.getBounds(g);
 		drawRectangle(bds.getX(), bds.getY(), bds.getWidth(),
 			bds.getHeight(), label);
@@ -154,8 +154,8 @@ public class ComponentDrawContext {
 			bds.getHeight(), label);
 	}
 
-	public void drawRectangle(ComponentFactory source, int x, int y,
-							  int width, int height, String label) {
+	private void drawRectangle(ComponentFactory source, int x, int y,
+							   int width, int height, String label) {
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawRect(x + 1, y + 1, width - 1, height - 1);
 		if (label != null && !label.equals("")) {

@@ -12,11 +12,11 @@ import java.awt.*;
 import java.util.HashMap;
 
 class PainterDin {
-	static final int AND = 0;
-	static final int OR = 1;
-	static final int XOR = 2;
-	static final int XNOR = 3;
-	private static HashMap<Integer, int[]> orLenArrays = new HashMap<Integer, int[]>();
+	private static final int AND = 0;
+	private static final int OR = 1;
+	private static final int XOR = 2;
+	private static final int XNOR = 3;
+	private static final HashMap<Integer, int[]> orLenArrays = new HashMap<>();
 
 	private PainterDin() {
 	}
@@ -48,12 +48,11 @@ class PainterDin {
 		int xMid = -width;
 		int y0 = -height / 2;
 		if (drawBubble) {
-			x -= 4;
 			width -= 8;
 		}
 		int diam = Math.min(height, 2 * width);
 		if (dinType == AND) {
-			; // nothing to do
+			// nothing to do
 		} else if (dinType == OR) {
 			paintOrLines(painter, width, height, drawBubble);
 		} else if (dinType == XOR || dinType == XNOR) {
@@ -93,7 +92,6 @@ class PainterDin {
 		g.drawLine(xMid, y0, xMid, y0 + height);
 		if (drawBubble) {
 			g.fillOval(x0 + diam - 4, -4, 8, 8);
-			xMid += 4;
 		}
 	}
 
@@ -109,7 +107,7 @@ class PainterDin {
 		// draw state if appropriate
 		// ignore lines if in print view
 		int r = Math.min(height / 2, width);
-		Integer hash = Integer.valueOf(r << 4 | inputs);
+		Integer hash = r << 4 | inputs;
 		int[] lens = orLenArrays.get(hash);
 		if (lens == null) {
 			lens = new int[inputs];

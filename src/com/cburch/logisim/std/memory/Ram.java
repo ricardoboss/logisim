@@ -14,28 +14,28 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Ram extends Mem {
-	static final AttributeOption BUS_COMBINED
+	private static final AttributeOption BUS_COMBINED
 		= new AttributeOption("combined", Strings.getter("ramBusSynchCombined"));
-	static final AttributeOption BUS_ASYNCH
+	private static final AttributeOption BUS_ASYNCH
 		= new AttributeOption("asynch", Strings.getter("ramBusAsynchCombined"));
-	static final AttributeOption BUS_SEPARATE
+	private static final AttributeOption BUS_SEPARATE
 		= new AttributeOption("separate", Strings.getter("ramBusSeparate"));
 
-	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus",
+	private static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus",
 		Strings.getter("ramBusAttr"),
 		new AttributeOption[]{BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE});
-	private static final int OE = MEM_INPUTS + 0;
+	private static final int OE = MEM_INPUTS;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;
 	private static final int WE = MEM_INPUTS + 3;
 	private static final int DIN = MEM_INPUTS + 4;
-	private static Attribute<?>[] ATTRIBUTES = {
+	private static final Attribute<?>[] ATTRIBUTES = {
 		Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS
 	};
-	private static Object[] DEFAULTS = {
+	private static final Object[] DEFAULTS = {
 		BitWidth.create(8), BitWidth.create(8), BUS_COMBINED
 	};
-	private static Object[][] logOptions = new Object[9][];
+	private static final Object[][] logOptions = new Object[9][];
 
 	public Ram() {
 		super("RAM", Strings.getter("ramComponent"), 3);
@@ -59,8 +59,8 @@ public class Ram extends Mem {
 	void configurePorts(Instance instance) {
 		Object bus = instance.getAttributeValue(ATTR_BUS);
 		if (bus == null) bus = BUS_COMBINED;
-		boolean asynch = bus == null ? false : bus.equals(BUS_ASYNCH);
-		boolean separate = bus == null ? false : bus.equals(BUS_SEPARATE);
+		boolean asynch = bus != null && bus.equals(BUS_ASYNCH);
+		boolean separate = bus != null && bus.equals(BUS_SEPARATE);
 
 		int portCount = MEM_INPUTS;
 		if (asynch) portCount += 2;
@@ -137,8 +137,8 @@ public class Ram extends Mem {
 		RamState myState = (RamState) getState(state);
 		BitWidth dataBits = state.getAttributeValue(DATA_ATTR);
 		Object busVal = state.getAttributeValue(ATTR_BUS);
-		boolean asynch = busVal == null ? false : busVal.equals(BUS_ASYNCH);
-		boolean separate = busVal == null ? false : busVal.equals(BUS_SEPARATE);
+		boolean asynch = busVal != null && busVal.equals(BUS_ASYNCH);
+		boolean separate = busVal != null && busVal.equals(BUS_SEPARATE);
 
 		Value addrValue = state.getPort(ADDR);
 		boolean chipSelect = state.getPort(CS) != Value.FALSE;
@@ -189,8 +189,8 @@ public class Ram extends Mem {
 	public void paintInstance(InstancePainter painter) {
 		super.paintInstance(painter);
 		Object busVal = painter.getAttributeValue(ATTR_BUS);
-		boolean asynch = busVal == null ? false : busVal.equals(BUS_ASYNCH);
-		boolean separate = busVal == null ? false : busVal.equals(BUS_SEPARATE);
+		boolean asynch = busVal != null && busVal.equals(BUS_ASYNCH);
+		boolean separate = busVal != null && busVal.equals(BUS_SEPARATE);
 
 		if (!asynch) painter.drawClock(CLK, Direction.NORTH);
 		painter.drawPort(OE, Strings.get("ramOELabel"), Direction.SOUTH);
@@ -205,8 +205,8 @@ public class Ram extends Mem {
 
 	private static class RamState extends MemState
 		implements InstanceData, AttributeListener {
+		private final MemListener listener;
 		private Instance parent;
-		private MemListener listener;
 		private HexFrame hexFrame = null;
 		private ClockState clockState;
 
@@ -236,7 +236,7 @@ public class Ram extends Mem {
 		}
 
 		// Retrieves a HexFrame for editing within a separate window
-		public HexFrame getHexFrame(Project proj) {
+		HexFrame getHexFrame(Project proj) {
 			if (hexFrame == null) {
 				hexFrame = new HexFrame(proj, getContents());
 				hexFrame.addWindowListener(new WindowAdapter() {
@@ -252,7 +252,7 @@ public class Ram extends Mem {
 		//
 		// methods for accessing the write-enable data
 		//
-		public boolean setClock(Value newClock, Object trigger) {
+		boolean setClock(Value newClock, Object trigger) {
 			return clockState.updateClock(newClock, trigger);
 		}
 
@@ -278,7 +278,7 @@ public class Ram extends Mem {
 					ret = new Object[1 << addrBits];
 					logOptions[addrBits] = ret;
 					for (int i = 0; i < ret.length; i++) {
-						ret[i] = Integer.valueOf(i);
+						ret[i] = i;
 					}
 				}
 				return ret;
@@ -300,7 +300,7 @@ public class Ram extends Mem {
 		public Value getLogValue(InstanceState state, Object option) {
 			if (option instanceof Integer) {
 				MemState s = (MemState) state.getData();
-				int addr = ((Integer) option).intValue();
+				int addr = (Integer) option;
 				return Value.createKnown(BitWidth.create(s.getDataBits()),
 					s.getContents().get(addr));
 			} else {

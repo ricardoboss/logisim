@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public class XmlCircuitReader extends CircuitTransaction {
-	private XmlReader.ReadContext reader;
-	private List<XmlReader.CircuitData> circuitsData;
+	private final XmlReader.ReadContext reader;
+	private final List<XmlReader.CircuitData> circuitsData;
 
 	public XmlCircuitReader(XmlReader.ReadContext reader,
 							List<XmlReader.CircuitData> circDatas) {
@@ -47,7 +47,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 		}
 
 		Tool tool = lib.getTool(name);
-		if (tool == null || !(tool instanceof AddTool)) {
+		if (!(tool instanceof AddTool)) {
 			if (libName == null || libName.equals("")) {
 				throw new XmlReaderException(Strings.get("compUnknownError", name));
 			} else {
@@ -77,7 +77,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 
 	@Override
 	protected Map<Circuit, Integer> getAccessedCircuits() {
-		HashMap<Circuit, Integer> access = new HashMap<Circuit, Integer>();
+		HashMap<Circuit, Integer> access = new HashMap<>();
 		for (XmlReader.CircuitData data : circuitsData) {
 			access.put(data.circuit, READ_WRITE);
 		}
@@ -142,7 +142,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 		return "w" + from + "-" + to;
 	}
 
-	void addWire(Circuit dest, CircuitMutator mutator, Element elt)
+	private void addWire(Circuit dest, CircuitMutator mutator, Element elt)
 		throws XmlReaderException {
 		Location pt0;
 		try {

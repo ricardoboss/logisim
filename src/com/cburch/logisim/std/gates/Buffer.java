@@ -13,10 +13,9 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
 
 import java.awt.*;
-import java.util.Map;
 
 class Buffer extends InstanceFactory {
-	public static InstanceFactory FACTORY = new Buffer();
+	public static final InstanceFactory FACTORY = new Buffer();
 
 	private Buffer() {
 		super("Buffer", Strings.getter("bufferComponent"));
@@ -108,12 +107,10 @@ class Buffer extends InstanceFactory {
 	@Override
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == ExpressionComputer.class) {
-			return new ExpressionComputer() {
-				public void computeExpression(Map<Location, Expression> expressionMap) {
-					Expression e = expressionMap.get(instance.getPortLocation(1));
-					if (e != null) {
-						expressionMap.put(instance.getPortLocation(0), e);
-					}
+			return (ExpressionComputer) expressionMap -> {
+				Expression e = expressionMap.get(instance.getPortLocation(1));
+				if (e != null) {
+					expressionMap.put(instance.getPortLocation(0), e);
 				}
 			};
 		}

@@ -11,34 +11,34 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class ModelEditTextAction extends ModelAction {
-    private Text text;
-    private String oldValue;
-    private String newValue;
+	private final Text text;
+	private final String oldValue;
+	private final String newValue;
 
-    public ModelEditTextAction(CanvasModel model, Text text, String newValue) {
-        super(model);
-        this.text = text;
-        this.oldValue = text.getText();
-        this.newValue = newValue;
-    }
+	public ModelEditTextAction(CanvasModel model, Text text, String newValue) {
+		super(model);
+		this.text = text;
+		this.oldValue = text.getText();
+		this.newValue = newValue;
+	}
 
-    @Override
-    public Collection<CanvasObject> getObjects() {
-        return Collections.singleton((CanvasObject) text);
-    }
+	@Override
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(text);
+	}
 
-    @Override
-    public String getName() {
-        return Strings.get("actionEditText");
-    }
+	@Override
+	public String getName() {
+		return Strings.get("actionEditText");
+	}
 
-    @Override
-    void doSub(CanvasModel model) {
-        model.setText(text, newValue);
-    }
+	@Override
+	void doSub(CanvasModel model) {
+		model.setText(text, newValue);
+	}
 
-    @Override
-    void undoSub(CanvasModel model) {
-        model.setText(text, oldValue);
-    }
+	@Override
+	void undoSub(CanvasModel model) {
+		model.setText(text, oldValue);
+	}
 }

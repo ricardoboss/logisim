@@ -31,9 +31,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		= Attributes.forIntegerRange("fanout", Strings.getter("splitterFanOutAttr"), 1, 32);
 
 	private static final List<Attribute<?>> INIT_ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE,
-	});
+		= Arrays.asList(StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE);
 
 	private static final String unchosen_val = "none";
 	AttributeOption appear = APPEAR_LEFT;
@@ -41,9 +39,10 @@ class SplitterAttributes extends AbstractAttributeSet {
 	byte fanout = 2;                 // number of ends this splits into
 	byte[] bit_end = new byte[2];    // how each bit maps to an end (0 if nowhere);
 	//   other values will be between 1 and fanout
-	BitOutOption[] options = null;
-	private ArrayList<Attribute<?>> attrs = new ArrayList<Attribute<?>>(INIT_ATTRIBUTES);
+	private BitOutOption[] options = null;
+	private ArrayList<Attribute<?>> attrs = new ArrayList<>(INIT_ATTRIBUTES);
 	private SplitterParameters parameters;
+
 	SplitterAttributes() {
 		configureOptions();
 		configureDefaults();
@@ -106,7 +105,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 	protected void copyInto(AbstractAttributeSet destObj) {
 		SplitterAttributes dest = (SplitterAttributes) destObj;
 		dest.parameters = this.parameters;
-		dest.attrs = new ArrayList<Attribute<?>>(this.attrs.size());
+		dest.attrs = new ArrayList<>(this.attrs.size());
 		dest.attrs.addAll(INIT_ATTRIBUTES);
 		for (int i = INIT_ATTRIBUTES.size(), n = this.attrs.size(); i < n; i++) {
 			BitOutAttribute attr = (BitOutAttribute) this.attrs.get(i);
@@ -160,7 +159,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			configureOptions();
 			parameters = null;
 		} else if (attr == ATTR_FANOUT) {
-			int newValue = ((Integer) value).intValue();
+			int newValue = (Integer) value;
 			byte[] bits = bit_end;
 			for (int i = 0; i < bits.length; i++) {
 				if (bits[i] >= newValue) bits[i] = (byte) (newValue - 1);
@@ -181,7 +180,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			BitOutAttribute bitOutAttr = (BitOutAttribute) attr;
 			int val;
 			if (value instanceof Integer) {
-				val = ((Integer) value).intValue();
+				val = (Integer) value;
 			} else {
 				val = ((BitOutOption) value).value + 1;
 			}
@@ -231,7 +230,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			if (bit_end[i] != dflt[i]) {
 				BitOutAttribute attr = (BitOutAttribute) attrs.get(offs + i);
 				bit_end[i] = dflt[i];
-				fireAttributeValueChanged(attr, Integer.valueOf(bit_end[i]));
+				fireAttributeValueChanged(attr, (int) bit_end[i]);
 			}
 		}
 
@@ -246,9 +245,9 @@ class SplitterAttributes extends AbstractAttributeSet {
 	}
 
 	private static class BitOutOption {
-		int value;
-		boolean isVertical;
-		boolean isLast;
+		final int value;
+		final boolean isVertical;
+		final boolean isLast;
 
 		BitOutOption(int value, boolean isVertical, boolean isLast) {
 			this.value = value;
@@ -279,7 +278,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 	}
 
 	static class BitOutAttribute extends Attribute<Integer> {
-		int which;
+		final int which;
 		BitOutOption[] options;
 
 		private BitOutAttribute(int which, BitOutOption[] options) {
@@ -293,27 +292,27 @@ class SplitterAttributes extends AbstractAttributeSet {
 		}
 
 		public Object getDefault() {
-			return Integer.valueOf(which + 1);
+			return which + 1;
 		}
 
 		@Override
 		public Integer parse(String value) {
 			if (value.equals(unchosen_val)) {
-				return Integer.valueOf(0);
+				return 0;
 			} else {
-				return Integer.valueOf(1 + Integer.parseInt(value));
+				return 1 + Integer.parseInt(value);
 			}
 		}
 
 		@Override
 		public String toDisplayString(Integer value) {
-			int index = value.intValue();
+			int index = value;
 			return options[index].toString();
 		}
 
 		@Override
 		public String toStandardString(Integer value) {
-			int index = value.intValue();
+			int index = value;
 			if (index == 0) {
 				return unchosen_val;
 			} else {
@@ -323,7 +322,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
-			int index = value.intValue();
+			int index = value;
 			javax.swing.JComboBox combo = new javax.swing.JComboBox(options);
 			combo.setSelectedIndex(index);
 			return combo;

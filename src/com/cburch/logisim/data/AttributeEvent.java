@@ -4,9 +4,9 @@
 package com.cburch.logisim.data;
 
 public class AttributeEvent {
-	private AttributeSet source;
-	private Attribute<?> attr;
-	private Object value;
+	private final AttributeSet source;
+	private final Attribute<?> attr;
+	private final Object value;
 
 	public AttributeEvent(AttributeSet source, Attribute<?> attr,
 						  Object value) {

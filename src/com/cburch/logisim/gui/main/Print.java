@@ -52,7 +52,7 @@ public class Print {
 
 		PrinterJob job = PrinterJob.getPrinterJob();
 		job.setPrintable(print, format);
-		if (job.printDialog() == false) return;
+		if (!job.printDialog()) return;
 		try {
 			job.print();
 		} catch (PrinterException e) {
@@ -71,22 +71,22 @@ public class Print {
 		int start = 0;
 		for (; mark >= 0 && mark + 1 < header.length();
 			 start = mark + 2, mark = header.indexOf('%', start)) {
-			ret.append(header.substring(start, mark));
+			ret.append(header, start, mark);
 			switch (header.charAt(mark + 1)) {
 				case 'n':
 					ret.append(circName);
 					break;
 				case 'p':
-					ret.append("" + index);
+					ret.append(index);
 					break;
 				case 'P':
-					ret.append("" + max);
+					ret.append(max);
 					break;
 				case '%':
 					ret.append("%");
 					break;
 				default:
-					ret.append("%" + header.charAt(mark + 1));
+					ret.append("%").append(header.charAt(mark + 1));
 			}
 		}
 		if (start < header.length()) {
@@ -96,11 +96,11 @@ public class Print {
 	}
 
 	private static class ParmsPanel extends JPanel {
-		JCheckBox rotateToFit;
-		JCheckBox printerView;
-		JTextField header;
-		GridBagLayout gridbag;
-		GridBagConstraints gbc;
+		final JCheckBox rotateToFit;
+		final JCheckBox printerView;
+		final JTextField header;
+		final GridBagLayout gridbag;
+		final GridBagConstraints gbc;
 
 		ParmsPanel(JList list) {
 			// set up components
@@ -159,11 +159,11 @@ public class Print {
 	}
 
 	private static class MyPrintable implements Printable {
-		Project proj;
-		List<Circuit> circuits;
-		String header;
-		boolean rotateToFit;
-		boolean printerView;
+		final Project proj;
+		final List<Circuit> circuits;
+		final String header;
+		final boolean rotateToFit;
+		final boolean printerView;
 
 		MyPrintable(Project proj, List<Circuit> circuits, String header,
 					boolean rotateToFit, boolean printerView) {
@@ -235,7 +235,6 @@ public class Print {
 				if (scale < 1.0) {
 					g2.scale(scale, scale);
 					imWidth /= scale;
-					imHeight /= scale;
 				}
 				double dx = Math.max(0.0, (imWidth - bds.getWidth()) / 2);
 				g2.translate(-bds.getX() + dx, -bds.getY());

@@ -6,10 +6,11 @@ package com.cburch.logisim.analyze.model;
 import java.util.*;
 
 public class Implicant implements Comparable<Implicant> {
-	static Implicant MINIMAL_IMPLICANT = new Implicant(0, -1);
-	static List<Implicant> MINIMAL_LIST = Arrays.asList(new Implicant[]{MINIMAL_IMPLICANT});
-	private int unknowns;
-	private int values;
+	private static final Implicant MINIMAL_IMPLICANT = new Implicant(0, -1);
+	static final List<Implicant> MINIMAL_LIST = Collections.singletonList(MINIMAL_IMPLICANT);
+	private final int unknowns;
+	private final int values;
+
 	private Implicant(int unknowns, int values) {
 		this.unknowns = unknowns;
 		this.values = values;
@@ -45,8 +46,8 @@ public class Implicant implements Comparable<Implicant> {
 
 		// determine the first-cut implicants, as well as the rows
 		// that we need to cover.
-		HashMap<Implicant, Entry> base = new HashMap<Implicant, Entry>();
-		HashSet<Implicant> toCover = new HashSet<Implicant>();
+		HashMap<Implicant, Entry> base = new HashMap<>();
+		HashSet<Implicant> toCover = new HashSet<>();
 		boolean knownFound = false;
 		for (int i = 0; i < table.getRowCount(); i++) {
 			Entry entry = table.getOutputEntry(i, column);
@@ -66,11 +67,11 @@ public class Implicant implements Comparable<Implicant> {
 
 		// work up to more general implicants, discovering
 		// any prime implicants.
-		HashSet<Implicant> primes = new HashSet<Implicant>();
+		HashSet<Implicant> primes = new HashSet<>();
 		HashMap<Implicant, Entry> current = base;
 		while (current.size() > 1) {
-			HashSet<Implicant> toRemove = new HashSet<Implicant>();
-			HashMap<Implicant, Entry> next = new HashMap<Implicant, Entry>();
+			HashSet<Implicant> toRemove = new HashSet<>();
+			HashMap<Implicant, Entry> next = new HashMap<>();
 			for (Map.Entry<Implicant, Entry> curEntry : current.entrySet()) {
 				Implicant imp = curEntry.getKey();
 				Entry detEntry = curEntry.getValue();
@@ -115,8 +116,8 @@ public class Implicant implements Comparable<Implicant> {
 		}
 
 		// determine the essential prime implicants
-		HashSet<Implicant> retSet = new HashSet<Implicant>();
-		HashSet<Implicant> covered = new HashSet<Implicant>();
+		HashSet<Implicant> retSet = new HashSet<>();
+		HashSet<Implicant> covered = new HashSet<>();
 		for (Implicant required : toCover) {
 			if (covered.contains(required)) continue;
 			int row = required.getRow();
@@ -182,7 +183,7 @@ public class Implicant implements Comparable<Implicant> {
 
 		// Now build up our sum-of-products expression
 		// from the remaining terms
-		ArrayList<Implicant> ret = new ArrayList<Implicant>(retSet);
+		ArrayList<Implicant> ret = new ArrayList<>(retSet);
 		Collections.sort(ret);
 		return ret;
 	}
@@ -197,9 +198,7 @@ public class Implicant implements Comparable<Implicant> {
 	public int compareTo(Implicant o) {
 		if (this.values < o.values) return -1;
 		if (this.values > o.values) return 1;
-		if (this.unknowns < o.unknowns) return -1;
-		if (this.unknowns > o.unknowns) return 1;
-		return 0;
+		return Integer.compare(this.unknowns, o.unknowns);
 	}
 
 	@Override
@@ -207,7 +206,7 @@ public class Implicant implements Comparable<Implicant> {
 		return (unknowns << 16) | values;
 	}
 
-	public int getUnknownCount() {
+	private int getUnknownCount() {
 		int ret = 0;
 		int n = unknowns;
 		while (n != 0) {
@@ -254,7 +253,7 @@ public class Implicant implements Comparable<Implicant> {
 
 	private static class TermIterator
 		implements Iterable<Implicant>, Iterator<Implicant> {
-		Implicant source;
+		final Implicant source;
 		int currentMask = 0;
 
 		TermIterator(Implicant source) {
@@ -276,7 +275,7 @@ public class Implicant implements Comparable<Implicant> {
 			if (diff == 0) {
 				currentMask = -1;
 			} else {
-				currentMask = (currentMask & ~(diff - 1)) | diff;
+				currentMask = (currentMask & -diff) | diff;
 			}
 			return new Implicant(0, ret);
 		}

@@ -14,8 +14,8 @@ import java.beans.PropertyChangeListener;
 
 class PrefBoolean extends JCheckBox
 	implements ActionListener, PropertyChangeListener {
-	private PrefMonitor<Boolean> pref;
-	private StringGetter title;
+	private final PrefMonitor<Boolean> pref;
+	private final StringGetter title;
 
 	PrefBoolean(PrefMonitor<Boolean> pref, StringGetter title) {
 		super(title.get());

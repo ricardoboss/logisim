@@ -9,9 +9,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public class BasicZoomModel implements ZoomModel {
-	private double[] zoomOptions;
+	private final double[] zoomOptions;
 
-	private PropertyChangeSupport support;
+	private final PropertyChangeSupport support;
 	private double zoomFactor;
 	private boolean showGrid;
 
@@ -22,7 +22,7 @@ public class BasicZoomModel implements ZoomModel {
 		zoomFactor = 1.0;
 		showGrid = true;
 
-		setZoomFactor(zoomPref.get().doubleValue());
+		setZoomFactor(zoomPref.get());
 		setShowGrid(gridPref.getBoolean());
 	}
 
@@ -54,8 +54,8 @@ public class BasicZoomModel implements ZoomModel {
 		double oldValue = zoomFactor;
 		if (value != oldValue) {
 			zoomFactor = value;
-			support.firePropertyChange(ZoomModel.ZOOM, Double.valueOf(oldValue),
-				Double.valueOf(value));
+			support.firePropertyChange(ZoomModel.ZOOM, oldValue,
+				value);
 		}
 	}
 

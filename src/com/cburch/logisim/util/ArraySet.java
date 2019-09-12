@@ -8,15 +8,17 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class ArraySet<E> extends AbstractSet<E> {
 	private static final Object[] EMPTY_ARRAY = new Object[0];
 	private int version = 0;
 	private Object[] values = EMPTY_ARRAY;
+
 	public ArraySet() {
 	}
 
 	public static void main(String[] args) throws java.io.IOException {
-		ArraySet<String> set = new ArraySet<String>();
+		ArraySet<String> set = new ArraySet<>();
 		java.io.BufferedReader in = new java.io.BufferedReader(
 			new java.io.InputStreamReader(System.in));
 		while (true) {
@@ -30,7 +32,6 @@ public class ArraySet<E> extends AbstractSet<E> {
 			if (cmd == null) break;
 			cmd = cmd.trim();
 			if (cmd.equals("")) {
-				;
 			} else if (cmd.startsWith("+")) {
 				set.add(cmd.substring(1));
 			} else if (cmd.startsWith("-")) {
@@ -51,7 +52,7 @@ public class ArraySet<E> extends AbstractSet<E> {
 
 	@Override
 	public Object clone() {
-		ArraySet<E> ret = new ArraySet<E>();
+		ArraySet<E> ret = new ArraySet<>();
 		if (this.values == EMPTY_ARRAY) {
 			ret.values = EMPTY_ARRAY;
 		} else {
@@ -79,8 +80,8 @@ public class ArraySet<E> extends AbstractSet<E> {
 	@Override
 	public boolean add(Object value) {
 		int n = values.length;
-		for (int i = 0; i < n; i++) {
-			if (values[i].equals(value)) return false;
+		for (Object o : values) {
+			if (o.equals(value)) return false;
 		}
 
 		Object[] newValues = new Object[n + 1];
@@ -93,8 +94,8 @@ public class ArraySet<E> extends AbstractSet<E> {
 
 	@Override
 	public boolean contains(Object value) {
-		for (int i = 0, n = values.length; i < n; i++) {
-			if (values[i].equals(value)) return true;
+		for (Object o : values) {
+			if (o.equals(value)) return true;
 		}
 		return false;
 	}

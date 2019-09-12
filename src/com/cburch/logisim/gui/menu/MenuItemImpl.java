@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class MenuItemImpl extends JMenuItem implements MenuItem {
-	private MenuItemHelper helper;
+	private final MenuItemHelper helper;
 
 	public MenuItemImpl(Menu menu, LogisimMenuItem menuItem) {
 		helper = new MenuItemHelper(this, menu, menuItem);

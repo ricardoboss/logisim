@@ -100,13 +100,13 @@ public class MenuTool extends Tool {
 		}
 	}
 
-	private class MenuComponent extends JPopupMenu
+	private static class MenuComponent extends JPopupMenu
 		implements ActionListener {
-		Project proj;
-		Circuit circ;
-		Component comp;
-		JMenuItem del = new JMenuItem(Strings.get("compDeleteItem"));
-		JMenuItem attrs = new JMenuItem(Strings.get("compShowAttrItem"));
+		final Project proj;
+		final Circuit circ;
+		final Component comp;
+		final JMenuItem del = new JMenuItem(Strings.get("compDeleteItem"));
+		final JMenuItem attrs = new JMenuItem(Strings.get("compShowAttrItem"));
 
 		MenuComponent(Project proj, Circuit circ, Component comp) {
 			this.proj = proj;
@@ -134,12 +134,12 @@ public class MenuTool extends Tool {
 		}
 	}
 
-	private class MenuSelection extends JPopupMenu
+	private static class MenuSelection extends JPopupMenu
 		implements ActionListener {
-		Project proj;
-		JMenuItem del = new JMenuItem(Strings.get("selDeleteItem"));
-		JMenuItem cut = new JMenuItem(Strings.get("selCutItem"));
-		JMenuItem copy = new JMenuItem(Strings.get("selCopyItem"));
+		final Project proj;
+		final JMenuItem del = new JMenuItem(Strings.get("selDeleteItem"));
+		final JMenuItem cut = new JMenuItem(Strings.get("selCutItem"));
+		final JMenuItem copy = new JMenuItem(Strings.get("selCopyItem"));
 
 		MenuSelection(Project proj) {
 			this.proj = proj;

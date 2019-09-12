@@ -26,12 +26,13 @@ import java.util.LinkedList;
 
 public class AttrTable extends JPanel implements LocaleListener {
 	private static final AttrTableModel NULL_ATTR_MODEL = new NullAttrModel();
-	private Window parent;
+	private final Window parent;
+	private final JLabel title;
+	private final JTable table;
+	private final TableModelAdapter tableModel;
+	private final CellEditor editor = new CellEditor();
 	private boolean titleEnabled;
-	private JLabel title;
-	private JTable table;
-	private TableModelAdapter tableModel;
-	private CellEditor editor = new CellEditor();
+
 	public AttrTable(Window parent) {
 		super(new BorderLayout());
 		this.parent = parent;
@@ -135,12 +136,12 @@ public class AttrTable extends JPanel implements LocaleListener {
 		JInputComponent input;
 		Object value;
 
-		public MyDialog(Dialog parent, JInputComponent input) {
+		MyDialog(Dialog parent, JInputComponent input) {
 			super(parent, Strings.get("attributeDialogTitle"), true);
 			configure(input);
 		}
 
-		public MyDialog(Frame parent, JInputComponent input) {
+		MyDialog(Frame parent, JInputComponent input) {
 			super(parent, Strings.get("attributeDialogTitle"), true);
 			configure(input);
 		}
@@ -165,20 +166,20 @@ public class AttrTable extends JPanel implements LocaleListener {
 			value = input.getValue();
 		}
 
-		public Object getValue() {
+		Object getValue() {
 			return value;
 		}
 	}
 
 	private class TableModelAdapter
 		implements TableModel, AttrTableModelListener {
-		Window parent;
-		LinkedList<TableModelListener> listeners;
+		final Window parent;
+		final LinkedList<TableModelListener> listeners;
 		AttrTableModel attrModel;
 
 		TableModelAdapter(Window parent, AttrTableModel attrModel) {
 			this.parent = parent;
-			this.listeners = new LinkedList<TableModelListener>();
+			this.listeners = new LinkedList<>();
 			this.attrModel = attrModel;
 		}
 
@@ -205,7 +206,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 
 		void fireTableChanged() {
 			TableModelEvent e = new TableModelEvent(this);
-			for (TableModelListener l : new ArrayList<TableModelListener>(listeners)) {
+			for (TableModelListener l : new ArrayList<>(listeners)) {
 				l.tableChanged(e);
 			}
 		}
@@ -292,7 +293,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 
 	private class CellEditor
 		implements TableCellEditor, FocusListener, ActionListener {
-		LinkedList<CellEditorListener> listeners = new LinkedList<CellEditorListener>();
+		final LinkedList<CellEditorListener> listeners = new LinkedList<>();
 		AttrTableModelRow currentRow;
 		Component currentEditor;
 
@@ -310,16 +311,16 @@ public class AttrTable extends JPanel implements LocaleListener {
 			listeners.remove(l);
 		}
 
-		public void fireEditingCanceled() {
+		void fireEditingCanceled() {
 			ChangeEvent e = new ChangeEvent(AttrTable.this);
-			for (CellEditorListener l : new ArrayList<CellEditorListener>(listeners)) {
+			for (CellEditorListener l : new ArrayList<>(listeners)) {
 				l.editingCanceled(e);
 			}
 		}
 
-		public void fireEditingStopped() {
+		void fireEditingStopped() {
 			ChangeEvent e = new ChangeEvent(AttrTable.this);
-			for (CellEditorListener l : new ArrayList<CellEditorListener>(listeners)) {
+			for (CellEditorListener l : new ArrayList<>(listeners)) {
 				l.editingStopped(e);
 			}
 		}
@@ -409,9 +410,9 @@ public class AttrTable extends JPanel implements LocaleListener {
 		// FocusListener methods
 		//
 		public void focusLost(FocusEvent e) {
-			Object dst = e.getOppositeComponent();
-			if (dst instanceof Component) {
-				Component p = (Component) dst;
+			Component dst = e.getOppositeComponent();
+			if (dst != null) {
+				Component p = dst;
 				while (p != null && !(p instanceof Window)) {
 					if (p == AttrTable.this) {
 						// switch to another place in this table,

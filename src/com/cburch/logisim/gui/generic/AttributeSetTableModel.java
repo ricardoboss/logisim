@@ -15,15 +15,16 @@ import java.util.HashSet;
 
 public abstract class AttributeSetTableModel
 	implements AttrTableModel, AttributeListener {
-	private ArrayList<AttrTableModelListener> listeners;
+	private final ArrayList<AttrTableModelListener> listeners;
+	private final HashMap<Attribute<?>, AttrRow> rowMap;
 	private AttributeSet attrs;
-	private HashMap<Attribute<?>, AttrRow> rowMap;
 	private ArrayList<AttrRow> rows;
-	public AttributeSetTableModel(AttributeSet attrs) {
+
+	protected AttributeSetTableModel(AttributeSet attrs) {
 		this.attrs = attrs;
-		this.listeners = new ArrayList<AttrTableModelListener>();
-		this.rowMap = new HashMap<Attribute<?>, AttrRow>();
-		this.rows = new ArrayList<AttrRow>();
+		this.listeners = new ArrayList<>();
+		this.rowMap = new HashMap<>();
+		this.rows = new ArrayList<>();
 		if (attrs != null) {
 			for (Attribute<?> attr : attrs.getAttributes()) {
 				AttrRow row = new AttrRow(attr);
@@ -35,11 +36,11 @@ public abstract class AttributeSetTableModel
 
 	public abstract String getTitle();
 
-	public AttributeSet getAttributeSet() {
+	protected AttributeSet getAttributeSet() {
 		return attrs;
 	}
 
-	public void setAttributeSet(AttributeSet value) {
+	protected void setAttributeSet(AttributeSet value) {
 		if (attrs != value) {
 			if (!listeners.isEmpty()) {
 				attrs.removeAttributeListener(this);
@@ -73,14 +74,14 @@ public abstract class AttributeSetTableModel
 		}
 	}
 
-	protected void fireStructureChanged() {
+	private void fireStructureChanged() {
 		AttrTableModelEvent event = new AttrTableModelEvent(this);
 		for (AttrTableModelListener l : listeners) {
 			l.attrStructureChanged(event);
 		}
 	}
 
-	protected void fireValueChanged(int index) {
+	private void fireValueChanged(int index) {
 		AttrTableModelEvent event = new AttrTableModelEvent(this, index);
 		for (AttrTableModelListener l : listeners) {
 			l.attrValueChanged(event);
@@ -116,8 +117,8 @@ public abstract class AttributeSetTableModel
 		if (match && index == rows.size()) return;
 
 		// compute the new list of rows, possible adding into hash map
-		ArrayList<AttrRow> newRows = new ArrayList<AttrRow>();
-		HashSet<Attribute<?>> missing = new HashSet<Attribute<?>>(rowMap.keySet());
+		ArrayList<AttrRow> newRows = new ArrayList<>();
+		HashSet<Attribute<?>> missing = new HashSet<>(rowMap.keySet());
 		for (Attribute<?> attr : attrs.getAttributes()) {
 			AttrRow row = rowMap.get(attr);
 			if (row == null) {
@@ -148,7 +149,7 @@ public abstract class AttributeSetTableModel
 	}
 
 	private class AttrRow implements AttrTableModelRow {
-		private Attribute<Object> attr;
+		private final Attribute<Object> attr;
 
 		AttrRow(Attribute<?> attr) {
 			@SuppressWarnings("unchecked")

@@ -64,7 +64,7 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 	}
 
 	private static class StatisticsTableModel extends AbstractTableModel {
-		private FileStatistics stats;
+		private final FileStatistics stats;
 
 		StatisticsTableModel(FileStatistics stats) {
 			this.stats = stats;
@@ -126,11 +126,11 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 						return "";
 					}
 				case 2:
-					return Integer.valueOf(count.getSimpleCount());
+					return count.getSimpleCount();
 				case 3:
-					return Integer.valueOf(count.getUniqueCount());
+					return count.getUniqueCount();
 				case 4:
-					return Integer.valueOf(count.getRecursiveCount());
+					return count.getRecursiveCount();
 				default:
 					return ""; // should never happen
 			}
@@ -138,9 +138,9 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 	}
 
 	private static class CompareString implements Comparator<String> {
-		private String[] fixedAtBottom;
+		private final String[] fixedAtBottom;
 
-		public CompareString(String... fixedAtBottom) {
+		CompareString(String... fixedAtBottom) {
 			this.fixedAtBottom = fixedAtBottom;
 		}
 
@@ -161,7 +161,7 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 			setPreferredColumnWidths(new double[]{0.45, 0.25, 0.1, 0.1, 0.1});
 		}
 
-		protected void setPreferredColumnWidths(double[] percentages) {
+		void setPreferredColumnWidths(double[] percentages) {
 			Dimension tableDim = getPreferredSize();
 
 			double total = 0;

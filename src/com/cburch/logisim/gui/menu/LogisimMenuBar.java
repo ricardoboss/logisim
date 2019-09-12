@@ -51,23 +51,23 @@ public class LogisimMenuBar extends JMenuBar {
 	public static final LogisimMenuItem SIMULATE_STEP = new LogisimMenuItem("SimulateStep");
 	public static final LogisimMenuItem TICK_ENABLE = new LogisimMenuItem("TickEnable");
 	public static final LogisimMenuItem TICK_STEP = new LogisimMenuItem("TickStep");
-	private JFrame parent;
-	private MyListener listener;
-	private Project proj;
+	private final JFrame parent;
+	private final Project proj;
+	private final HashMap<LogisimMenuItem, MenuItem> menuItems
+		= new HashMap<>();
+	private final ArrayList<ChangeListener> enableListeners;
+	private final MenuFile file;
+	private final MenuEdit edit;
+	private final MenuProject project;
+	private final MenuSimulate simulate;
+	private final MenuHelp help;
 	private SimulateListener simulateListener = null;
-	private HashMap<LogisimMenuItem, MenuItem> menuItems
-		= new HashMap<LogisimMenuItem, MenuItem>();
-	private ArrayList<ChangeListener> enableListeners;
-	private MenuFile file;
-	private MenuEdit edit;
-	private MenuProject project;
-	private MenuSimulate simulate;
-	private MenuHelp help;
+
 	public LogisimMenuBar(JFrame parent, Project proj) {
 		this.parent = parent;
-		this.listener = new MyListener();
+		MyListener listener = new MyListener();
 		this.proj = proj;
-		this.enableListeners = new ArrayList<ChangeListener>();
+		this.enableListeners = new ArrayList<>();
 
 		add(file = new MenuFile(this));
 		add(edit = new MenuEdit(this));

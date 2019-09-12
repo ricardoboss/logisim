@@ -12,23 +12,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AppearanceEditPopup extends EditPopup implements EditHandler.Listener {
-	private AppearanceCanvas canvas;
-	private EditHandler handler;
-	private Map<LogisimMenuItem, Boolean> enabled;
+	private final AppearanceCanvas canvas;
+	private final EditHandler handler;
+	private final Map<LogisimMenuItem, Boolean> enabled;
 
 	public AppearanceEditPopup(AppearanceCanvas canvas) {
 		super(true);
 		this.canvas = canvas;
 		handler = new AppearanceEditHandler(canvas);
 		handler.setListener(this);
-		enabled = new HashMap<LogisimMenuItem, Boolean>();
+		enabled = new HashMap<>();
 		handler.computeEnabled();
 		initialize();
 	}
 
 	public void enableChanged(EditHandler handler, LogisimMenuItem action,
 							  boolean value) {
-		enabled.put(action, Boolean.valueOf(value));
+		enabled.put(action, value);
 	}
 
 
@@ -44,7 +44,7 @@ public class AppearanceEditPopup extends EditPopup implements EditHandler.Listen
 	@Override
 	protected boolean isEnabled(LogisimMenuItem item) {
 		Boolean value = enabled.get(item);
-		return value != null && value.booleanValue();
+		return value != null && value;
 	}
 
 	@Override

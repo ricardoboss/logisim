@@ -11,15 +11,15 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 public class BitFinder extends InstanceFactory {
-	static final AttributeOption LOW_ONE
+	private static final AttributeOption LOW_ONE
 		= new AttributeOption("low1", Strings.getter("bitFinderLowOption", "1"));
-	static final AttributeOption HIGH_ONE
+	private static final AttributeOption HIGH_ONE
 		= new AttributeOption("high1", Strings.getter("bitFinderHighOption", "1"));
-	static final AttributeOption LOW_ZERO
+	private static final AttributeOption LOW_ZERO
 		= new AttributeOption("low0", Strings.getter("bitFinderLowOption", "0"));
-	static final AttributeOption HIGH_ZERO
+	private static final AttributeOption HIGH_ZERO
 		= new AttributeOption("high0", Strings.getter("bitFinderHighOption", "0"));
-	static final Attribute<AttributeOption> TYPE
+	private static final Attribute<AttributeOption> TYPE
 		= Attributes.forOption("type", Strings.getter("bitFinderTypeAttr"),
 		new AttributeOption[]{LOW_ONE, HIGH_ONE, LOW_ZERO, HIGH_ZERO});
 

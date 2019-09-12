@@ -9,21 +9,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Base extends Library {
-	private List<Tool> tools = null;
+	private List<Tool> tools;
 
 	public Base() {
 		SelectTool select = new SelectTool();
 		WiringTool wiring = new WiringTool();
 
-		tools = Arrays.asList(new Tool[]{
-			new PokeTool(),
+		tools = Arrays.asList(new PokeTool(),
 			new EditTool(select, wiring),
 			select,
 			wiring,
 			new TextTool(),
 			new MenuTool(),
-			new AddTool(Text.FACTORY),
-		});
+			new AddTool(Text.FACTORY));
 	}
 
 	@Override

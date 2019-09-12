@@ -7,21 +7,20 @@ import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 class ClipboardContents {
 	static final ClipboardContents EMPTY
-		= new ClipboardContents(Collections.<CanvasObject>emptySet(), null, null);
+		= new ClipboardContents(Collections.emptySet(), null, null);
 
-	private Collection<CanvasObject> onClipboard;
-	private Location anchorLocation;
-	private Direction anchorFacing;
+	private final Collection<CanvasObject> onClipboard;
+	private final Location anchorLocation;
+	private final Direction anchorFacing;
 
 	public ClipboardContents(Collection<CanvasObject> onClipboard,
 							 Location anchorLocation, Direction anchorFacing) {
-		this.onClipboard = Collections.unmodifiableList(new ArrayList<CanvasObject>(onClipboard));
+		this.onClipboard = java.util.List.copyOf(onClipboard);
 		this.anchorLocation = anchorLocation;
 		this.anchorFacing = anchorFacing;
 	}

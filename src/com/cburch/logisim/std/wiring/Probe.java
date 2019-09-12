@@ -10,11 +10,12 @@ import com.cburch.logisim.instance.*;
 import com.cburch.logisim.util.GraphicsUtil;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class Probe extends InstanceFactory {
 	public static final Probe FACTORY = new Probe();
 
-	public Probe() {
+	private Probe() {
 		super("Probe", Strings.getter("probeComponent"));
 		setIconName("probe.gif");
 		setFacingAttribute(StdAttr.FACING);
@@ -81,8 +82,6 @@ public class Probe extends InstanceFactory {
 			switch (len) {
 				case 0:
 				case 1:
-					ret = Bounds.create(-20, -10, 20, 20);
-					break;
 				case 2:
 					ret = Bounds.create(-20, -10, 20, 20);
 					break;
@@ -139,8 +138,6 @@ public class Probe extends InstanceFactory {
 			switch (len) {
 				case 0:
 				case 1:
-					ret = Bounds.create(0, -10, 20, 20);
-					break;
 				case 2:
 					ret = Bounds.create(0, -10, 20, 20);
 					break;
@@ -197,8 +194,6 @@ public class Probe extends InstanceFactory {
 			switch (len) {
 				case 0:
 				case 1:
-					ret = Bounds.create(-10, -20, 20, 20);
-					break;
 				case 2:
 					ret = Bounds.create(-10, -20, 20, 20);
 					break;
@@ -255,8 +250,6 @@ public class Probe extends InstanceFactory {
 			switch (len) {
 				case 0:
 				case 1:
-					ret = Bounds.create(-10, 0, 20, 20);
-					break;
 				case 2:
 					ret = Bounds.create(-10, 0, 20, 20);
 					break;
@@ -446,7 +439,7 @@ public class Probe extends InstanceFactory {
 		StateData oldData = (StateData) state.getData();
 		Value oldValue = oldData == null ? Value.NIL : oldData.curValue;
 		Value newValue = state.getPort(0);
-		boolean same = oldValue == null ? newValue == null : oldValue.equals(newValue);
+		boolean same = Objects.equals(oldValue, newValue);
 		if (!same) {
 			if (oldData == null) {
 				oldData = new StateData();
@@ -467,7 +460,7 @@ public class Probe extends InstanceFactory {
 		}
 	}
 
-	void configureLabel(Instance instance) {
+	private void configureLabel(Instance instance) {
 		ProbeAttributes attrs = (ProbeAttributes) instance.getAttributeSet();
 		Probe.configureLabel(instance, attrs.labelloc, attrs.facing);
 	}
@@ -486,7 +479,7 @@ public class Probe extends InstanceFactory {
 	}
 
 	public static class ProbeLogger extends InstanceLogger {
-		public ProbeLogger() {
+		ProbeLogger() {
 		}
 
 		@Override

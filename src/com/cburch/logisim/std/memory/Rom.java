@@ -28,16 +28,16 @@ import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
 public class Rom extends Mem {
-	public static Attribute<MemContents> CONTENTS_ATTR = new ContentsAttribute();
+	static final Attribute<MemContents> CONTENTS_ATTR = new ContentsAttribute();
 
 	// The following is so that instance's MemListeners aren't freed by the
 	// garbage collector until the instance itself is ready to be freed.
-	private WeakHashMap<Instance, MemListener> memListeners;
+	private final WeakHashMap<Instance, MemListener> memListeners;
 
 	public Rom() {
 		super("ROM", Strings.getter("romComponent"), 0);
 		setIconName("rom.gif");
-		memListeners = new WeakHashMap<Instance, MemListener>();
+		memListeners = new WeakHashMap<>();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class Rom extends Mem {
 	}
 
 	// TODO - maybe delete this method?
-	MemContents getMemContents(Instance instance) {
+	private MemContents getMemContents(Instance instance) {
 		return instance.getAttributeValue(CONTENTS_ATTR);
 	}
 
@@ -120,7 +120,7 @@ public class Rom extends Mem {
 	}
 
 	private static class ContentsAttribute extends Attribute<MemContents> {
-		public ContentsAttribute() {
+		ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
 		}
 
@@ -148,7 +148,7 @@ public class Rom extends Mem {
 			ret.write("addr/data: " + addr + " " + data + "\n");
 			try {
 				HexFile.save(ret, state);
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 			}
 			return ret.toString();
 		}
@@ -167,11 +167,7 @@ public class Rom extends Mem {
 				MemContents ret = MemContents.create(addr, data);
 				HexFile.open(ret, new StringReader(rest));
 				return ret;
-			} catch (IOException e) {
-				return null;
-			} catch (NumberFormatException e) {
-				return null;
-			} catch (NoSuchElementException e) {
+			} catch (IOException | NumberFormatException | NoSuchElementException e) {
 				return null;
 			}
 		}
@@ -179,8 +175,8 @@ public class Rom extends Mem {
 
 	private static class ContentsCell extends JLabel
 		implements MouseListener {
-		Window source;
-		MemContents contents;
+		final Window source;
+		final MemContents contents;
 
 		ContentsCell(Window source, MemContents contents) {
 			super(Strings.get("romContentsValue"));

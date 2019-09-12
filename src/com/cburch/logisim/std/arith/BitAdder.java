@@ -13,7 +13,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 public class BitAdder extends InstanceFactory {
-	static final Attribute<Integer> NUM_INPUTS
+	private static final Attribute<Integer> NUM_INPUTS
 		= Attributes.forIntegerRange("inputs", Strings.getter("gateInputsAttr"), 1, 32);
 
 	public BitAdder() {
@@ -21,7 +21,7 @@ public class BitAdder extends InstanceFactory {
 		setAttributes(new Attribute[]{
 			StdAttr.WIDTH, NUM_INPUTS
 		}, new Object[]{
-			BitWidth.create(8), Integer.valueOf(1)
+			BitWidth.create(8), 1
 		});
 		setKeyConfigurator(JoinedConfigurator.create(
 			new IntegerConfigurator(NUM_INPUTS, 1, 32, 0),
@@ -31,7 +31,7 @@ public class BitAdder extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int inputs = attrs.getValue(NUM_INPUTS).intValue();
+		int inputs = attrs.getValue(NUM_INPUTS);
 		int h = Math.max(40, 10 * inputs);
 		int y = inputs < 4 ? 20 : (((inputs - 1) / 2) * 10 + 5);
 		return Bounds.create(-40, -y, 40, h);
@@ -55,7 +55,7 @@ public class BitAdder extends InstanceFactory {
 
 	private void configurePorts(Instance instance) {
 		BitWidth inWidth = instance.getAttributeValue(StdAttr.WIDTH);
-		int inputs = instance.getAttributeValue(NUM_INPUTS).intValue();
+		int inputs = instance.getAttributeValue(NUM_INPUTS);
 		int outWidth = computeOutputBits(inWidth.getWidth(), inputs);
 
 		int y;
@@ -95,7 +95,7 @@ public class BitAdder extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		int width = state.getAttributeValue(StdAttr.WIDTH).getWidth();
-		int inputs = state.getAttributeValue(NUM_INPUTS).intValue();
+		int inputs = state.getAttributeValue(NUM_INPUTS);
 
 		// compute the number of 1 bits
 		int minCount = 0; // number that are definitely 1
@@ -103,8 +103,7 @@ public class BitAdder extends InstanceFactory {
 		for (int i = 1; i <= inputs; i++) {
 			Value v = state.getPort(i);
 			Value[] bits = v.getAll();
-			for (int j = 0; j < bits.length; j++) {
-				Value b = bits[j];
+			for (Value b : bits) {
 				if (b == Value.TRUE) minCount++;
 				if (b != Value.FALSE) maxCount++;
 			}

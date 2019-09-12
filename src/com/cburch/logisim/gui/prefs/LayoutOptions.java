@@ -10,8 +10,7 @@ import com.cburch.logisim.util.TableLayout;
 import javax.swing.*;
 
 class LayoutOptions extends OptionsPanel {
-	private PrefBoolean[] checks;
-	private PrefOptionList afterAdd;
+	private final PrefBoolean[] checks;
 	private PrefOptionList radix1;
 	private PrefOptionList radix2;
 
@@ -45,7 +44,7 @@ class LayoutOptions extends OptionsPanel {
 					Strings.getter("layoutRadix2"), items);
 			}
 		}
-		afterAdd = new PrefOptionList(AppPreferences.ADD_AFTER,
+		PrefOptionList afterAdd = new PrefOptionList(AppPreferences.ADD_AFTER,
 			Strings.getter("layoutAddAfter"),
 			new PrefOption[]{
 				new PrefOption(AppPreferences.ADD_AFTER_UNCHANGED,
@@ -62,8 +61,8 @@ class LayoutOptions extends OptionsPanel {
 		panel.add(radix2.getJComboBox());
 
 		setLayout(new TableLayout(1));
-		for (int i = 0; i < checks.length; i++) {
-			add(checks[i]);
+		for (PrefBoolean check : checks) {
+			add(check);
 		}
 		add(panel);
 	}
@@ -80,8 +79,8 @@ class LayoutOptions extends OptionsPanel {
 
 	@Override
 	public void localeChanged() {
-		for (int i = 0; i < checks.length; i++) {
-			checks[i].localeChanged();
+		for (PrefBoolean check : checks) {
+			check.localeChanged();
 		}
 		radix1.localeChanged();
 		radix2.localeChanged();

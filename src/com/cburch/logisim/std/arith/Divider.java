@@ -11,7 +11,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 public class Divider extends InstanceFactory {
-	static final int PER_DELAY = 1;
+	private static final int PER_DELAY = 1;
 
 	private static final int IN0 = 0;
 	private static final int IN1 = 1;
@@ -41,7 +41,7 @@ public class Divider extends InstanceFactory {
 		setPorts(ps);
 	}
 
-	static Value[] computeResult(BitWidth width, Value a, Value b, Value upper) {
+	private static Value[] computeResult(BitWidth width, Value a, Value b, Value upper) {
 		int w = width.getWidth();
 		if (upper == Value.NIL || upper.isUnknown()) upper = Value.createKnown(width, 0);
 		if (a.isFullyDefined() && b.isFullyDefined() && upper.isFullyDefined()) {
@@ -52,13 +52,8 @@ public class Divider extends InstanceFactory {
 			long result = num / den;
 			long rem = num % den;
 			if (rem < 0) {
-				if (den >= 0) {
-					rem += den;
-					result--;
-				} else {
-					rem -= den;
-					result++;
-				}
+				rem += den;
+				result--;
 			}
 			return new Value[]{Value.createKnown(width, (int) result),
 				Value.createKnown(width, (int) rem)};

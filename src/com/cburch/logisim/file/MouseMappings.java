@@ -16,13 +16,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class MouseMappings {
-	private ArrayList<MouseMappingsListener> listeners;
-	private HashMap<Integer, Tool> map;
+	private final ArrayList<MouseMappingsListener> listeners;
+	private final HashMap<Integer, Tool> map;
 	private int cache_mods;
 	private Tool cache_tool;
+
 	public MouseMappings() {
-		listeners = new ArrayList<MouseMappingsListener>();
-		map = new HashMap<Integer, Tool>();
+		listeners = new ArrayList<>();
+		map = new HashMap<>();
 	}
 
 	//
@@ -61,7 +62,7 @@ public class MouseMappings {
 		if (mods == cache_mods) {
 			return cache_tool;
 		} else {
-			Tool ret = map.get(Integer.valueOf(mods));
+			Tool ret = map.get(mods);
 			cache_mods = mods;
 			cache_tool = ret;
 			return ret;
@@ -69,11 +70,11 @@ public class MouseMappings {
 	}
 
 	public Tool getToolFor(Integer mods) {
-		if (mods.intValue() == cache_mods) {
+		if (mods == cache_mods) {
 			return cache_tool;
 		} else {
 			Tool ret = map.get(mods);
-			cache_mods = mods.intValue();
+			cache_mods = mods;
 			cache_tool = ret;
 			return ret;
 		}
@@ -123,16 +124,16 @@ public class MouseMappings {
 		if (mods == cache_mods) cache_mods = -1;
 
 		if (tool == null) {
-			Object old = map.remove(Integer.valueOf(mods));
+			Object old = map.remove(mods);
 			if (old != null) fireMouseMappingsChanged();
 		} else {
-			Object old = map.put(Integer.valueOf(mods), tool);
+			Object old = map.put(mods, tool);
 			if (old != tool) fireMouseMappingsChanged();
 		}
 	}
 
 	public void setToolFor(Integer mods, Tool tool) {
-		if (mods.intValue() == cache_mods) cache_mods = -1;
+		if (mods == cache_mods) cache_mods = -1;
 
 		if (tool == null) {
 			Object old = map.remove(mods);
@@ -183,7 +184,7 @@ public class MouseMappings {
 		if (changed) fireMouseMappingsChanged();
 	}
 
-	public static interface MouseMappingsListener {
-		public void mouseMappingsChanged();
+	public interface MouseMappingsListener {
+		void mouseMappingsChanged();
 	}
 }

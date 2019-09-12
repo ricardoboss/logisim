@@ -10,11 +10,10 @@ import javax.swing.*;
 import java.awt.*;
 
 class ComponentIcon implements Icon {
-	public static final int TRIANGLE_NONE = 0;
 	public static final int TRIANGLE_CLOSED = 1;
 	public static final int TRIANGLE_OPEN = 2;
-
-	private Component comp;
+	private static final int TRIANGLE_NONE = 0;
+	private final Component comp;
 	private int triangleState = TRIANGLE_NONE;
 
 	ComponentIcon(Component comp) {

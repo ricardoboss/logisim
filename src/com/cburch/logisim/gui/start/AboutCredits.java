@@ -25,15 +25,16 @@ class AboutCredits extends JComponent {
 	 */
 	private static final String HENDRIX_PATH = "resources/logisim/hendrix.png";
 	private static final int HENDRIX_WIDTH = 50;
-	private Color[] colorBase;
-	private Paint[] paintSteady;
-	private Font[] font;
+	private final Color[] colorBase;
+	private final Paint[] paintSteady;
+	private final Font[] font;
+	private final float fadeStop;
+	private final ArrayList<CreditsLine> lines;
+	private final int initialLines; // number of lines to show in initial freeze
 	private int scroll;
-	private float fadeStop;
-	private ArrayList<CreditsLine> lines;
-	private int initialLines; // number of lines to show in initial freeze
 	private int initialHeight; // computed in code based on above
 	private int linesHeight; // computed in code based on above
+
 	public AboutCredits() {
 		scroll = 0;
 		setOpaque(false);
@@ -72,7 +73,7 @@ class AboutCredits extends JComponent {
 		// version, but they do appear in the acknowledgements section of the User's
 		// Guide. Current contributors appear in both locations.
 
-		lines = new ArrayList<CreditsLine>();
+		lines = new ArrayList<>();
 		linesHeight = 0; // computed in paintComponent
 		lines.add(new CreditsLine(1, "www.cburch.com/logisim/"));
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleLead"),
@@ -137,7 +138,7 @@ class AboutCredits extends JComponent {
 		}
 
 		Paint[] paint = paintSteady;
-		int yPos = 0;
+		int yPos;
 		int height = getHeight();
 		int initY = Math.min(0, initialHeight - height + About.IMAGE_BORDER);
 		int maxY = linesHeight - height - initY;
@@ -202,17 +203,17 @@ class AboutCredits extends JComponent {
 	}
 
 	private static class CreditsLine {
+		private final int type;
+		private final String text;
+		private final Image img;
+		private final int imgWidth;
 		private int y;
-		private int type;
-		private String text;
-		private Image img;
-		private int imgWidth;
 
-		public CreditsLine(int type, String text) {
+		CreditsLine(int type, String text) {
 			this(type, text, null, 0);
 		}
 
-		public CreditsLine(int type, String text, Image img, int imgWidth) {
+		CreditsLine(int type, String text, Image img, int imgWidth) {
 			this.y = 0;
 			this.type = type;
 			this.text = text;

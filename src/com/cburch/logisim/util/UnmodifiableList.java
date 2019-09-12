@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class UnmodifiableList<E> extends AbstractList<E> {
-	private E[] data;
+	private final E[] data;
 
 	public UnmodifiableList(E[] data) {
 		this.data = data;
@@ -18,7 +18,7 @@ public class UnmodifiableList<E> extends AbstractList<E> {
 		if (data.length == 0) {
 			return Collections.emptyList();
 		} else {
-			return new UnmodifiableList<E>(data);
+			return new UnmodifiableList<>(data);
 		}
 	}
 

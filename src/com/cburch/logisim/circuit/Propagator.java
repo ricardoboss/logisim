@@ -19,14 +19,11 @@ import java.util.PriorityQueue;
 import java.util.Random;
 
 public class Propagator {
-	static int lastId = 0;
-	int id = lastId++;
-	private CircuitState root; // root of state tree
-	/**
-	 * The number of clock cycles to let pass before deciding that the
-	 * circuit is oscillating.
-	 */
-	private int simLimit = 1000;
+	private static int lastId = 0;
+	private final int id = lastId++;
+	private final CircuitState root; // root of state tree
+	private final PriorityQueue<SetData> toProcess = new PriorityQueue<>();
+	private final Random noiseSource = new Random();
 	/**
 	 * On average, one out of every 2**simRandomShift propagations
 	 * through a component is delayed one step more than the component
@@ -35,15 +32,14 @@ public class Propagator {
 	 * practice).
 	 */
 	private volatile int simRandomShift;
-	private PriorityQueue<SetData> toProcess = new PriorityQueue<SetData>();
 	private int clock = 0;
 	private boolean isOscillating = false;
 	private boolean oscAdding = false;
 	private PropagationPoints oscPoints = new PropagationPoints();
 	private int ticks = 0;
-	private Random noiseSource = new Random();
 	private int noiseCount = 0;
 	private int setDataSerialNumber = 0;
+
 	public Propagator(CircuitState root) {
 		this.root = root;
 		Listener l = new Listener(this);
@@ -65,8 +61,7 @@ public class Propagator {
 
 	private void updateRandomness() {
 		Options opts = root.getProject().getOptions();
-		Object rand = opts.getAttributeSet().getValue(Options.sim_rand_attr);
-		int val = ((Integer) rand).intValue();
+		int val = opts.getAttributeSet().getValue(Options.sim_rand_attr);
 		int logVal = 0;
 		while ((1 << logVal) < val) logVal++;
 		simRandomShift = logVal;
@@ -103,15 +98,18 @@ public class Propagator {
 		clearDirtyPoints();
 		clearDirtyComponents();
 
-		int oscThreshold = simLimit;
-		int logThreshold = 3 * oscThreshold / 4;
+		/*
+		  The number of clock cycles to let pass before deciding that the
+		  circuit is oscillating.
+		 */
+		int logThreshold = 3 * 1000 / 4;
 		int iters = 0;
 		while (!toProcess.isEmpty()) {
 			iters++;
 
 			if (iters < logThreshold) {
 				stepInternal(null);
-			} else if (iters < oscThreshold) {
+			} else if (iters < 1000) {
 				oscAdding = true;
 				stepInternal(oscPoints);
 			} else {
@@ -146,7 +144,7 @@ public class Propagator {
 
 		// propagate all values for this clock tick
 		HashMap<CircuitState, HashSet<ComponentPoint>> visited
-			= new HashMap<CircuitState, HashSet<ComponentPoint>>();
+			= new HashMap<>();
 		while (true) {
 			SetData data = toProcess.peek();
 			if (data == null || data.time != clock) break;
@@ -158,7 +156,7 @@ public class Propagator {
 			if (handled != null) {
 				if (!handled.add(new ComponentPoint(data.cause, data.loc))) continue;
 			} else {
-				handled = new HashSet<ComponentPoint>();
+				handled = new HashSet<>();
 				visited.put(state, handled);
 				handled.add(new ComponentPoint(data.cause, data.loc));
 			}
@@ -341,7 +339,6 @@ public class Propagator {
 								Location loc, Component cause) {
 		HashMap<Location, SetData> causes = state.causes;
 		if (head == null) {
-			;
 		} else if (head.cause == cause) {
 			head = head.next;
 			if (head == null) causes.remove(loc);
@@ -362,11 +359,11 @@ public class Propagator {
 	}
 
 	static class SetData implements Comparable<SetData> {
-		int time;
-		int serialNumber;
-		CircuitState state; // state of circuit containing component
-		Component cause;    // component emitting the value
-		Location loc;       // the location at which value is emitted
+		final int time;
+		final int serialNumber;
+		final CircuitState state; // state of circuit containing component
+		final Component cause;    // component emitting the value
+		final Location loc;       // the location at which value is emitted
 		Value val;          // value being emitted
 		SetData next = null;
 
@@ -405,10 +402,10 @@ public class Propagator {
 	}
 
 	private static class ComponentPoint {
-		Component cause;
-		Location loc;
+		final Component cause;
+		final Location loc;
 
-		public ComponentPoint(Component cause, Location loc) {
+		ComponentPoint(Component cause, Location loc) {
 			this.cause = cause;
 			this.loc = loc;
 		}
@@ -427,10 +424,10 @@ public class Propagator {
 	}
 
 	private static class Listener implements AttributeListener {
-		WeakReference<Propagator> prop;
+		final WeakReference<Propagator> prop;
 
-		public Listener(Propagator propagator) {
-			prop = new WeakReference<Propagator>(propagator);
+		Listener(Propagator propagator) {
+			prop = new WeakReference<>(propagator);
 		}
 
 		public void attributeListChanged(AttributeEvent e) {

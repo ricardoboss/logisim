@@ -23,8 +23,7 @@ public class JFileChoosers {
 
 	public static JFileChooser create() {
 		RuntimeException first = null;
-		for (int i = 0; i < PROP_NAMES.length; i++) {
-			String prop = PROP_NAMES[i];
+		for (String prop : PROP_NAMES) {
 			try {
 				String dirname;
 				if (prop == null) {
@@ -62,7 +61,7 @@ public class JFileChoosers {
 				if (t.getCause() instanceof IOException) {
 					try {
 						return create();
-					} catch (RuntimeException u) {
+					} catch (RuntimeException ignored) {
 					}
 				}
 				throw t;

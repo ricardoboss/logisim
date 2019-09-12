@@ -20,5 +20,5 @@ public interface ExpressionComputer {
 	 * If, in fact, no valid expression exists for the component,
 	 * it throws <code>UnsupportedOperationException</code>.
 	 */
-	public void computeExpression(Map<Location, Expression> expressionMap);
+	void computeExpression(Map<Location, Expression> expressionMap);
 }

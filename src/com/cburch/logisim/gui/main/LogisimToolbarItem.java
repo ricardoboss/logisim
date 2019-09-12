@@ -12,9 +12,9 @@ import javax.swing.*;
 import java.awt.*;
 
 class LogisimToolbarItem implements ToolbarItem {
-	private MenuListener menu;
+	private final MenuListener menu;
+	private final LogisimMenuItem action;
 	private Icon icon;
-	private LogisimMenuItem action;
 	private StringGetter toolTip;
 
 	public LogisimToolbarItem(MenuListener menu, String iconName,

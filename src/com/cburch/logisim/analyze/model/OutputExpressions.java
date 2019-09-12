@@ -6,14 +6,15 @@ package com.cburch.logisim.analyze.model;
 import java.util.*;
 
 public class OutputExpressions {
-	private MyListener myListener = new MyListener();
-	private AnalyzerModel model;
-	private HashMap<String, OutputData> outputData = new HashMap<String, OutputData>();
-	private ArrayList<OutputExpressionsListener> listeners
-		= new ArrayList<OutputExpressionsListener>();
+	private final AnalyzerModel model;
+	private final HashMap<String, OutputData> outputData = new HashMap<>();
+	private final ArrayList<OutputExpressionsListener> listeners
+		= new ArrayList<>();
 	private boolean updatingTable = false;
+
 	public OutputExpressions(AnalyzerModel model) {
 		this.model = model;
+		MyListener myListener = new MyListener();
 		model.getInputs().addVariableListListener(myListener);
 		model.getOutputs().addVariableListListener(myListener);
 		model.getTruthTable().addTruthTableListener(myListener);
@@ -51,8 +52,8 @@ public class OutputExpressions {
 	}
 
 	private static boolean isAllUndefined(Entry[] a) {
-		for (int i = 0; i < a.length; i++) {
-			if (a[i] == Entry.ZERO || a[i] == Entry.ONE) return false;
+		for (Entry entry : a) {
+			if (entry == Entry.ZERO || entry == Entry.ONE) return false;
 		}
 		return true;
 	}
@@ -61,7 +62,7 @@ public class OutputExpressions {
 		if (a == null) {
 			return b == null || b.size() == 0;
 		} else if (b == null) {
-			return a == null || a.size() == 0;
+			return a.size() == 0;
 		} else if (a.size() != b.size()) {
 			return false;
 		} else {
@@ -116,7 +117,7 @@ public class OutputExpressions {
 
 	public boolean isExpressionMinimal(String output) {
 		OutputData data = getOutputData(output, false);
-		return data == null ? true : data.isExpressionMinimal();
+		return data != null && !data.isExpressionMinimal();
 	}
 
 	public Expression getMinimalExpression(String output) {
@@ -343,7 +344,7 @@ public class OutputExpressions {
 				}
 			} else if (type == VariableListEvent.REPLACE) {
 				String input = event.getVariable();
-				int inputIndex = ((Integer) event.getData()).intValue();
+				int inputIndex = (Integer) event.getData();
 				String newName = event.getSource().get(inputIndex);
 				for (String output : outputData.keySet()) {
 					OutputData data = getOutputData(output, false);
@@ -368,7 +369,7 @@ public class OutputExpressions {
 				String oldName = event.getVariable();
 				if (outputData.containsKey(oldName)) {
 					OutputData toMove = outputData.remove(oldName);
-					int inputIndex = ((Integer) event.getData()).intValue();
+					int inputIndex = (Integer) event.getData();
 					String newName = event.getSource().get(inputIndex);
 					toMove.output = newName;
 					outputData.put(newName, toMove);

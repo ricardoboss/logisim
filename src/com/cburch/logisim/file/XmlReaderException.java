@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 class XmlReaderException extends Exception {
-	private List<String> messages;
+	private final List<String> messages;
 
 	public XmlReaderException(String message) {
 		this(Collections.singletonList(message));

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 class XmlReader {
-	private LibraryLoader loader;
+	private final LibraryLoader loader;
 
 	XmlReader(Loader loader) {
 		this.loader = loader;
@@ -77,7 +77,7 @@ class XmlReader {
 		DocumentBuilder builder = null;
 		try {
 			builder = factory.newDocumentBuilder();
-		} catch (ParserConfigurationException ex) {
+		} catch (ParserConfigurationException ignored) {
 		}
 		return builder.parse(is);
 	}
@@ -153,7 +153,7 @@ class XmlReader {
 					int thisLabel = Integer.parseInt(label);
 					if (thisLabel > maxLabel) maxLabel = thisLabel;
 				}
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException ignored) {
 			}
 		}
 
@@ -182,7 +182,7 @@ class XmlReader {
 			newBaseElt = null;
 		}
 
-		HashMap<String, String> labelMap = new HashMap<String, String>();
+		HashMap<String, String> labelMap = new HashMap<>();
 		addToLabelMap(labelMap, oldBaseLabel, newBaseLabel, "Poke Tool;"
 			+ "Edit Tool;Select Tool;Wiring Tool;Text Tool;Menu Tool;Text");
 		addToLabelMap(labelMap, oldBaseLabel, wiringLabel, "Splitter;Pin;"
@@ -210,7 +210,7 @@ class XmlReader {
 		String srcLabel = src.getAttribute("name");
 		if (srcLabel == null) return;
 
-		ArrayList<Element> toRemove = new ArrayList<Element>();
+		ArrayList<Element> toRemove = new ArrayList<>();
 		for (Element elt : XmlIterator.forChildElements(src, "tool")) {
 			String name = elt.getAttribute("name");
 			if (name != null && labelMap.containsKey(srcLabel + ":" + name)) {
@@ -254,7 +254,7 @@ class XmlReader {
 		if (legacyElt != null) {
 			root.removeChild(legacyElt);
 
-			ArrayList<Element> toRemove = new ArrayList<Element>();
+			ArrayList<Element> toRemove = new ArrayList<>();
 			findLibraryUses(toRemove, legacyLabel,
 				XmlIterator.forDescendantElements(root, "comp"));
 			boolean componentsRemoved = !toRemove.isEmpty();
@@ -274,26 +274,26 @@ class XmlReader {
 	}
 
 	static class CircuitData {
-		Element circuitElement;
-		Circuit circuit;
+		final Element circuitElement;
+		final Circuit circuit;
 		Map<Element, Component> knownComponents;
 		List<AbstractCanvasObject> appearance;
 
-		public CircuitData(Element circuitElement, Circuit circuit) {
+		CircuitData(Element circuitElement, Circuit circuit) {
 			this.circuitElement = circuitElement;
 			this.circuit = circuit;
 		}
 	}
 
 	class ReadContext {
-		LogisimFile file;
+		final LogisimFile file;
+		final HashMap<String, Library> libs = new HashMap<>();
+		private final ArrayList<String> messages;
 		LogisimVersion sourceVersion;
-		HashMap<String, Library> libs = new HashMap<String, Library>();
-		private ArrayList<String> messages;
 
 		ReadContext(LogisimFile file) {
 			this.file = file;
-			this.messages = new ArrayList<String>();
+			this.messages = new ArrayList<>();
 		}
 
 		void addError(String message, String context) {
@@ -322,7 +322,7 @@ class XmlReader {
 			}
 
 			// second, create the circuits - empty for now
-			List<CircuitData> circuitsData = new ArrayList<CircuitData>();
+			List<CircuitData> circuitsData = new ArrayList<>();
 			for (Element circElt : XmlIterator.forChildElements(elt, "circuit")) {
 				String name = circElt.getAttribute("name");
 				if (name == null || name.equals("")) {
@@ -340,26 +340,34 @@ class XmlReader {
 			// third, process the other child elements
 			for (Element sub_elt : XmlIterator.forChildElements(elt)) {
 				String name = sub_elt.getTagName();
-				if (name.equals("circuit") || name.equals("lib")) {
-					; // Nothing to do: Done earlier.
-				} else if (name.equals("options")) {
-					try {
-						initAttributeSet(sub_elt, file.getOptions().getAttributeSet(), null);
-					} catch (XmlReaderException e) {
-						addErrors(e, "options");
-					}
-				} else if (name.equals("mappings")) {
-					initMouseMappings(sub_elt);
-				} else if (name.equals("toolbar")) {
-					initToolbarData(sub_elt);
-				} else if (name.equals("main")) {
-					String main = sub_elt.getAttribute("name");
-					Circuit circ = file.getCircuit(main);
-					if (circ != null) {
-						file.setMainCircuit(circ);
-					}
-				} else if (name.equals("message")) {
-					file.addMessage(sub_elt.getAttribute("value"));
+				switch (name) {
+					case "circuit":
+					case "lib":
+						// Nothing to do: Done earlier.
+						break;
+					case "options":
+						try {
+							initAttributeSet(sub_elt, file.getOptions().getAttributeSet(), null);
+						} catch (XmlReaderException e) {
+							addErrors(e, "options");
+						}
+						break;
+					case "mappings":
+						initMouseMappings(sub_elt);
+						break;
+					case "toolbar":
+						initToolbarData(sub_elt);
+						break;
+					case "main":
+						String main = sub_elt.getAttribute("name");
+						Circuit circ = file.getCircuit(main);
+						if (circ != null) {
+							file.setMainCircuit(circ);
+						}
+						break;
+					case "message":
+						file.addMessage(sub_elt.getAttribute("value"));
+						break;
 				}
 			}
 
@@ -402,12 +410,12 @@ class XmlReader {
 		}
 
 		private Map<Element, Component> loadKnownComponents(Element elt) {
-			Map<Element, Component> known = new HashMap<Element, Component>();
+			Map<Element, Component> known = new HashMap<>();
 			for (Element sub : XmlIterator.forChildElements(elt, "comp")) {
 				try {
 					Component comp = XmlCircuitReader.getComponent(sub, this);
 					known.put(sub, comp);
-				} catch (XmlReaderException e) {
+				} catch (XmlReaderException ignored) {
 				}
 			}
 			return known;
@@ -415,7 +423,7 @@ class XmlReader {
 
 		private void loadAppearance(Element appearElt, CircuitData circData,
 									String context) {
-			Map<Location, Instance> pins = new HashMap<Location, Instance>();
+			Map<Location, Instance> pins = new HashMap<>();
 			for (Component comp : circData.knownComponents.values()) {
 				if (comp.getFactory() == Pin.FACTORY) {
 					Instance instance = Instance.getInstanceFor(comp);
@@ -423,7 +431,7 @@ class XmlReader {
 				}
 			}
 
-			List<AbstractCanvasObject> shapes = new ArrayList<AbstractCanvasObject>();
+			List<AbstractCanvasObject> shapes = new ArrayList<>();
 			for (Element sub : XmlIterator.forChildElements(appearElt)) {
 				try {
 					AbstractCanvasObject m = AppearanceSvgReader.createShape(sub, pins);
@@ -526,10 +534,10 @@ class XmlReader {
 							  AttributeDefaultProvider defaults) throws XmlReaderException {
 			ArrayList<String> messages = null;
 
-			HashMap<String, String> attrsDefined = new HashMap<String, String>();
+			HashMap<String, String> attrsDefined = new HashMap<>();
 			for (Element attrElt : XmlIterator.forChildElements(parentElt, "a")) {
 				if (!attrElt.hasAttribute("name")) {
-					if (messages == null) messages = new ArrayList<String>();
+					if (messages == null) messages = new ArrayList<>();
 					messages.add(Strings.get("attrNameMissingError"));
 				} else {
 					String attrName = attrElt.getAttribute("name");
@@ -570,7 +578,7 @@ class XmlReader {
 						Object val = attr.parse(attrVal);
 						attrs.setValue(attr, val);
 					} catch (NumberFormatException e) {
-						if (messages == null) messages = new ArrayList<String>();
+						if (messages == null) messages = new ArrayList<>();
 						messages.add(StringUtil.format(
 							Strings.get("attrValueInvalidError"),
 							attrVal, attrName));

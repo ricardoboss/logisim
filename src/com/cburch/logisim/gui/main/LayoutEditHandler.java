@@ -20,7 +20,7 @@ import java.beans.PropertyChangeListener;
 
 public class LayoutEditHandler extends EditHandler
 	implements ProjectListener, LibraryListener, PropertyChangeListener {
-	private Frame frame;
+	private final Frame frame;
 
 	LayoutEditHandler(Frame frame) {
 		this.frame = frame;
@@ -35,12 +35,15 @@ public class LayoutEditHandler extends EditHandler
 	public void computeEnabled() {
 		Project proj = frame.getProject();
 		Selection sel = proj == null ? null : proj.getSelection();
-		boolean selEmpty = (sel == null ? true : sel.isEmpty());
+		boolean selEmpty = (sel == null || sel.isEmpty());
 		boolean canChange = proj != null && proj.getLogisimFile().contains(proj.getCurrentCircuit());
 
 		boolean selectAvailable = false;
 		for (Library lib : proj.getLogisimFile().getLibraries()) {
-			if (lib instanceof Base) selectAvailable = true;
+			if (lib instanceof Base) {
+				selectAvailable = true;
+				break;
+			}
 		}
 
 		setEnabled(LogisimMenuBar.CUT, !selEmpty && selectAvailable && canChange);
@@ -78,9 +81,7 @@ public class LayoutEditHandler extends EditHandler
 		Selection sel = frame.getCanvas().getSelection();
 		selectSelectTool(proj);
 		Action action = SelectionActions.pasteMaybe(proj, sel);
-		if (action != null) {
-			proj.doAction(action);
-		}
+		proj.doAction(action);
 	}
 
 	@Override
@@ -110,32 +111,32 @@ public class LayoutEditHandler extends EditHandler
 
 	@Override
 	public void raise() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	@Override
 	public void lower() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	@Override
 	public void raiseTop() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	@Override
 	public void lowerBottom() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	@Override
 	public void addControlPoint() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	@Override
 	public void removeControlPoint() {
-		; // not yet supported in layout mode
+		// not yet supported in layout mode
 	}
 
 	private void selectSelectTool(Project proj) {

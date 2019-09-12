@@ -16,8 +16,8 @@ import java.util.List;
 
 class AppearanceToolbarModel extends AbstractToolbarModel
 	implements PropertyChangeListener {
-	private Canvas canvas;
-	private List<ToolbarItem> items;
+	private final Canvas canvas;
+	private final List<ToolbarItem> items;
 
 	public AppearanceToolbarModel(AbstractTool selectTool, Canvas canvas,
 								  DrawingAttributeSet attrs) {
@@ -35,7 +35,7 @@ class AppearanceToolbarModel extends AbstractToolbarModel
 			new PolyTool(true, attrs),
 		};
 
-		ArrayList<ToolbarItem> rawItems = new ArrayList<ToolbarItem>();
+		ArrayList<ToolbarItem> rawItems = new ArrayList<>();
 		for (AbstractTool tool : tools) {
 			rawItems.add(new ToolbarToolItem(tool));
 		}

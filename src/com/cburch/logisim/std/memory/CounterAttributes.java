@@ -7,6 +7,7 @@ import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.StdAttr;
 
 import java.util.List;
+import java.util.Objects;
 
 class CounterAttributes extends AbstractAttributeSet {
 	private AttributeSet base;
@@ -17,7 +18,7 @@ class CounterAttributes extends AbstractAttributeSet {
 			StdAttr.EDGE_TRIGGER,
 			StdAttr.LABEL, StdAttr.LABEL_FONT
 		}, new Object[]{
-			BitWidth.create(8), Integer.valueOf(0xFF),
+			BitWidth.create(8), 0xFF,
 			Counter.ON_GOAL_WRAP,
 			StdAttr.TRIG_RISING,
 			"", StdAttr.DEFAULT_LABEL_FONT
@@ -42,7 +43,7 @@ class CounterAttributes extends AbstractAttributeSet {
 	@Override
 	public <V> void setValue(Attribute<V> attr, V value) {
 		Object oldValue = base.getValue(attr);
-		if (oldValue == null ? value == null : oldValue.equals(value)) return;
+		if (Objects.equals(oldValue, value)) return;
 
 		Integer newMax = null;
 		if (attr == StdAttr.WIDTH) {
@@ -50,24 +51,23 @@ class CounterAttributes extends AbstractAttributeSet {
 			BitWidth newWidth = (BitWidth) value;
 			int oldW = oldWidth.getWidth();
 			int newW = newWidth.getWidth();
-			Integer oldValObj = base.getValue(Counter.ATTR_MAX);
-			int oldVal = oldValObj.intValue();
+			int oldVal = base.getValue(Counter.ATTR_MAX);
 			base.setValue(StdAttr.WIDTH, newWidth);
 			if (newW > oldW) {
-				newMax = Integer.valueOf(newWidth.getMask());
+				newMax = newWidth.getMask();
 			} else {
 				int v = oldVal & newWidth.getMask();
 				if (v != oldVal) {
-					Integer newValObj = Integer.valueOf(v);
+					Integer newValObj = v;
 					base.setValue(Counter.ATTR_MAX, newValObj);
 					fireAttributeValueChanged(Counter.ATTR_MAX, newValObj);
 				}
 			}
 			fireAttributeValueChanged(StdAttr.WIDTH, newWidth);
 		} else if (attr == Counter.ATTR_MAX) {
-			int oldVal = base.getValue(Counter.ATTR_MAX).intValue();
+			int oldVal = base.getValue(Counter.ATTR_MAX);
 			BitWidth width = base.getValue(StdAttr.WIDTH);
-			int newVal = ((Integer) value).intValue() & width.getMask();
+			int newVal = (Integer) value & width.getMask();
 			if (newVal != oldVal) {
 				@SuppressWarnings("unchecked")
 				V val = (V) Integer.valueOf(newVal);

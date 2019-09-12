@@ -12,7 +12,7 @@ import com.cburch.logisim.proj.Project;
 import java.util.ArrayList;
 
 public class RevertAppearanceAction extends Action {
-	private Circuit circuit;
+	private final Circuit circuit;
 	private ArrayList<CanvasObject> old;
 	private boolean wasDefault;
 
@@ -29,7 +29,7 @@ public class RevertAppearanceAction extends Action {
 	public void doIt(Project proj) {
 		CircuitAppearance appear = circuit.getAppearance();
 		wasDefault = appear.isDefaultAppearance();
-		old = new ArrayList<CanvasObject>(appear.getObjectsFromBottom());
+		old = new ArrayList<>(appear.getObjectsFromBottom());
 		appear.setDefaultAppearance(true);
 	}
 

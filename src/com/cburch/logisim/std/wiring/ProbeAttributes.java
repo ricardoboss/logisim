@@ -16,24 +16,22 @@ import java.util.List;
 
 class ProbeAttributes extends AbstractAttributeSet {
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, RadixOption.ATTRIBUTE,
-		StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-	});
+		= Arrays.asList(StdAttr.FACING, RadixOption.ATTRIBUTE,
+		StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT);
 	public static ProbeAttributes instance = new ProbeAttributes();
 	Direction facing = Direction.EAST;
 	String label = "";
 	Direction labelloc = Direction.WEST;
-	Font labelfont = StdAttr.DEFAULT_LABEL_FONT;
 	RadixOption radix = RadixOption.RADIX_2;
 	BitWidth width = BitWidth.ONE;
+	private Font labelfont = StdAttr.DEFAULT_LABEL_FONT;
 
 	public ProbeAttributes() {
 	}
 
 	@Override
 	protected void copyInto(AbstractAttributeSet destObj) {
-		; // nothing to do
+		// nothing to do
 	}
 
 	@Override

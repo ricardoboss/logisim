@@ -17,7 +17,7 @@ import java.util.List;
 public class AppearanceAnchor extends AppearanceElement {
 	public static final Attribute<Direction> FACING
 		= Attributes.forDirection("facing", Strings.getter("appearanceFacingAttr"));
-	static final List<Attribute<?>> ATTRIBUTES
+	private static final List<Attribute<?>> ATTRIBUTES
 		= UnmodifiableList.create(new Attribute<?>[]{FACING});
 
 	private static final int RADIUS = 3;
@@ -26,7 +26,7 @@ public class AppearanceAnchor extends AppearanceElement {
 
 	private Direction facing;
 
-	public AppearanceAnchor(Location location) {
+	AppearanceAnchor(Location location) {
 		super(location);
 		facing = Direction.EAST;
 	}

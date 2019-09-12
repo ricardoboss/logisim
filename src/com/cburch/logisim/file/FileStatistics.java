@@ -14,9 +14,9 @@ import com.cburch.logisim.tools.Tool;
 import java.util.*;
 
 public class FileStatistics {
-	private List<Count> counts;
-	private Count totalWithout;
-	private Count totalWith;
+	private final List<Count> counts;
+	private final Count totalWithout;
+	private final Count totalWith;
 
 	private FileStatistics(List<Count> counts, Count totalWithout,
 						   Count totalWith) {
@@ -26,9 +26,9 @@ public class FileStatistics {
 	}
 
 	public static FileStatistics compute(LogisimFile file, Circuit circuit) {
-		Set<Circuit> include = new HashSet<Circuit>(file.getCircuits());
+		Set<Circuit> include = new HashSet<>(file.getCircuits());
 		Map<Circuit, Map<ComponentFactory, Count>> countMap;
-		countMap = new HashMap<Circuit, Map<ComponentFactory, Count>>();
+		countMap = new HashMap<>();
 		doRecursiveCount(circuit, include, countMap);
 		doUniqueCounts(countMap.get(circuit), countMap);
 		List<Count> countList = sortCounts(countMap.get(circuit), file);
@@ -72,7 +72,7 @@ public class FileStatistics {
 
 	private static Map<ComponentFactory, Count> doSimpleCount(Circuit circuit) {
 		Map<ComponentFactory, Count> counts;
-		counts = new HashMap<ComponentFactory, Count>();
+		counts = new HashMap<>();
 		for (Component comp : circuit.getNonWires()) {
 			ComponentFactory factory = comp.getFactory();
 			Count count = counts.get(factory);
@@ -102,7 +102,7 @@ public class FileStatistics {
 
 	private static List<Count> sortCounts(Map<ComponentFactory, Count> counts,
 										  LogisimFile file) {
-		List<Count> ret = new ArrayList<Count>();
+		List<Count> ret = new ArrayList<>();
 		for (AddTool tool : file.getTools()) {
 			ComponentFactory factory = tool.getFactory();
 			Count count = counts.get(factory);
@@ -156,8 +156,8 @@ public class FileStatistics {
 	}
 
 	public static class Count {
+		private final ComponentFactory factory;
 		private Library library;
-		private ComponentFactory factory;
 		private int simpleCount;
 		private int uniqueCount;
 		private int recursiveCount;

@@ -10,18 +10,18 @@ import com.cburch.logisim.data.AttributeSet;
 import java.util.*;
 
 class CircuitMutatorImpl implements CircuitMutator {
-	private ArrayList<CircuitChange> log;
-	private HashMap<Circuit, ReplacementMap> replacements;
-	private HashSet<Circuit> modified;
+	private final ArrayList<CircuitChange> log;
+	private final HashMap<Circuit, ReplacementMap> replacements;
+	private final HashSet<Circuit> modified;
 
 	public CircuitMutatorImpl() {
-		log = new ArrayList<CircuitChange>();
-		replacements = new HashMap<Circuit, ReplacementMap>();
-		modified = new HashSet<Circuit>();
+		log = new ArrayList<>();
+		replacements = new HashMap<>();
+		modified = new HashSet<>();
 	}
 
 	public void clear(Circuit circuit) {
-		HashSet<Component> comps = new HashSet<Component>(circuit.getNonWires());
+		HashSet<Component> comps = new HashSet<>(circuit.getNonWires());
 		comps.addAll(circuit.getWires());
 		if (!comps.isEmpty()) modified.add(circuit);
 		log.add(CircuitChange.clear(circuit, comps));
@@ -62,7 +62,7 @@ class CircuitMutatorImpl implements CircuitMutator {
 	}
 
 	public void replace(Circuit circuit, ReplacementMap repl) {
-		if (!repl.isEmpty()) {
+		if (repl.isEmpty()) {
 			modified.add(circuit);
 			log.add(CircuitChange.replace(circuit, repl));
 

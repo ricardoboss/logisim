@@ -20,7 +20,7 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 
 public class SubcircuitFactory extends InstanceFactory {
-	private Circuit source;
+	private final Circuit source;
 
 	public SubcircuitFactory(Circuit source) {
 		super("", null);
@@ -157,7 +157,7 @@ public class SubcircuitFactory extends InstanceFactory {
 	//
 	// propagation-oriented methods
 	//
-	public CircuitState getSubstate(CircuitState superState, Instance instance) {
+	private CircuitState getSubstate(CircuitState superState, Instance instance) {
 		return getSubstate(createInstanceState(superState, instance));
 	}
 
@@ -294,10 +294,10 @@ public class SubcircuitFactory extends InstanceFactory {
 	}
 
 	private class CircuitFeature implements StringGetter, MenuExtender, ActionListener {
-		private Instance instance;
+		private final Instance instance;
 		private Project proj;
 
-		public CircuitFeature(Instance instance) {
+		CircuitFeature(Instance instance) {
 			this.instance = instance;
 		}
 
@@ -319,7 +319,6 @@ public class SubcircuitFactory extends InstanceFactory {
 			if (superState == null) return;
 
 			CircuitState subState = getSubstate(superState, instance);
-			if (subState == null) return;
 			proj.setCircuitState(subState);
 		}
 	}

@@ -55,6 +55,8 @@ public class SelectTool extends Tool {
 	private static final Color COLOR_COMPUTING = new Color(96, 192, 96);
 	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
 	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
+	private final HashSet<Selection> selectionsAdded;
+	private final Listener selListener;
 	private Location start;
 	private int state;
 	private int curDx;
@@ -62,12 +64,11 @@ public class SelectTool extends Tool {
 	private boolean drawConnections;
 	private MoveGesture moveGesture;
 	private HashMap<Component, KeyConfigurator> keyHandlers;
-	private HashSet<Selection> selectionsAdded;
-	private Listener selListener;
+
 	public SelectTool() {
 		start = null;
 		state = IDLE;
-		selectionsAdded = new HashSet<Selection>();
+		selectionsAdded = new HashSet<>();
 		selListener = new Listener();
 		keyHandlers = null;
 	}
@@ -225,7 +226,7 @@ public class SelectTool extends Tool {
 		// selection is being modified
 		Collection<Component> in_sel = sel.getComponentsContaining(start, g);
 		if (!in_sel.isEmpty()) {
-			if ((e.getModifiers() & InputEvent.SHIFT_MASK) == 0) {
+			if ((e.getModifiersEx() & InputEvent.SHIFT_MASK) == 0) {
 				setState(proj, MOVING);
 				proj.repaintCanvas();
 				return;
@@ -241,7 +242,7 @@ public class SelectTool extends Tool {
 		// wants to add/reset selection
 		Collection<Component> clicked = circuit.getAllContaining(start, g);
 		if (!clicked.isEmpty()) {
-			if ((e.getModifiers() & InputEvent.SHIFT_MASK) == 0) {
+			if ((e.getModifiersEx() & InputEvent.SHIFT_MASK) == 0) {
 				if (sel.getComponentsContaining(start).isEmpty()) {
 					Action act = SelectionActions.dropAll(sel);
 					if (act != null) {
@@ -261,7 +262,7 @@ public class SelectTool extends Tool {
 
 		// The user clicked on the background. This is a rectangular
 		// selection (maybe with the shift key down).
-		if ((e.getModifiers() & InputEvent.SHIFT_MASK) == 0) {
+		if ((e.getModifiersEx() & InputEvent.SHIFT_MASK) == 0) {
 			Action act = SelectionActions.dropAll(sel);
 			if (act != null) {
 				proj.doAction(act);
@@ -412,7 +413,7 @@ public class SelectTool extends Tool {
 	private void processKeyEvent(Canvas canvas, KeyEvent e, int type) {
 		HashMap<Component, KeyConfigurator> handlers = keyHandlers;
 		if (handlers == null) {
-			handlers = new HashMap<Component, KeyConfigurator>();
+			handlers = new HashMap<>();
 			Selection sel = canvas.getSelection();
 			for (Component comp : sel.getComponents()) {
 				ComponentFactory factory = comp.getFactory();
@@ -429,7 +430,7 @@ public class SelectTool extends Tool {
 		if (!handlers.isEmpty()) {
 			boolean consume = false;
 			ArrayList<KeyConfigurationResult> results;
-			results = new ArrayList<KeyConfigurationResult>();
+			results = new ArrayList<>();
 			for (Map.Entry<Component, KeyConfigurator> entry : handlers.entrySet()) {
 				Component comp = entry.getKey();
 				KeyConfigurator handler = entry.getValue();
@@ -454,7 +455,7 @@ public class SelectTool extends Tool {
 						act.set(comp, entry.getKey(), entry.getValue());
 					}
 				}
-				if (!act.isEmpty()) {
+				if (act.isEmpty()) {
 					canvas.getProject().doAction(act);
 				}
 			}
@@ -515,7 +516,7 @@ public class SelectTool extends Tool {
 			if (gesture != null && drawConnections) {
 				MoveResult result = gesture.findResult(dx, dy);
 				if (result != null) {
-					HashSet<Component> ret = new HashSet<Component>(sel);
+					HashSet<Component> ret = new HashSet<>(sel);
 					ret.addAll(result.getReplacementMap().getRemovals());
 					return ret;
 				}
@@ -534,7 +535,7 @@ public class SelectTool extends Tool {
 	}
 
 	private static class MoveRequestHandler implements MoveRequestListener {
-		private Canvas canvas;
+		private final Canvas canvas;
 
 		MoveRequestHandler(Canvas canvas) {
 			this.canvas = canvas;
@@ -546,10 +547,10 @@ public class SelectTool extends Tool {
 	}
 
 	private static class ComputingMessage implements StringGetter {
-		private int dx;
-		private int dy;
+		private final int dx;
+		private final int dy;
 
-		public ComputingMessage(int dx, int dy) {
+		ComputingMessage(int dx, int dy) {
 			this.dx = dx;
 			this.dy = dy;
 		}

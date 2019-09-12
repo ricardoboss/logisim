@@ -20,10 +20,11 @@ public class Direction implements AttributeOptionInterface {
 		Strings.getter("directionSouthVertical"), 3);
 	public static final Direction[] cardinals
 		= {NORTH, EAST, SOUTH, WEST};
-	private String name;
-	private StringGetter disp;
-	private StringGetter vert;
-	private int id;
+	private final String name;
+	private final StringGetter disp;
+	private final StringGetter vert;
+	private final int id;
+
 	private Direction(String name, StringGetter disp, StringGetter vert, int id) {
 		this.name = name;
 		this.disp = disp;

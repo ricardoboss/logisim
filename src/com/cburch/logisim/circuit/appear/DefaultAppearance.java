@@ -25,20 +25,20 @@ class DefaultAppearance {
 	static void sortPinList(List<Instance> pins, Direction facing) {
 		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
 			Comparator<Instance> sortHorizontal = new CompareLocations(true);
-			Collections.sort(pins, sortHorizontal);
+			pins.sort(sortHorizontal);
 		} else {
 			Comparator<Instance> sortVertical = new CompareLocations(false);
-			Collections.sort(pins, sortVertical);
+			pins.sort(sortVertical);
 		}
 	}
 
 	public static List<CanvasObject> build(Collection<Instance> pins) {
 		Map<Direction, List<Instance>> edge;
-		edge = new HashMap<Direction, List<Instance>>();
-		edge.put(Direction.NORTH, new ArrayList<Instance>());
-		edge.put(Direction.SOUTH, new ArrayList<Instance>());
-		edge.put(Direction.EAST, new ArrayList<Instance>());
-		edge.put(Direction.WEST, new ArrayList<Instance>());
+		edge = new HashMap<>();
+		edge.put(Direction.NORTH, new ArrayList<>());
+		edge.put(Direction.SOUTH, new ArrayList<>());
+		edge.put(Direction.EAST, new ArrayList<>());
+		edge.put(Direction.WEST, new ArrayList<>());
 		for (Instance pin : pins) {
 			Direction pinFacing = pin.getAttributeValue(StdAttr.FACING);
 			Direction pinEdge = pinFacing.reverse();
@@ -93,12 +93,12 @@ class DefaultAppearance {
 		Location e1 = Location.create(rx + (width + 8) / 2, ry + 1);
 		Location ct = Location.create(rx + width / 2, ry + 11);
 		Curve notch = new Curve(e0, e1, ct);
-		notch.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
+		notch.setValue(DrawAttr.STROKE_WIDTH, 2);
 		notch.setValue(DrawAttr.STROKE_COLOR, Color.GRAY);
 		Rectangle rect = new Rectangle(rx, ry, width, height);
-		rect.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
+		rect.setValue(DrawAttr.STROKE_WIDTH, 2);
 
-		List<CanvasObject> ret = new ArrayList<CanvasObject>();
+		List<CanvasObject> ret = new ArrayList<>();
 		ret.add(notch);
 		ret.add(rect);
 		placePins(ret, edge.get(Direction.WEST),
@@ -150,7 +150,7 @@ class DefaultAppearance {
 	}
 
 	private static class CompareLocations implements Comparator<Instance> {
-		private boolean byX;
+		private final boolean byX;
 
 		CompareLocations(boolean byX) {
 			this.byX = byX;

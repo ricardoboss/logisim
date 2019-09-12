@@ -11,14 +11,14 @@ import javax.swing.*;
 import java.awt.*;
 
 abstract class OptionsPanel extends JPanel {
-	private OptionsFrame optionsFrame;
+	private final OptionsFrame optionsFrame;
 
-	public OptionsPanel(OptionsFrame frame) {
+	OptionsPanel(OptionsFrame frame) {
 		super();
 		this.optionsFrame = frame;
 	}
 
-	public OptionsPanel(OptionsFrame frame, LayoutManager manager) {
+	OptionsPanel(OptionsFrame frame, LayoutManager manager) {
 		super(manager);
 		this.optionsFrame = frame;
 	}

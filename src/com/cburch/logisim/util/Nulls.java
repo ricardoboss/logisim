@@ -3,7 +3,7 @@
 
 package com.cburch.logisim.util;
 
-public final class Nulls {
+final class Nulls {
 	private Nulls() {
 	}
 

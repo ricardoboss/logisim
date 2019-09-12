@@ -10,12 +10,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class CardPanel extends JPanel {
-	private ArrayList<ChangeListener> listeners;
+	private final ArrayList<ChangeListener> listeners;
 	private String current;
 
 	public CardPanel() {
 		super(new CardLayout());
-		listeners = new ArrayList<ChangeListener>();
+		listeners = new ArrayList<>();
 		current = "";
 	}
 

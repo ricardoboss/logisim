@@ -13,40 +13,40 @@ import java.util.List;
 import java.util.Map;
 
 public interface CanvasModel {
-    // listener methods
-    public void addCanvasModelListener(CanvasModelListener l);
+	// listener methods
+	void addCanvasModelListener(CanvasModelListener l);
 
-    public void removeCanvasModelListener(CanvasModelListener l);
+	void removeCanvasModelListener(CanvasModelListener l);
 
-    // methods that don't change any data in the model
-    public void paint(Graphics g, Selection selection);
+	// methods that don't change any data in the model
+	void paint(Graphics g, Selection selection);
 
-    public List<CanvasObject> getObjectsFromTop();
+	List<CanvasObject> getObjectsFromTop();
 
-    public List<CanvasObject> getObjectsFromBottom();
+	List<CanvasObject> getObjectsFromBottom();
 
-    public Collection<CanvasObject> getObjectsIn(Bounds bds);
+	Collection<CanvasObject> getObjectsIn(Bounds bds);
 
-    public Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape);
+	Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape);
 
-    // methods that alter the model
-    public void addObjects(int index, Collection<? extends CanvasObject> shapes);
+	// methods that alter the model
+	void addObjects(int index, Collection<? extends CanvasObject> shapes);
 
-    public void addObjects(Map<? extends CanvasObject, Integer> shapes);
+	void addObjects(Map<? extends CanvasObject, Integer> shapes);
 
-    public void removeObjects(Collection<? extends CanvasObject> shapes);
+	void removeObjects(Collection<? extends CanvasObject> shapes);
 
-    public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy);
+	void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy);
 
-    public void reorderObjects(List<ReorderRequest> requests);
+	void reorderObjects(List<ReorderRequest> requests);
 
-    public Handle moveHandle(HandleGesture gesture);
+	Handle moveHandle(HandleGesture gesture);
 
-    public void insertHandle(Handle desired, Handle previous);
+	void insertHandle(Handle desired, Handle previous);
 
-    public Handle deleteHandle(Handle handle);
+	Handle deleteHandle(Handle handle);
 
-    public void setAttributeValues(Map<AttributeMapKey, Object> values);
+	void setAttributeValues(Map<AttributeMapKey, Object> values);
 
-    public void setText(Text text, String value);
+	void setText(Text text, String value);
 }

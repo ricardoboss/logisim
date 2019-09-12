@@ -95,7 +95,7 @@ public class HexDigit extends InstanceFactory {
 		if ((segs & 0x1000000) != 0) summary |= 32; // vertical seg at top left
 		if (state.getPort(1) == Value.TRUE) summary |= 128;
 
-		Object value = Integer.valueOf(summary);
+		Object value = summary;
 		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 		if (data == null) {
 			state.setData(new InstanceDataSingleton(value));

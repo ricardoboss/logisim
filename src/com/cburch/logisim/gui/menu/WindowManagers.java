@@ -19,10 +19,11 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 
 public class WindowManagers {
+	private static final MyListener myListener = new MyListener();
+	private static final HashMap<Project, ProjectManager> projectMap
+		= new LinkedHashMap<>();
 	private static boolean initialized = false;
-	private static MyListener myListener = new MyListener();
-	private static HashMap<Project, ProjectManager> projectMap
-		= new LinkedHashMap<Project, ProjectManager>();
+
 	private WindowManagers() {
 	}
 
@@ -39,7 +40,7 @@ public class WindowManagers {
 	private static void computeListeners() {
 		List<Project> nowOpen = Projects.getOpenProjects();
 
-		HashSet<Project> closed = new HashSet<Project>(projectMap.keySet());
+		HashSet<Project> closed = new HashSet<>(projectMap.keySet());
 		closed.removeAll(nowOpen);
 		for (Project proj : closed) {
 			ProjectManager manager = projectMap.get(proj);
@@ -47,7 +48,7 @@ public class WindowManagers {
 			projectMap.remove(proj);
 		}
 
-		HashSet<Project> opened = new LinkedHashSet<Project>(nowOpen);
+		HashSet<Project> opened = new LinkedHashSet<>(nowOpen);
 		opened.removeAll(projectMap.keySet());
 		for (Project proj : opened) {
 			ProjectManager manager = new ProjectManager(proj);
@@ -63,7 +64,7 @@ public class WindowManagers {
 
 	private static class ProjectManager extends WindowMenuItemManager
 		implements ProjectListener, LibraryListener {
-		private Project proj;
+		private final Project proj;
 
 		ProjectManager(Project proj) {
 			super(proj.getLogisimFile().getName(), false);

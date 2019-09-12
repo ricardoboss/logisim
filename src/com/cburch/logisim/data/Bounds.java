@@ -13,24 +13,21 @@ import java.awt.*;
  * are immutable.
  */
 public class Bounds {
+	public static final Bounds EMPTY_BOUNDS = new Bounds(0, 0, 0, 0);
 	private static final Cache cache = new Cache();
-	public static Bounds EMPTY_BOUNDS = new Bounds(0, 0, 0, 0);
 	private final int x;
 	private final int y;
 	private final int wid;
 	private final int ht;
+
 	private Bounds(int x, int y, int wid, int ht) {
 		this.x = x;
 		this.y = y;
 		this.wid = wid;
 		this.ht = ht;
 		if (wid < 0) {
-			x += wid / 2;
-			wid = 0;
 		}
 		if (ht < 0) {
-			y += ht / 2;
-			ht = 0;
 		}
 	}
 
@@ -116,12 +113,12 @@ public class Bounds {
 		return contains(px, py, 0);
 	}
 
-	public boolean contains(int px, int py, int allowedError) {
+	private boolean contains(int px, int py, int allowedError) {
 		return px >= x - allowedError && px < x + wid + allowedError
 			&& py >= y - allowedError && py < y + ht + allowedError;
 	}
 
-	public boolean contains(int x, int y, int wid, int ht) {
+	private boolean contains(int x, int y, int wid, int ht) {
 		int oth_x = (wid <= 0 ? x : x + wid - 1);
 		int oth_y = (ht <= 0 ? y : y + ht - 1);
 		return contains(x, y) && contains(oth_x, oth_y);
@@ -135,7 +132,7 @@ public class Bounds {
 		return borderContains(p.getX(), p.getY(), fudge);
 	}
 
-	public boolean borderContains(int px, int py, int fudge) {
+	private boolean borderContains(int px, int py, int fudge) {
 		int x1 = x + wid - 1;
 		int y1 = y + ht - 1;
 		if (Math.abs(px - x) <= fudge || Math.abs(px - x1) <= fudge) {

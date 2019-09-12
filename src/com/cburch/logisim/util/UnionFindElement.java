@@ -3,8 +3,8 @@
 
 package com.cburch.logisim.util;
 
-public interface UnionFindElement<E> {
-	public E getUnionFindParent();
+interface UnionFindElement<E> {
+	E getUnionFindParent();
 
-	public void setUnionFindParent(E value);
+	void setUnionFindParent(E value);
 }

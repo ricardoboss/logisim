@@ -14,10 +14,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 class TableTabCaret {
-	private static Color SELECT_COLOR = new Color(192, 192, 255);
+	private static final Color SELECT_COLOR = new Color(192, 192, 255);
 
-	private Listener listener = new Listener();
-	private TableTab table;
+	private final TableTab table;
 	private int cursorRow;
 	private int cursorCol;
 	private int markRow;
@@ -29,6 +28,7 @@ class TableTabCaret {
 		cursorCol = 0;
 		markRow = 0;
 		markCol = 0;
+		Listener listener = new Listener();
 		table.getTruthTable().addTruthTableListener(listener);
 		table.addMouseListener(listener);
 		table.addMouseMotionListener(listener);
@@ -88,7 +88,7 @@ class TableTabCaret {
 
 		if (row == cursorRow && col == cursorCol
 			&& (keepMark || (row == markRow && col == markCol))) {
-			; // nothing is changing, so do nothing
+			// nothing is changing, so do nothing
 		} else if (!keepMark && markRow == cursorRow && markCol == cursorCol) {
 			int oldRow = cursorRow;
 			int oldCol = cursorCol;
@@ -185,7 +185,7 @@ class TableTabCaret {
 			table.requestFocus();
 			int row = table.getRow(e);
 			int col = table.getColumn(e);
-			setCursor(row, col, (e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
+			setCursor(row, col, (e.getModifiersEx() & InputEvent.SHIFT_MASK) != 0);
 		}
 
 		public void mouseReleased(MouseEvent e) {
@@ -208,7 +208,7 @@ class TableTabCaret {
 		}
 
 		public void keyTyped(KeyEvent e) {
-			int mask = e.getModifiers();
+			int mask = e.getModifiersEx();
 			if ((mask & ~InputEvent.SHIFT_MASK) != 0) return;
 
 			char c = e.getKeyChar();
@@ -268,7 +268,7 @@ class TableTabCaret {
 			int inputs = model.getInputColumnCount();
 			int outputs = model.getOutputColumnCount();
 			int cols = inputs + outputs;
-			boolean shift = (e.getModifiers() & InputEvent.SHIFT_MASK) != 0;
+			boolean shift = (e.getModifiersEx() & InputEvent.SHIFT_MASK) != 0;
 			switch (e.getKeyCode()) {
 				case KeyEvent.VK_UP:
 					setCursor(cursorRow - 1, cursorCol, shift);

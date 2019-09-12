@@ -18,8 +18,9 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
 	private static final int COLUMN_SEP = 8;
 	private static final int HEADER_SEP = 4;
-	private MyListener myListener = new MyListener();
-	private TruthTable table;
+	private final TruthTable table;
+	private final TableTabCaret caret;
+	private final TableTabClip clip;
 	private int cellWidth = 25; // reasonable start values
 	private int cellHeight = 15;
 	private int tableWidth;
@@ -27,10 +28,10 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	private int provisionalX;
 	private int provisionalY;
 	private Entry provisionalValue = null;
-	private TableTabCaret caret;
-	private TableTabClip clip;
-	public TableTab(TruthTable table) {
+
+	TableTab(TruthTable table) {
 		this.table = table;
+		MyListener myListener = new MyListener();
 		table.addTruthTableListener(myListener);
 		setToolTipText(" ");
 		caret = new TableTabCaret(this);
@@ -50,14 +51,14 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		repaint();
 	}
 
-	public int getColumn(MouseEvent event) {
+	int getColumn(MouseEvent event) {
 		int x = event.getX() - (getWidth() - tableWidth) / 2;
 		if (x < 0) return -1;
 		int inputs = table.getInputColumnCount();
 		int cols = inputs + table.getOutputColumnCount();
 		int ret = (x + COLUMN_SEP / 2) / (cellWidth + COLUMN_SEP);
 		if (inputs == 0) ret--;
-		return ret >= 0 ? ret < cols ? ret : cols : -1;
+		return ret >= 0 ? Math.min(ret, cols) : -1;
 	}
 
 	int getColumnCount() {
@@ -78,7 +79,7 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		if (y < cellHeight + HEADER_SEP) return -1;
 		int ret = (y - cellHeight - HEADER_SEP) / cellHeight;
 		int rows = table.getRowCount();
-		return ret >= 0 ? ret < rows ? ret : rows : -1;
+		return ret >= 0 ? Math.min(ret, rows) : -1;
 	}
 
 	public void setEntryProvisional(int y, int x, Entry value) {
@@ -136,8 +137,9 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 				x = paintHeader(table.getInputHeader(i), x, y, g, headerMetric);
 			}
 		}
+
 		if (outputs == 0) {
-			x = paintHeader(Strings.get("tableNullHeader"), x, y, g, headerMetric);
+			paintHeader(Strings.get("tableNullHeader"), x, y, g, headerMetric);
 		} else {
 			for (int i = 0; i < outputs; i++) {
 				x = paintHeader(table.getOutputHeader(i), x, y, g, headerMetric);

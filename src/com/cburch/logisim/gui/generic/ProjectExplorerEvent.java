@@ -6,7 +6,7 @@ package com.cburch.logisim.gui.generic;
 import javax.swing.tree.TreePath;
 
 public class ProjectExplorerEvent {
-	private TreePath path;
+	private final TreePath path;
 
 	public ProjectExplorerEvent(TreePath path) {
 		this.path = path;

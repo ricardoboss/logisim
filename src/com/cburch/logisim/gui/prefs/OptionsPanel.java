@@ -7,9 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 
 abstract class OptionsPanel extends JPanel {
-	private PreferencesFrame optionsFrame;
+	private final PreferencesFrame optionsFrame;
 
-	public OptionsPanel(PreferencesFrame frame) {
+	OptionsPanel(PreferencesFrame frame) {
 		super();
 		this.optionsFrame = frame;
 	}

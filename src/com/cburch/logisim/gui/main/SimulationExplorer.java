@@ -18,9 +18,9 @@ import java.awt.event.MouseListener;
 
 class SimulationExplorer extends JPanel
 	implements ProjectListener, MouseListener {
-	private Project project;
+	private final Project project;
+	private final JTree tree;
 	private SimulationTreeModel model;
-	private JTree tree;
 
 	SimulationExplorer(Project proj, MenuListener menu) {
 		super(new BorderLayout());
@@ -83,7 +83,7 @@ class SimulationExplorer extends JPanel
 
 	private void checkForPopup(MouseEvent e) {
 		if (e.isPopupTrigger()) {
-			; // do nothing
+			// do nothing
 		}
 	}
 

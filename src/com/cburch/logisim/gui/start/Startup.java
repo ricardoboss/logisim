@@ -23,19 +23,20 @@ import java.util.*;
 public class Startup {
 	private static Startup startupTemp = null;
 	// based on command line
-	boolean isTty;
+	private final boolean isTty;
+	private final ArrayList<File> filesToOpen = new ArrayList<>();
+	private final HashMap<File, File> substitutions = new HashMap<>();
+	private final ArrayList<File> filesToPrint = new ArrayList<>();
 	private File templFile = null;
 	private boolean templEmpty = false;
 	private boolean templPlain = false;
-	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
 	private File loadFile;
-	private HashMap<File, File> substitutions = new HashMap<File, File>();
 	private int ttyFormat = 0;
 	// from other sources
 	private boolean initialized = false;
 	private SplashScreen monitor = null;
-	private ArrayList<File> filesToPrint = new ArrayList<File>();
+
 	private Startup(boolean isTty) {
 		this.isTty = isTty;
 		this.showSplash = !isTty;
@@ -57,28 +58,27 @@ public class Startup {
 			if (needed2 == null) return;
 			MacOsAdapter.register();
 			MacOsAdapter.addListeners(true);
-		} catch (ClassNotFoundException e) {
-			return;
+		} catch (ClassNotFoundException ignored) {
 		} catch (Throwable t) {
 			try {
 				MacOsAdapter.addListeners(false);
-			} catch (Throwable t2) {
+			} catch (Throwable ignored) {
 			}
 		}
 	}
 
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
-		for (int i = 0; i < opts.length; i++) {
-			if (lang.equals(opts[i].toString())) {
-				LocaleManager.setLocale(opts[i]);
+		for (Locale locale : opts) {
+			if (lang.equals(locale.toString())) {
+				LocaleManager.setLocale(locale);
 				return;
 			}
 		}
 		System.err.println(Strings.get("invalidLocaleError")); //OK
 		System.err.println(Strings.get("invalidLocaleOptionsHeader")); //OK
-		for (int i = 0; i < opts.length; i++) {
-			System.err.println("   " + opts[i].toString()); //OK
+		for (Locale opt : opts) {
+			System.err.println("   " + opt.toString()); //OK
 		}
 		System.exit(-1);
 	}
@@ -87,10 +87,10 @@ public class Startup {
 		// see whether we'll be using any graphics
 		boolean isTty = false;
 		boolean isClearPreferences = false;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-tty")) {
+		for (String value : args) {
+			if (value.equals("-tty")) {
 				isTty = true;
-			} else if (args[i].equals("-clearprefs") || args[i].equals("-clearprops")) {
+			} else if (value.equals("-clearprefs") || value.equals("-clearprops")) {
 				isClearPreferences = true;
 			}
 		}
@@ -118,7 +118,7 @@ public class Startup {
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) {
+		} catch (Exception ignored) {
 		}
 
 		// parse arguments
@@ -131,20 +131,28 @@ public class Startup {
 					if (fmts.length == 0) {
 						System.err.println(Strings.get("ttyFormatError")); //OK
 					}
-					for (int j = 0; j < fmts.length; j++) {
-						String fmt = fmts[j].trim();
-						if (fmt.equals("table")) {
-							ret.ttyFormat |= TtyInterface.FORMAT_TABLE;
-						} else if (fmt.equals("speed")) {
-							ret.ttyFormat |= TtyInterface.FORMAT_SPEED;
-						} else if (fmt.equals("tty")) {
-							ret.ttyFormat |= TtyInterface.FORMAT_TTY;
-						} else if (fmt.equals("halt")) {
-							ret.ttyFormat |= TtyInterface.FORMAT_HALT;
-						} else if (fmt.equals("stats")) {
-							ret.ttyFormat |= TtyInterface.FORMAT_STATISTICS;
-						} else {
-							System.err.println(Strings.get("ttyFormatError")); //OK
+					for (String s : fmts) {
+						String fmt = s.trim();
+						switch (fmt) {
+							case "table":
+								ret.ttyFormat |= TtyInterface.FORMAT_TABLE;
+								break;
+							case "speed":
+								ret.ttyFormat |= TtyInterface.FORMAT_SPEED;
+								break;
+							case "tty":
+								ret.ttyFormat |= TtyInterface.FORMAT_TTY;
+								break;
+							case "halt":
+								ret.ttyFormat |= TtyInterface.FORMAT_HALT;
+								break;
+							case "stats":
+								ret.ttyFormat |= TtyInterface.FORMAT_STATISTICS;
+								break;
+							default:
+								System.err.println(Strings.get("ttyFormatError")); //OK
+
+								break;
 						}
 					}
 				} else {
@@ -172,8 +180,7 @@ public class Startup {
 					if (ret.loadFile != null) {
 						System.err.println(Strings.get("loadMultipleError")); //OK
 					}
-					File f = new File(args[i]);
-					ret.loadFile = f;
+					ret.loadFile = new File(args[i]);
 				} else {
 					System.err.println(Strings.get("loadNeedsFileError")); //OK
 					return null;

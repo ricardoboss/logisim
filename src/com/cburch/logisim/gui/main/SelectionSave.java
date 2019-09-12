@@ -6,11 +6,13 @@ package com.cburch.logisim.gui.main;
 import com.cburch.logisim.comp.Component;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 class SelectionSave {
 	private Component[] floating;
 	private Component[] anchored;
+
 	private SelectionSave() {
 	}
 
@@ -19,12 +21,12 @@ class SelectionSave {
 
 		Collection<Component> lifted = sel.getFloatingComponents();
 		if (!lifted.isEmpty()) {
-			save.floating = lifted.toArray(new Component[lifted.size()]);
+			save.floating = lifted.toArray(new Component[0]);
 		}
 
 		Collection<Component> selected = sel.getAnchoredComponents();
 		if (!selected.isEmpty()) {
-			save.anchored = selected.toArray(new Component[selected.size()]);
+			save.anchored = selected.toArray(new Component[0]);
 		}
 
 		return save;
@@ -51,8 +53,8 @@ class SelectionSave {
 	}
 
 	private static HashSet<Component> toSet(Component[] comps) {
-		HashSet<Component> ret = new HashSet<Component>(comps.length);
-		for (Component c : comps) ret.add(c);
+		HashSet<Component> ret = new HashSet<>(comps.length);
+		Collections.addAll(ret, comps);
 		return ret;
 	}
 

@@ -12,21 +12,21 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cloneable {
-	private NodeList list;
+	private final NodeList list;
 	private int index;
 
-	public XmlIterator(NodeList nodes) {
+	private XmlIterator(NodeList nodes) {
 		list = nodes;
 		index = 0;
 	}
 
 	public static XmlIterator<Node> forChildren(Element node) {
-		return new XmlIterator<Node>(node.getChildNodes());
+		return new XmlIterator<>(node.getChildNodes());
 	}
 
 	public static Iterable<Element> forChildElements(Element node) {
 		NodeList nodes = node.getChildNodes();
-		ArrayList<Element> ret = new ArrayList<Element>();
+		ArrayList<Element> ret = new ArrayList<>();
 		for (int i = 0, n = nodes.getLength(); i < n; i++) {
 			Node sub = nodes.item(i);
 			if (sub.getNodeType() == Node.ELEMENT_NODE) {
@@ -38,7 +38,7 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 
 	public static Iterable<Element> forChildElements(Element node, String tagName) {
 		NodeList nodes = node.getChildNodes();
-		ArrayList<Element> ret = new ArrayList<Element>();
+		ArrayList<Element> ret = new ArrayList<>();
 		for (int i = 0, n = nodes.getLength(); i < n; i++) {
 			Node sub = nodes.item(i);
 			if (sub.getNodeType() == Node.ELEMENT_NODE) {
@@ -50,7 +50,7 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 	}
 
 	public static Iterable<Element> forDescendantElements(Element node, String tagName) {
-		return new XmlIterator<Element>(node.getElementsByTagName(tagName));
+		return new XmlIterator<>(node.getElementsByTagName(tagName));
 	}
 
 	@Override

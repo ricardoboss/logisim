@@ -14,30 +14,30 @@ import java.util.List;
 
 public interface Component {
 	// listener methods
-	public void addComponentListener(ComponentListener l);
+	void addComponentListener(ComponentListener l);
 
-	public void removeComponentListener(ComponentListener l);
+	void removeComponentListener(ComponentListener l);
 
 	// basic information methods
-	public ComponentFactory getFactory();
+	ComponentFactory getFactory();
 
-	public AttributeSet getAttributeSet();
+	AttributeSet getAttributeSet();
 
 	// location/extent methods
-	public Location getLocation();
+	Location getLocation();
 
-	public Bounds getBounds();
+	Bounds getBounds();
 
-	public Bounds getBounds(Graphics g);
+	Bounds getBounds(Graphics g);
 
-	public boolean contains(Location pt);
+	boolean contains(Location pt);
 
-	public boolean contains(Location pt, Graphics g);
+	boolean contains(Location pt, Graphics g);
 
 	// user interface methods
-	public void expose(ComponentDrawContext context);
+	void expose(ComponentDrawContext context);
 
-	public void draw(ComponentDrawContext context);
+	void draw(ComponentDrawContext context);
 
 	/**
 	 * Retrieves information about a special-purpose feature for this
@@ -60,14 +60,14 @@ public interface Component {
 	 * supports the feature, or <code>null</code> if it does not support
 	 * the feature.
 	 */
-	public Object getFeature(Object key);
+	Object getFeature(Object key);
 
 	// propagation methods
-	public List<EndData> getEnds(); // list of EndDatas
+	List<EndData> getEnds(); // list of EndDatas
 
-	public EndData getEnd(int index);
+	EndData getEnd(int index);
 
-	public boolean endsAt(Location pt);
+	boolean endsAt(Location pt);
 
-	public void propagate(CircuitState state);
+	void propagate(CircuitState state);
 }

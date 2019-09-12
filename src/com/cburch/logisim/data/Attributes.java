@@ -87,7 +87,7 @@ public class Attributes {
 
 	public static <V> Attribute<V> forOption(String name, StringGetter disp,
 											 V[] vals) {
-		return new OptionAttribute<V>(name, disp, vals);
+		return new OptionAttribute<>(name, disp, vals);
 	}
 
 	public static Attribute<Integer> forInteger(String name, StringGetter disp) {
@@ -103,7 +103,7 @@ public class Attributes {
 		return new IntegerRangeAttribute(name, disp, start, end);
 	}
 
-	public static Attribute<Double> forDouble(String name, StringGetter disp) {
+	private static Attribute<Double> forDouble(String name, StringGetter disp) {
 		return new DoubleAttribute(name, disp);
 	}
 
@@ -127,7 +127,7 @@ public class Attributes {
 		return new FontAttribute(name, disp);
 	}
 
-	public static Attribute<Location> forLocation(String name, StringGetter disp) {
+	private static Attribute<Location> forLocation(String name, StringGetter disp) {
 		return new LocationAttribute(name, disp);
 	}
 
@@ -136,9 +136,9 @@ public class Attributes {
 	}
 
 	private static class ConstantGetter implements StringGetter {
-		private String str;
+		private final String str;
 
-		public ConstantGetter(String str) {
+		ConstantGetter(String str) {
 			this.str = str;
 		}
 
@@ -165,7 +165,7 @@ public class Attributes {
 
 	private static class OptionComboRenderer<V>
 		extends BasicComboBoxRenderer {
-		Attribute<V> attr;
+		final Attribute<V> attr;
 
 		OptionComboRenderer(Attribute<V> attr) {
 			this.attr = attr;
@@ -187,7 +187,7 @@ public class Attributes {
 	}
 
 	private static class OptionAttribute<V> extends Attribute<V> {
-		private V[] vals;
+		private final V[] vals;
 
 		private OptionAttribute(String name, StringGetter disp,
 								V[] vals) {
@@ -206,9 +206,9 @@ public class Attributes {
 
 		@Override
 		public V parse(String value) {
-			for (int i = 0; i < vals.length; i++) {
-				if (value.equals(vals[i].toString())) {
-					return vals[i];
+			for (V val : vals) {
+				if (value.equals(val.toString())) {
+					return val;
 				}
 			}
 			throw new NumberFormatException("value not among choices");
@@ -217,7 +217,7 @@ public class Attributes {
 		@Override
 		public java.awt.Component getCellEditor(Object value) {
 			JComboBox combo = new JComboBox(vals);
-			combo.setRenderer(new OptionComboRenderer<V>(this));
+			combo.setRenderer(new OptionComboRenderer<>(this));
 			if (value == null) combo.setSelectedIndex(-1);
 			else combo.setSelectedItem(value);
 			return combo;
@@ -242,7 +242,7 @@ public class Attributes {
 
 		@Override
 		public String toDisplayString(Integer value) {
-			int val = value.intValue();
+			int val = value;
 			return "0x" + Integer.toHexString(val);
 		}
 
@@ -256,15 +256,15 @@ public class Attributes {
 			value = value.toLowerCase();
 			if (value.startsWith("0x")) {
 				value = value.substring(2);
-				return Integer.valueOf((int) Long.parseLong(value, 16));
+				return (int) Long.parseLong(value, 16);
 			} else if (value.startsWith("0b")) {
 				value = value.substring(2);
-				return Integer.valueOf((int) Long.parseLong(value, 2));
+				return (int) Long.parseLong(value, 2);
 			} else if (value.startsWith("0")) {
 				value = value.substring(1);
-				return Integer.valueOf((int) Long.parseLong(value, 8));
+				return (int) Long.parseLong(value, 8);
 			} else {
-				return Integer.valueOf((int) Long.parseLong(value, 10));
+				return (int) Long.parseLong(value, 10);
 			}
 
 		}
@@ -282,7 +282,7 @@ public class Attributes {
 	}
 
 	private static class BooleanAttribute extends OptionAttribute<Boolean> {
-		private static Boolean[] vals = {Boolean.TRUE, Boolean.FALSE};
+		private static final Boolean[] vals = {Boolean.TRUE, Boolean.FALSE};
 
 		private BooleanAttribute(String name, StringGetter disp) {
 			super(name, disp, vals);
@@ -290,21 +290,21 @@ public class Attributes {
 
 		@Override
 		public String toDisplayString(Boolean value) {
-			if (value.booleanValue()) return Strings.get("booleanTrueOption");
+			if (value) return Strings.get("booleanTrueOption");
 			else return Strings.get("booleanFalseOption");
 		}
 
 		@Override
 		public Boolean parse(String value) {
 			Boolean b = Boolean.valueOf(value);
-			return vals[b.booleanValue() ? 0 : 1];
+			return vals[b ? 0 : 1];
 		}
 	}
 
 	private static class IntegerRangeAttribute extends Attribute<Integer> {
+		final int start;
+		final int end;
 		Integer[] options = null;
-		int start;
-		int end;
 
 		private IntegerRangeAttribute(String name, StringGetter disp, int start, int end) {
 			super(name, disp);
@@ -317,7 +317,7 @@ public class Attributes {
 			int v = (int) Long.parseLong(value);
 			if (v < start) throw new NumberFormatException("integer too small");
 			if (v > end) throw new NumberFormatException("integer too large");
-			return Integer.valueOf(v);
+			return v;
 		}
 
 		@Override
@@ -328,7 +328,7 @@ public class Attributes {
 				if (options == null) {
 					options = new Integer[end - start + 1];
 					for (int i = start; i <= end; i++) {
-						options[i - start] = Integer.valueOf(i);
+						options[i - start] = i;
 					}
 				}
 				JComboBox combo = new JComboBox(options);
@@ -340,14 +340,14 @@ public class Attributes {
 	}
 
 	private static class DirectionAttribute extends OptionAttribute<Direction> {
-		private static Direction[] vals = {
+		private static final Direction[] vals = {
 			Direction.NORTH,
 			Direction.SOUTH,
 			Direction.EAST,
 			Direction.WEST,
 		};
 
-		public DirectionAttribute(String name, StringGetter disp) {
+		DirectionAttribute(String name, StringGetter disp) {
 			super(name, disp, vals);
 		}
 
@@ -409,7 +409,7 @@ public class Attributes {
 	}
 
 	private static class LocationAttribute extends Attribute<Location> {
-		public LocationAttribute(String name, StringGetter desc) {
+		LocationAttribute(String name, StringGetter desc) {
 			super(name, desc);
 		}
 
@@ -420,7 +420,7 @@ public class Attributes {
 	}
 
 	private static class ColorAttribute extends Attribute<Color> {
-		public ColorAttribute(String name, StringGetter desc) {
+		ColorAttribute(String name, StringGetter desc) {
 			super(name, desc);
 		}
 

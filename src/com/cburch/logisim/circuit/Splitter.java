@@ -34,7 +34,7 @@ public class Splitter extends ManagedComponent
 		if (start == end) {
 			buf.append(start);
 		} else {
-			buf.append(start + "-" + end);
+			buf.append(start).append("-").append(end);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class Splitter extends ManagedComponent
 
 	@Override
 	public void propagate(CircuitState state) {
-		; // handled by CircuitWires, nothing to do
+		// handled by CircuitWires, nothing to do
 	}
 
 	@Override

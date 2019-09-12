@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class WireUtil {
+class WireUtil {
 	private WireUtil() {
 	}
 
-	static CircuitPoints computeCircuitPoints(Collection<? extends Component> components) {
+	private static CircuitPoints computeCircuitPoints(Collection<? extends Component> components) {
 		CircuitPoints points = new CircuitPoints();
 		for (Component comp : components) {
 			points.add(comp);
@@ -26,10 +26,10 @@ public class WireUtil {
 	public static Collection<? extends Component> mergeExclusive(Collection<? extends Component> toMerge) {
 		if (toMerge.size() <= 1) return toMerge;
 
-		HashSet<Component> ret = new HashSet<Component>(toMerge);
+		HashSet<Component> ret = new HashSet<>(toMerge);
 		CircuitPoints points = computeCircuitPoints(toMerge);
 
-		HashSet<Wire> wires = new HashSet<Wire>();
+		HashSet<Wire> wires = new HashSet<>();
 		for (Location loc : points.getSplitLocations()) {
 			Collection<? extends Component> at = points.getComponents(loc);
 			if (at.size() == 2) {
@@ -46,7 +46,6 @@ public class WireUtil {
 				}
 			}
 		}
-		points = null;
 
 		ret.removeAll(wires);
 		while (!wires.isEmpty()) {

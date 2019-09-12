@@ -35,7 +35,7 @@ public class About {
 	}
 
 	private static class PanelThread extends Thread {
-		private MyPanel panel;
+		private final MyPanel panel;
 		private boolean running = true;
 
 		PanelThread(MyPanel panel) {
@@ -54,7 +54,7 @@ public class About {
 				panel.repaint();
 				try {
 					Thread.sleep(20);
-				} catch (InterruptedException ex) {
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}
@@ -67,13 +67,12 @@ public class About {
 		private final Font headerFont = new Font("Monospaced", Font.BOLD, 72);
 		private final Font versionFont = new Font("Serif", Font.PLAIN | Font.ITALIC, 32);
 		private final Font copyrightFont = new Font("Serif", Font.ITALIC, 18);
-
+		private final AboutCredits credits;
 		private Value upper = Value.FALSE;
 		private Value lower = Value.TRUE;
-		private AboutCredits credits;
 		private PanelThread thread = null;
 
-		public MyPanel() {
+		MyPanel() {
 			setLayout(null);
 
 			int prefWidth = IMAGE_WIDTH + 2 * IMAGE_BORDER;
@@ -110,7 +109,7 @@ public class About {
 				g.setColor(fadeColor);
 				g.fillRect(x, y, IMAGE_WIDTH, IMAGE_HEIGHT);
 				drawText(g, x, y);
-			} catch (Throwable t) {
+			} catch (Throwable ignored) {
 			}
 		}
 

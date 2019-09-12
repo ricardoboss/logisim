@@ -8,10 +8,11 @@ import com.cburch.logisim.util.PropertyChangeWeakSupport;
 import java.beans.PropertyChangeListener;
 
 class Clipboard {
-	public static final String contentsProperty = "appearance";
-	private static ClipboardContents current = ClipboardContents.EMPTY;
-	private static PropertyChangeWeakSupport propertySupport
+	private static final String contentsProperty = "appearance";
+	private static final PropertyChangeWeakSupport propertySupport
 		= new PropertyChangeWeakSupport(Clipboard.class);
+	private static ClipboardContents current = ClipboardContents.EMPTY;
+
 	private Clipboard() {
 	}
 

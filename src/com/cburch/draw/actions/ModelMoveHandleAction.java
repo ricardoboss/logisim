@@ -12,39 +12,39 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class ModelMoveHandleAction extends ModelAction {
-    private HandleGesture gesture;
-    private Handle newHandle;
+	private final HandleGesture gesture;
+	private Handle newHandle;
 
-    public ModelMoveHandleAction(CanvasModel model, HandleGesture gesture) {
-        super(model);
-        this.gesture = gesture;
-    }
+	public ModelMoveHandleAction(CanvasModel model, HandleGesture gesture) {
+		super(model);
+		this.gesture = gesture;
+	}
 
-    public Handle getNewHandle() {
-        return newHandle;
-    }
+	public Handle getNewHandle() {
+		return newHandle;
+	}
 
-    @Override
-    public Collection<CanvasObject> getObjects() {
-        return Collections.singleton(gesture.getHandle().getObject());
-    }
+	@Override
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(gesture.getHandle().getObject());
+	}
 
-    @Override
-    public String getName() {
-        return Strings.get("actionMoveHandle");
-    }
+	@Override
+	public String getName() {
+		return Strings.get("actionMoveHandle");
+	}
 
-    @Override
-    void doSub(CanvasModel model) {
-        newHandle = model.moveHandle(gesture);
-    }
+	@Override
+	void doSub(CanvasModel model) {
+		newHandle = model.moveHandle(gesture);
+	}
 
-    @Override
-    void undoSub(CanvasModel model) {
-        Handle oldHandle = gesture.getHandle();
-        int dx = oldHandle.getX() - newHandle.getX();
-        int dy = oldHandle.getY() - newHandle.getY();
-        HandleGesture reverse = new HandleGesture(newHandle, dx, dy, 0);
-        model.moveHandle(reverse);
-    }
+	@Override
+	void undoSub(CanvasModel model) {
+		Handle oldHandle = gesture.getHandle();
+		int dx = oldHandle.getX() - newHandle.getX();
+		int dy = oldHandle.getY() - newHandle.getY();
+		HandleGesture reverse = new HandleGesture(newHandle, dx, dy, 0);
+		model.moveHandle(reverse);
+	}
 }

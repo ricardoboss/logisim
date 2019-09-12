@@ -4,13 +4,13 @@
 package com.cburch.logisim.gui.generic;
 
 public interface AttrTableModel {
-	public void addAttrTableModelListener(AttrTableModelListener listener);
+	void addAttrTableModelListener(AttrTableModelListener listener);
 
-	public void removeAttrTableModelListener(AttrTableModelListener listener);
+	void removeAttrTableModelListener(AttrTableModelListener listener);
 
-	public String getTitle();
+	String getTitle();
 
-	public int getRowCount();
+	int getRowCount();
 
-	public AttrTableModelRow getRow(int rowIndex);
+	AttrTableModelRow getRow(int rowIndex);
 }

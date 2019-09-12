@@ -35,10 +35,10 @@ public class SelectionActions {
 
 	// clears the selection, anchoring all floating elements in selection
 	public static Action drop(Selection sel, Collection<Component> comps) {
-		HashSet<Component> floating = new HashSet<Component>(sel.getFloatingComponents());
-		HashSet<Component> anchored = new HashSet<Component>(sel.getAnchoredComponents());
-		ArrayList<Component> toDrop = new ArrayList<Component>();
-		ArrayList<Component> toIgnore = new ArrayList<Component>();
+		HashSet<Component> floating = new HashSet<>(sel.getFloatingComponents());
+		HashSet<Component> anchored = new HashSet<>(sel.getAnchoredComponents());
+		ArrayList<Component> toDrop = new ArrayList<>();
+		ArrayList<Component> toIgnore = new ArrayList<>();
 		for (Component comp : comps) {
 			if (floating.contains(comp)) {
 				toDrop.add(comp);
@@ -89,10 +89,10 @@ public class SelectionActions {
 
 	private static HashMap<Component, Component> getReplacementMap(Project proj) {
 		HashMap<Component, Component> replMap;
-		replMap = new HashMap<Component, Component>();
+		replMap = new HashMap<>();
 
 		LogisimFile file = proj.getLogisimFile();
-		ArrayList<Library> libs = new ArrayList<Library>();
+		ArrayList<Library> libs = new ArrayList<>();
 		libs.add(file);
 		libs.addAll(file.getLibraries());
 
@@ -100,7 +100,7 @@ public class SelectionActions {
 		Clipboard clip = Clipboard.get();
 		Collection<Component> comps = clip.getComponents();
 		HashMap<ComponentFactory, ComponentFactory> factoryReplacements;
-		factoryReplacements = new HashMap<ComponentFactory, ComponentFactory>();
+		factoryReplacements = new HashMap<>();
 		for (Component comp : comps) {
 			if (comp instanceof Wire) continue;
 
@@ -112,7 +112,7 @@ public class SelectionActions {
 				ComponentFactory candidate = findComponentFactory(compFactory, libs, true);
 				if (candidate == null) {
 					if (dropped == null) {
-						dropped = new ArrayList<String>();
+						dropped = new ArrayList<>();
 					}
 					dropped.add(compFactory.getDisplayName());
 				} else {
@@ -161,7 +161,7 @@ public class SelectionActions {
 					droppedStr.append("\n  ");
 					droppedStr.append(curName);
 					if (curCount > 1) {
-						droppedStr.append(" \u00d7 " + curCount);
+						droppedStr.append(" \u00d7 ").append(curCount);
 					}
 
 					curName = nextName;
@@ -208,10 +208,10 @@ public class SelectionActions {
 	}
 
 	private static class Drop extends Action {
-		private Selection sel;
-		private Component[] drops;
-		private int numDrops;
-		private SelectionSave before;
+		private final Selection sel;
+		private final Component[] drops;
+		private final int numDrops;
+		private final SelectionSave before;
 		private CircuitTransaction xnReverse;
 
 		Drop(Selection sel, Collection<Component> toDrop, int numDrops) {
@@ -261,9 +261,9 @@ public class SelectionActions {
 	}
 
 	private static class Anchor extends Action {
-		private Selection sel;
-		private int numAnchor;
-		private SelectionSave before;
+		private final Selection sel;
+		private final int numAnchor;
+		private final SelectionSave before;
 		private CircuitTransaction xnReverse;
 
 		Anchor(Selection sel, int numAnchor) {
@@ -309,7 +309,7 @@ public class SelectionActions {
 	}
 
 	private static class Delete extends Action {
-		private Selection sel;
+		private final Selection sel;
 		private CircuitTransaction xnReverse;
 
 		Delete(Selection sel) {
@@ -337,7 +337,7 @@ public class SelectionActions {
 	}
 
 	private static class Duplicate extends Action {
-		private Selection sel;
+		private final Selection sel;
 		private CircuitTransaction xnReverse;
 		private SelectionSave after;
 
@@ -368,8 +368,8 @@ public class SelectionActions {
 	}
 
 	private static class Cut extends Action {
-		private Action first;
-		private Action second;
+		private final Action first;
+		private final Action second;
 
 		Cut(Selection sel) {
 			first = new Copy(sel);
@@ -395,7 +395,7 @@ public class SelectionActions {
 	}
 
 	private static class Copy extends Action {
-		private Selection sel;
+		private final Selection sel;
 		private Clipboard oldClip;
 
 		Copy(Selection sel) {
@@ -425,10 +425,10 @@ public class SelectionActions {
 	}
 
 	private static class Paste extends Action {
-		private Selection sel;
+		private final Selection sel;
+		private final HashMap<Component, Component> componentReplacements;
 		private CircuitTransaction xnReverse;
 		private SelectionSave after;
-		private HashMap<Component, Component> componentReplacements;
 
 		Paste(Selection sel, HashMap<Component, Component> replacements) {
 			this.sel = sel;
@@ -459,9 +459,8 @@ public class SelectionActions {
 
 		private Collection<Component> computeAdditions(Collection<Component> comps) {
 			HashMap<Component, Component> replMap = componentReplacements;
-			ArrayList<Component> toAdd = new ArrayList<Component>(comps.size());
-			for (Iterator<Component> it = comps.iterator(); it.hasNext(); ) {
-				Component comp = it.next();
+			ArrayList<Component> toAdd = new ArrayList<>(comps.size());
+			for (Component comp : comps) {
 				if (replMap.containsKey(comp)) {
 					Component repl = replMap.get(comp);
 					if (repl != null) {
@@ -483,11 +482,11 @@ public class SelectionActions {
 	}
 
 	private static class Translate extends Action {
-		private Selection sel;
-		private int dx;
-		private int dy;
-		private ReplacementMap replacements;
-		private SelectionSave before;
+		private final Selection sel;
+		private final int dx;
+		private final int dy;
+		private final ReplacementMap replacements;
+		private final SelectionSave before;
 		private CircuitTransaction xnReverse;
 
 		Translate(Selection sel, int dx, int dy, ReplacementMap replacements) {

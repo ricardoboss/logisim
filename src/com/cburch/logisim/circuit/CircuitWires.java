@@ -22,14 +22,15 @@ import java.util.*;
 class CircuitWires {
 	final CircuitPoints points = new CircuitPoints();
 	// user-given data
-	private HashSet<Wire> wires = new HashSet<Wire>();
-	private HashSet<Splitter> splitters = new HashSet<Splitter>();
-	private HashSet<Component> tunnels = new HashSet<Component>(); // of Components with Tunnel factory
-	private TunnelListener tunnelListener = new TunnelListener();
-	private HashSet<Component> pulls = new HashSet<Component>(); // of Components with PullResistor factory
+	private final HashSet<Wire> wires = new HashSet<>();
+	private final HashSet<Splitter> splitters = new HashSet<>();
+	private final HashSet<Component> tunnels = new HashSet<>(); // of Components with Tunnel factory
+	private final TunnelListener tunnelListener = new TunnelListener();
+	private final HashSet<Component> pulls = new HashSet<>(); // of Components with PullResistor factory
 	// derived data
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;
 	private BundleMap bundleMap = null;
+
 	CircuitWires() {
 	}
 
@@ -110,7 +111,7 @@ class CircuitWires {
 	WireSet getWireSet(Wire start) {
 		WireBundle bundle = getWireBundle(start.e0);
 		if (bundle == null) return WireSet.EMPTY;
-		HashSet<Wire> wires = new HashSet<Wire>();
+		HashSet<Wire> wires = new HashSet<>();
 		for (Location loc : bundle.points) {
 			wires.addAll(points.getWires(loc));
 		}
@@ -208,7 +209,7 @@ class CircuitWires {
 	//
 	void propagate(CircuitState circState, Set<Location> points) {
 		BundleMap map = getBundleMap();
-		SmallSet<WireThread> dirtyThreads = new SmallSet<WireThread>(); // affected threads
+		SmallSet<WireThread> dirtyThreads = new SmallSet<>(); // affected threads
 
 		// get state, or create a new one if current state is outdated
 		State s = circState.getWireData();
@@ -218,9 +219,7 @@ class CircuitWires {
 			for (WireBundle b : map.getBundles()) {
 				WireThread[] th = b.threads;
 				if (b.isValid() && th != null) {
-					for (WireThread t : th) {
-						dirtyThreads.add(t);
-					}
+					Collections.addAll(dirtyThreads, th);
 				}
 			}
 			circState.setWireData(s);
@@ -236,17 +235,11 @@ class CircuitWires {
 				if (!pb.isValid() || th == null) {
 					// immediately propagate NILs across invalid bundles
 					SmallSet<Location> pbPoints = pb.points;
-					if (pbPoints == null) {
-						circState.setValueByWire(p, Value.NIL);
-					} else {
-						for (Location loc2 : pbPoints) {
-							circState.setValueByWire(loc2, Value.NIL);
-						}
+					for (Location loc2 : pbPoints) {
+						circState.setValueByWire(loc2, Value.NIL);
 					}
 				} else {
-					for (WireThread t : th) {
-						dirtyThreads.add(t);
-					}
+					Collections.addAll(dirtyThreads, th);
 				}
 			}
 		}
@@ -254,7 +247,7 @@ class CircuitWires {
 		if (dirtyThreads.isEmpty()) return;
 
 		// determine values of affected threads
-		HashSet<ThreadBundle> bundles = new HashSet<ThreadBundle>();
+		HashSet<ThreadBundle> bundles = new HashSet<>();
 		for (WireThread t : dirtyThreads) {
 			Value v = getThreadValue(circState, t);
 			s.thr_values.put(t, v);
@@ -266,22 +259,22 @@ class CircuitWires {
 			WireBundle b = tb.b;
 
 			Value bv = null;
-			if (!b.isValid() || b.threads == null) {
-				; // do nothing
-			} else if (b.threads.length == 1) {
-				bv = s.thr_values.get(b.threads[0]);
-			} else {
-				Value[] tvs = new Value[b.threads.length];
-				boolean tvs_valid = true;
-				for (int i = 0; i < tvs.length; i++) {
-					Value tv = s.thr_values.get(b.threads[i]);
-					if (tv == null) {
-						tvs_valid = false;
-						break;
+			if (b.isValid() && b.threads != null) {
+				if (b.threads.length == 1) {
+					bv = s.thr_values.get(b.threads[0]);
+				} else {
+					Value[] tvs = new Value[b.threads.length];
+					boolean tvs_valid = true;
+					for (int i = 0; i < tvs.length; i++) {
+						Value tv = s.thr_values.get(b.threads[i]);
+						if (tv == null) {
+							tvs_valid = false;
+							break;
+						}
+						tvs[i] = tv;
 					}
-					tvs[i] = tv;
+					if (tvs_valid) bv = Value.create(tvs);
 				}
-				if (tvs_valid) bv = Value.create(tvs);
 			}
 
 			if (bv != null) {
@@ -431,13 +424,19 @@ class CircuitWires {
 				}
 			}
 		} catch (RuntimeException ex) {
-			ret.invalidate();
-			ret.markComputed();
+			if (ret != null) {
+				ret.invalidate();
+				ret.markComputed();
+			}
+
 			throw ex;
 		} finally {
 			// Mark the BundleMap as computed in case anybody is waiting for the result.
-			ret.markComputed();
+			if (ret != null) {
+				ret.markComputed();
+			}
 		}
+
 		return ret;
 	}
 
@@ -464,7 +463,7 @@ class CircuitWires {
 
 		// make a WireBundle object for each end of a splitter
 		for (Splitter spl : splitters) {
-			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
+			List<EndData> ends = new ArrayList<>(spl.getEnds());
 			for (EndData end : ends) {
 				Location p = end.getLocation();
 				WireBundle pb = ret.createBundleAt(p);
@@ -484,7 +483,7 @@ class CircuitWires {
 
 		// determine the bundles at the end of each splitter
 		for (Splitter spl : splitters) {
-			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
+			List<EndData> ends = new ArrayList<>(spl.getEnds());
 			int index = -1;
 			for (EndData end : ends) {
 				index++;
@@ -499,6 +498,7 @@ class CircuitWires {
 
 		// unite threads going through splitters
 		for (Splitter spl : splitters) {
+			//noinspection SynchronizationOnLocalVariableOrMethodParameter
 			synchronized (spl) {
 				SplitterAttributes spl_attrs = (SplitterAttributes) spl.getAttributeSet();
 				byte[] bit_end = spl_attrs.bit_end;
@@ -573,16 +573,12 @@ class CircuitWires {
 
 	private void connectTunnels(BundleMap ret) {
 		// determine the sets of tunnels
-		HashMap<String, ArrayList<Location>> tunnelSets = new HashMap<String, ArrayList<Location>>();
+		HashMap<String, ArrayList<Location>> tunnelSets = new HashMap<>();
 		for (Component comp : tunnels) {
 			String label = comp.getAttributeSet().getValue(StdAttr.LABEL);
 			label = label.trim();
 			if (!label.equals("")) {
-				ArrayList<Location> tunnelSet = tunnelSets.get(label);
-				if (tunnelSet == null) {
-					tunnelSet = new ArrayList<Location>(3);
-					tunnelSets.put(label, tunnelSet);
-				}
+				ArrayList<Location> tunnelSet = tunnelSets.computeIfAbsent(label, k -> new ArrayList<>(3));
 				tunnelSet.add(comp.getLocation());
 			}
 		}
@@ -680,7 +676,7 @@ class CircuitWires {
 	}
 
 	static class SplitterData {
-		WireBundle[] end_bundle; // PointData associated with each end
+		final WireBundle[] end_bundle; // PointData associated with each end
 
 		SplitterData(int fan_out) {
 			end_bundle = new WireBundle[fan_out + 1];
@@ -688,8 +684,8 @@ class CircuitWires {
 	}
 
 	static class ThreadBundle {
-		int loc;
-		WireBundle b;
+		final int loc;
+		final WireBundle b;
 
 		ThreadBundle(int loc, WireBundle b) {
 			this.loc = loc;
@@ -697,9 +693,10 @@ class CircuitWires {
 		}
 	}
 
+	@SuppressWarnings("MethodDoesntCallSuperMethod")
 	static class State {
-		BundleMap bundleMap;
-		HashMap<WireThread, Value> thr_values = new HashMap<WireThread, Value>();
+		final BundleMap bundleMap;
+		final HashMap<WireThread, Value> thr_values = new HashMap<>();
 
 		State(BundleMap bundleMap) {
 			this.bundleMap = bundleMap;
@@ -714,9 +711,9 @@ class CircuitWires {
 	}
 
 	static class BundleMap {
+		final HashMap<Location, WireBundle> pointBundles = new HashMap<>();
+		final HashSet<WireBundle> bundles = new HashSet<>();
 		boolean computed = false;
-		HashMap<Location, WireBundle> pointBundles = new HashMap<Location, WireBundle>();
-		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
 		boolean isValid = true;
 		// NOTE: It would make things more efficient if we also had
 		// a set of just the first bundle in each tree.
@@ -728,7 +725,7 @@ class CircuitWires {
 
 		void addWidthIncompatibilityData(WidthIncompatibilityData e) {
 			if (incompatibilityData == null) {
-				incompatibilityData = new HashSet<WidthIncompatibilityData>();
+				incompatibilityData = new HashSet<>();
 			}
 			incompatibilityData.add(e);
 		}
@@ -777,7 +774,7 @@ class CircuitWires {
 			while (!computed) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}

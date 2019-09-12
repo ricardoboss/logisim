@@ -19,18 +19,18 @@ public class Options {
 		= Attributes.forOption("gateUndefined", Strings.getter("gateUndefinedOption"),
 		new AttributeOption[]{GATE_UNDEFINED_IGNORE, GATE_UNDEFINED_ERROR});
 
-	public static final Integer sim_rand_dflt = Integer.valueOf(32);
+	public static final Integer sim_rand_dflt = 32;
 
 	private static final Attribute<?>[] ATTRIBUTES = {
 		ATTR_GATE_UNDEFINED, sim_limit_attr, sim_rand_attr,
 	};
 	private static final Object[] DEFAULTS = {
-		GATE_UNDEFINED_IGNORE, Integer.valueOf(1000), Integer.valueOf(0),
+		GATE_UNDEFINED_IGNORE, 1000, 0,
 	};
 
-	private AttributeSet attrs;
-	private MouseMappings mmappings;
-	private ToolbarData toolbar;
+	private final AttributeSet attrs;
+	private final MouseMappings mmappings;
+	private final ToolbarData toolbar;
 
 	public Options() {
 		attrs = AttributeSets.fixedSet(ATTRIBUTES, DEFAULTS);

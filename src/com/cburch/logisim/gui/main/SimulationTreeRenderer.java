@@ -11,7 +11,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
-public class SimulationTreeRenderer extends DefaultTreeCellRenderer {
+class SimulationTreeRenderer extends DefaultTreeCellRenderer {
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value,
 												  boolean selected, boolean expanded, boolean leaf, int row,
@@ -33,8 +33,8 @@ public class SimulationTreeRenderer extends DefaultTreeCellRenderer {
 	}
 
 	private static class RendererIcon implements Icon {
-		private ComponentFactory factory;
-		private boolean isCurrentView;
+		private final ComponentFactory factory;
+		private final boolean isCurrentView;
 
 		RendererIcon(ComponentFactory factory, boolean isCurrentView) {
 			this.factory = factory;

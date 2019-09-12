@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Keyboard extends InstanceFactory {
 	static final int WIDTH = 145;
-	static final int HEIGHT = 25;
+	private static final int HEIGHT = 25;
 	private static final int CLR = 0;
 	private static final int CK = 1;
 	private static final int RE = 2;
@@ -30,7 +30,7 @@ public class Keyboard extends InstanceFactory {
 	public Keyboard() {
 		super("Keyboard", Strings.getter("keyboardComponent"));
 		setAttributes(new Attribute[]{ATTR_BUFFER, StdAttr.EDGE_TRIGGER},
-			new Object[]{Integer.valueOf(32), StdAttr.TRIG_RISING});
+			new Object[]{32, StdAttr.TRIG_RISING});
 		setOffsetBounds(Bounds.create(0, -15, WIDTH, HEIGHT));
 		setIconName("keyboard.gif");
 		setInstancePoker(Poker.class);
@@ -50,7 +50,7 @@ public class Keyboard extends InstanceFactory {
 	}
 
 	private static int getBufferLength(Object bufferAttr) {
-		if (bufferAttr instanceof Integer) return ((Integer) bufferAttr).intValue();
+		if (bufferAttr instanceof Integer) return (Integer) bufferAttr;
 		else return 32;
 	}
 
@@ -68,8 +68,8 @@ public class Keyboard extends InstanceFactory {
 
 	public static void addToBuffer(InstanceState state, char[] newChars) {
 		KeyboardData keyboardData = getKeyboardState(state);
-		for (int i = 0; i < newChars.length; i++) {
-			keyboardData.insert(newChars[i]);
+		for (char newChar : newChars) {
+			keyboardData.insert(newChar);
 		}
 	}
 
@@ -118,16 +118,16 @@ public class Keyboard extends InstanceFactory {
 			String str;
 			int dispStart;
 			int dispEnd;
-			ArrayList<Integer> specials = new ArrayList<Integer>();
+			ArrayList<Integer> specials = new ArrayList<>();
 			FontMetrics fm = null;
 			KeyboardData state = getKeyboardState(painter);
 			synchronized (state) {
 				str = state.toString();
 				for (int i = state.getNextSpecial(0); i >= 0; i = state.getNextSpecial(i + 1)) {
 					char c = state.getChar(i);
-					specials.add(Integer.valueOf(c << 16 | i));
+					specials.add(c << 16 | i);
 				}
-				if (!state.isDisplayValid()) {
+				if (state.isDisplayValid()) {
 					fm = g.getFontMetrics(DEFAULT_FONT);
 					state.updateDisplay(fm);
 				}
@@ -154,7 +154,7 @@ public class Keyboard extends InstanceFactory {
 		int r = width / 10;
 		if (r < 1) r = 1;
 		int d = 2 * r;
-		if (2 * r + 1 * d <= width) g.fillOval(x + r, y - d, d, d);
+		if (2 * r + d <= width) g.fillOval(x + r, y - d, d, d);
 		if (3 * r + 2 * d <= width) g.fillOval(x + 2 * r + d, y - d, d, d);
 		if (5 * r + 3 * d <= width) g.fillOval(x + 3 * r + 2 * d, y - d, d, d);
 	}
@@ -202,7 +202,7 @@ public class Keyboard extends InstanceFactory {
 		int[] px = new int[3];
 		int[] py = new int[3];
 		for (Integer special : specials) {
-			int code = special.intValue();
+			int code = special;
 			int pos = code & 0xFF;
 			int w0;
 			int w1;
@@ -311,7 +311,7 @@ public class Keyboard extends InstanceFactory {
 			synchronized (data) {
 				str = data.toString();
 				cursor = data.getCursorPosition();
-				if (!data.isDisplayValid()) data.updateDisplay(fm);
+				if (data.isDisplayValid()) data.updateDisplay(fm);
 				dispStart = data.getDisplayStart();
 			}
 

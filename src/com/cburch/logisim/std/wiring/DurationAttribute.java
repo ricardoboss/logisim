@@ -10,8 +10,8 @@ import com.cburch.logisim.util.StringUtil;
 import javax.swing.*;
 
 public class DurationAttribute extends Attribute<Integer> {
-	private int min;
-	private int max;
+	private final int min;
+	private final int max;
 
 	public DurationAttribute(String name, StringGetter disp, int min, int max) {
 		super(name, disp);
@@ -23,9 +23,9 @@ public class DurationAttribute extends Attribute<Integer> {
 	public Integer parse(String value) {
 		try {
 			Integer ret = Integer.valueOf(value);
-			if (ret.intValue() < min) {
+			if (ret < min) {
 				throw new NumberFormatException(StringUtil.format(Strings.get("durationSmallMessage"), "" + min));
-			} else if (ret.intValue() > max) {
+			} else if (ret > max) {
 				throw new NumberFormatException(StringUtil.format(Strings.get("durationLargeMessage"), "" + max));
 			}
 			return ret;
@@ -36,7 +36,7 @@ public class DurationAttribute extends Attribute<Integer> {
 
 	@Override
 	public String toDisplayString(Integer value) {
-		if (value.equals(Integer.valueOf(1))) {
+		if (value.equals(1)) {
 			return Strings.get("clockDurationOneValue");
 		} else {
 			return StringUtil.format(Strings.get("clockDurationValue"),

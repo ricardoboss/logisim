@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 class ScrollPanel extends LogPanel {
-	private TablePanel table;
+	private final TablePanel table;
 
 	public ScrollPanel(LogFrame frame) {
 		super(frame);

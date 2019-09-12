@@ -9,12 +9,13 @@ import com.cburch.logisim.data.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 class FactoryAttributes implements AttributeSet, AttributeListener, Cloneable {
-	private Class<? extends Library> descBase;
-	private FactoryDescription desc;
+	private final Class<? extends Library> descBase;
+	private final FactoryDescription desc;
+	private final ArrayList<AttributeListener> listeners;
 	private ComponentFactory factory;
 	private AttributeSet baseAttrs;
-	private ArrayList<AttributeListener> listeners;
 
 	public FactoryAttributes(Class<? extends Library> descBase,
 							 FactoryDescription desc) {
@@ -22,7 +23,7 @@ class FactoryAttributes implements AttributeSet, AttributeListener, Cloneable {
 		this.desc = desc;
 		this.factory = null;
 		this.baseAttrs = null;
-		this.listeners = new ArrayList<AttributeListener>();
+		this.listeners = new ArrayList<>();
 	}
 
 	public FactoryAttributes(ComponentFactory factory) {
@@ -30,7 +31,7 @@ class FactoryAttributes implements AttributeSet, AttributeListener, Cloneable {
 		this.desc = null;
 		this.factory = factory;
 		this.baseAttrs = null;
-		this.listeners = new ArrayList<AttributeListener>();
+		this.listeners = new ArrayList<>();
 	}
 
 	boolean isFactoryInstantiated() {

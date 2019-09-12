@@ -6,5 +6,5 @@ package com.cburch.draw.model;
 import java.util.EventListener;
 
 public interface CanvasModelListener extends EventListener {
-    public void modelChanged(CanvasModelEvent event);
+	void modelChanged(CanvasModelEvent event);
 }

@@ -15,7 +15,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 class NorGate extends AbstractGate {
-	public static NorGate FACTORY = new NorGate();
+	public static final NorGate FACTORY = new NorGate();
 
 	private NorGate() {
 		super("NOR Gate", Strings.getter("norGateComponent"));

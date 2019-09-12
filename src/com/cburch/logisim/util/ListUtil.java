@@ -13,12 +13,12 @@ public class ListUtil {
 
 	public static <E> List<E> joinImmutableLists(List<? extends E> a,
 												 List<? extends E> b) {
-		return new JoinedList<E>(a, b);
+		return new JoinedList<>(a, b);
 	}
 
 	private static class JoinedList<E> extends AbstractList<E> {
-		List<? extends E> a;
-		List<? extends E> b;
+		final List<? extends E> a;
+		final List<? extends E> b;
 
 		JoinedList(List<? extends E> a, List<? extends E> b) {
 			this.a = a;

@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ConcurrentHashQueue<E> {
+class ConcurrentHashQueue<E> {
 	private static final int DONE_MARKER = Integer.MIN_VALUE / 2;
 
-	private ConcurrentHashMap<E, Boolean> members;
-	private ConcurrentLinkedQueue<E> queue;
-	private AtomicInteger removeCount;
+	private final ConcurrentHashMap<E, Boolean> members;
+	private final ConcurrentLinkedQueue<E> queue;
+	private final AtomicInteger removeCount;
 
 	public ConcurrentHashQueue() {
-		members = new ConcurrentHashMap<E, Boolean>();
-		queue = new ConcurrentLinkedQueue<E>();
+		members = new ConcurrentHashMap<>();
+		queue = new ConcurrentLinkedQueue<>();
 		removeCount = new AtomicInteger(0);
 	}
 

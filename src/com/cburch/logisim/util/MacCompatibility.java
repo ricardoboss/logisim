@@ -60,7 +60,7 @@ public class MacCompatibility {
 	public static void setFramelessJMenuBar(JMenuBar menubar) {
 		try {
 			MRJAdapter.setFramelessJMenuBar(menubar);
-		} catch (Throwable t) {
+		} catch (Throwable ignored) {
 		}
 	}
 
@@ -73,7 +73,7 @@ public class MacCompatibility {
 			} catch (IOException e) {
 				ioExcept = e;
 			}
-		} catch (Throwable t) {
+		} catch (Throwable ignored) {
 		}
 		if (ioExcept != null) throw ioExcept;
 	}

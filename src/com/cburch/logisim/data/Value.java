@@ -20,10 +20,10 @@ public class Value {
 	public static final Color NIL_COLOR = Color.GRAY;
 	public static final Color FALSE_COLOR = new Color(0, 100, 0);
 	public static final Color TRUE_COLOR = new Color(0, 210, 0);
-	public static final Color UNKNOWN_COLOR = new Color(40, 40, 255);
 	public static final Color ERROR_COLOR = new Color(192, 0, 0);
 	public static final Color WIDTH_ERROR_COLOR = new Color(255, 123, 0);
-	public static final Color MULTI_COLOR = Color.BLACK;
+	private static final Color UNKNOWN_COLOR = new Color(40, 40, 255);
+	private static final Color MULTI_COLOR = Color.BLACK;
 
 	private static final Cache cache = new Cache();
 	private final int width;
@@ -191,11 +191,10 @@ public class Value {
 	public boolean equals(Object other_obj) {
 		if (!(other_obj instanceof Value)) return false;
 		Value other = (Value) other_obj;
-		boolean ret = this.width == other.width
+		return this.width == other.width
 			&& this.error == other.error
 			&& this.unknown == other.unknown
 			&& this.value == other.value;
-		return ret;
 	}
 
 	@Override
@@ -233,7 +232,7 @@ public class Value {
 		}
 	}
 
-	public String toOctalString() {
+	private String toOctalString() {
 		if (width <= 1) {
 			return toString();
 		} else {

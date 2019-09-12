@@ -63,7 +63,7 @@ class ProjectExplorerModel extends DefaultTreeModel implements ProjectListener {
 	}
 
 	static abstract class Node<T> extends DefaultMutableTreeNode {
-		ProjectExplorerModel model;
+		final ProjectExplorerModel model;
 		int oldIndex;
 		int newIndex;
 

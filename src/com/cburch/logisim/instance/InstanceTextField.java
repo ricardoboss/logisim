@@ -18,8 +18,7 @@ import java.awt.*;
 
 public class InstanceTextField implements AttributeListener, TextFieldListener,
 	TextEditable {
-	private Canvas canvas;
-	private InstanceComponent comp;
+	private final InstanceComponent comp;
 	private TextField field;
 	private Attribute<String> labelAttr;
 	private Attribute<Font> fontAttr;
@@ -123,7 +122,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener,
 	}
 
 	public Caret getTextCaret(ComponentUserEvent event) {
-		canvas = event.getCanvas();
+		Canvas canvas = event.getCanvas();
 		Graphics g = canvas.getGraphics();
 
 		// if field is absent, create it empty

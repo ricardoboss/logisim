@@ -9,8 +9,8 @@ import com.cburch.logisim.util.StringGetter;
 import javax.swing.*;
 
 class ComboOption {
-	private Object value;
-	private StringGetter getter;
+	private final Object value;
+	private final StringGetter getter;
 
 	ComboOption(String value, StringGetter getter) {
 		this.value = value;

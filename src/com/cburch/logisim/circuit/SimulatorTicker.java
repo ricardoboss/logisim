@@ -4,7 +4,7 @@
 package com.cburch.logisim.circuit;
 
 class SimulatorTicker extends Thread {
-	private Simulator.PropagationManager manager;
+	private final Simulator.PropagationManager manager;
 	private int ticksPerTickPhase;
 	private int millisPerTickPhase;
 
@@ -61,7 +61,7 @@ class SimulatorTicker extends Thread {
 						ticks = ticksPerTickPhase;
 					}
 				}
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignored) {
 			}
 
 			if (complete) break;
@@ -94,7 +94,7 @@ class SimulatorTicker extends Thread {
 				if (wait < 1) wait = 1;
 				if (wait > 100) wait = 100;
 				Thread.sleep(wait);
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignored) {
 			}
 		}
 	}

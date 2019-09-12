@@ -16,13 +16,14 @@ import java.util.ListIterator;
 import java.util.Map;
 
 public class ToolbarData {
-	private EventSourceWeakSupport<ToolbarListener> listeners;
-	private EventSourceWeakSupport<AttributeListener> toolListeners;
-	private ArrayList<Tool> contents;
+	private final EventSourceWeakSupport<ToolbarListener> listeners;
+	private final EventSourceWeakSupport<AttributeListener> toolListeners;
+	private final ArrayList<Tool> contents;
+
 	public ToolbarData() {
-		listeners = new EventSourceWeakSupport<ToolbarListener>();
-		toolListeners = new EventSourceWeakSupport<AttributeListener>();
-		contents = new ArrayList<Tool>();
+		listeners = new EventSourceWeakSupport<>();
+		toolListeners = new EventSourceWeakSupport<>();
+		contents = new ArrayList<>();
 	}
 
 	//
@@ -70,7 +71,7 @@ public class ToolbarData {
 		}
 	}
 
-	public void fireToolbarChanged() {
+	private void fireToolbarChanged() {
 		for (ToolbarListener l : listeners) {
 			l.toolbarChanged();
 		}
@@ -156,8 +157,8 @@ public class ToolbarData {
 	}
 
 	public Object remove(int pos) {
-		Object ret = contents.remove(pos);
-		if (ret instanceof Tool) removeAttributeListeners((Tool) ret);
+		Tool ret = contents.remove(pos);
+		if (ret instanceof Tool) removeAttributeListeners(ret);
 		fireToolbarChanged();
 		return ret;
 	}
@@ -175,10 +176,10 @@ public class ToolbarData {
 	void replaceAll(Map<Tool, Tool> toolMap) {
 		boolean changed = false;
 		for (ListIterator<Tool> it = contents.listIterator(); it.hasNext(); ) {
-			Object old = it.next();
+			Tool old = it.next();
 			if (toolMap.containsKey(old)) {
 				changed = true;
-				removeAttributeListeners((Tool) old);
+				removeAttributeListeners(old);
 				Tool newTool = toolMap.get(old);
 				if (newTool == null) {
 					it.remove();
@@ -186,7 +187,7 @@ public class ToolbarData {
 					Tool addedTool = newTool.cloneTool();
 					addAttributeListeners(addedTool);
 					LoadedLibrary.copyAttributes(addedTool.getAttributeSet(),
-						((Tool) old).getAttributeSet());
+						old.getAttributeSet());
 					it.set(addedTool);
 				}
 			}
@@ -194,7 +195,7 @@ public class ToolbarData {
 		if (changed) fireToolbarChanged();
 	}
 
-	public static interface ToolbarListener {
-		public void toolbarChanged();
+	public interface ToolbarListener {
+		void toolbarChanged();
 	}
 }

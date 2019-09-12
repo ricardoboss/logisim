@@ -11,19 +11,20 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class WindowMenu extends JMenu {
-	private JFrame owner;
-	private MyListener myListener = new MyListener();
-	private JMenuItem minimize = new JMenuItem();
-	private JMenuItem zoom = new JMenuItem();
-	private JMenuItem close = new JMenuItem();
-	private JRadioButtonMenuItem nullItem = new JRadioButtonMenuItem();
-	private ArrayList<WindowMenuItem> persistentItems = new ArrayList<WindowMenuItem>();
-	private ArrayList<WindowMenuItem> transientItems = new ArrayList<WindowMenuItem>();
+	private final JFrame owner;
+	private final MyListener myListener = new MyListener();
+	private final JMenuItem minimize = new JMenuItem();
+	private final JMenuItem zoom = new JMenuItem();
+	private final JMenuItem close = new JMenuItem();
+	private final JRadioButtonMenuItem nullItem = new JRadioButtonMenuItem();
+	private final ArrayList<WindowMenuItem> persistentItems = new ArrayList<>();
+	private final ArrayList<WindowMenuItem> transientItems = new ArrayList<>();
+
 	public WindowMenu(JFrame owner) {
 		this.owner = owner;
 		WindowMenuManager.addMenu(this);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMask();
+		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
 		minimize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, menuMask));
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask));
 
@@ -103,13 +104,13 @@ public class WindowMenu extends JMenu {
 		}
 	}
 
-	void doMinimize() {
+	private void doMinimize() {
 		if (owner != null) {
 			owner.setExtendedState(Frame.ICONIFIED);
 		}
 	}
 
-	void doClose() {
+	private void doClose() {
 		if (owner instanceof WindowClosable) {
 			((WindowClosable) owner).requestClose();
 		} else if (owner != null) {
@@ -124,7 +125,7 @@ public class WindowMenu extends JMenu {
 		}
 	}
 
-	void doZoom() {
+	private void doZoom() {
 		if (owner == null) return;
 
 		owner.pack();

@@ -23,12 +23,13 @@ import java.awt.event.MouseEvent;
 public class PokeTool extends Tool {
 	private static final Icon toolIcon = Icons.getIcon("poke.gif");
 	private static final Color caretColor = new Color(255, 255, 150);
-	private static Cursor cursor
+	private static final Cursor cursor
 		= Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-	private Listener listener;
+	private final Listener listener;
 	private Circuit pokedCircuit;
 	private Component pokedComponent;
 	private Caret pokeCaret;
+
 	public PokeTool() {
 		this.listener = new Listener();
 	}
@@ -198,11 +199,11 @@ public class PokeTool extends Tool {
 	}
 
 	private static class WireCaret extends AbstractCaret {
-		AttributeSet opts;
-		Canvas canvas;
-		Wire wire;
-		int x;
-		int y;
+		final AttributeSet opts;
+		final Canvas canvas;
+		final Wire wire;
+		final int x;
+		final int y;
 
 		WireCaret(Canvas c, Wire w, int x, int y, AttributeSet opts) {
 			canvas = c;

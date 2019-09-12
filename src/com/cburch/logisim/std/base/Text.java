@@ -15,28 +15,28 @@ import java.awt.*;
 
 public class Text extends InstanceFactory {
 	public static final Text FACTORY = new Text();
-	public static Attribute<String> ATTR_TEXT = Attributes.forString("text",
+	public static final Attribute<String> ATTR_TEXT = Attributes.forString("text",
 		Strings.getter("textTextAttr"));
-	public static Attribute<Font> ATTR_FONT = Attributes.forFont("font",
+	public static final Attribute<Font> ATTR_FONT = Attributes.forFont("font",
 		Strings.getter("textFontAttr"));
-	public static Attribute<AttributeOption> ATTR_HALIGN = Attributes.forOption("halign",
+	public static final Attribute<AttributeOption> ATTR_HALIGN = Attributes.forOption("halign",
 		Strings.getter("textHorzAlignAttr"), new AttributeOption[]{
-			new AttributeOption(Integer.valueOf(TextField.H_LEFT),
+			new AttributeOption(TextField.H_LEFT,
 				"left", Strings.getter("textHorzAlignLeftOpt")),
-			new AttributeOption(Integer.valueOf(TextField.H_RIGHT),
+			new AttributeOption(TextField.H_RIGHT,
 				"right", Strings.getter("textHorzAlignRightOpt")),
-			new AttributeOption(Integer.valueOf(TextField.H_CENTER),
+			new AttributeOption(TextField.H_CENTER,
 				"center", Strings.getter("textHorzAlignCenterOpt")),
 		});
-	public static Attribute<AttributeOption> ATTR_VALIGN = Attributes.forOption("valign",
+	public static final Attribute<AttributeOption> ATTR_VALIGN = Attributes.forOption("valign",
 		Strings.getter("textVertAlignAttr"), new AttributeOption[]{
-			new AttributeOption(Integer.valueOf(TextField.V_TOP),
+			new AttributeOption(TextField.V_TOP,
 				"top", Strings.getter("textVertAlignTopOpt")),
-			new AttributeOption(Integer.valueOf(TextField.V_BASELINE),
+			new AttributeOption(TextField.V_BASELINE,
 				"base", Strings.getter("textVertAlignBaseOpt")),
-			new AttributeOption(Integer.valueOf(TextField.V_BOTTOM),
+			new AttributeOption(TextField.V_BOTTOM,
 				"bottom", Strings.getter("textVertAlignBottomOpt")),
-			new AttributeOption(Integer.valueOf(TextField.H_CENTER),
+			new AttributeOption(TextField.H_CENTER,
 				"center", Strings.getter("textVertAlignCenterOpt")),
 		});
 
@@ -72,7 +72,6 @@ public class Text extends InstanceFactory {
 		String text = attrs.getText();
 		if (text == null || text.length() == 0) return Bounds.EMPTY_BOUNDS;
 		int size = attrs.getFont().getSize();
-		int h = size;
 		int w = size * text.length() / 2;
 		int ha = attrs.getHorizontalAlign();
 		int va = attrs.getVerticalAlign();
@@ -88,18 +87,18 @@ public class Text extends InstanceFactory {
 		if (va == TextField.V_TOP) {
 			y = 0;
 		} else if (va == TextField.V_CENTER) {
-			y = -h / 2;
+			y = -size / 2;
 		} else {
-			y = -h;
+			y = -size;
 		}
-		return Bounds.create(x, y, w, h);
+		return Bounds.create(x, y, w, size);
 	}
 
 	//
 	// graphics methods
 	//
 	@Override
-	public void paintGhost(InstancePainter painter) {
+	protected void paintGhost(InstancePainter painter) {
 		TextAttributes attrs = (TextAttributes) painter.getAttributeSet();
 		String text = attrs.getText();
 		if (text == null || text.equals("")) return;

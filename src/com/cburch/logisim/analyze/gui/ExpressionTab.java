@@ -16,17 +16,18 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 
 class ExpressionTab extends AnalyzerTab implements TabInterface {
-	private OutputSelector selector;
-	private ExpressionView prettyView = new ExpressionView();
-	private JTextArea field = new JTextArea(4, 25);
-	private JButton clear = new JButton();
-	private JButton revert = new JButton();
-	private JButton enter = new JButton();
-	private JLabel error = new JLabel();
-	private MyListener myListener = new MyListener();
-	private AnalyzerModel model;
+	private final OutputSelector selector;
+	private final ExpressionView prettyView = new ExpressionView();
+	private final JTextArea field = new JTextArea(4, 25);
+	private final JButton clear = new JButton();
+	private final JButton revert = new JButton();
+	private final JButton enter = new JButton();
+	private final JLabel error = new JLabel();
+	private final MyListener myListener = new MyListener();
+	private final AnalyzerModel model;
 	private int curExprStringLength = 0;
 	private StringGetter errorMessage;
+
 	public ExpressionTab(AnalyzerModel model) {
 		this.model = model;
 		selector = new OutputSelector(model);
@@ -103,7 +104,7 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		registry.registerDefaultButton(field, enter);
 	}
 
-	String getCurrentVariable() {
+	private String getCurrentVariable() {
 		return selector.getSelectedOutput();
 	}
 

@@ -57,8 +57,6 @@ public class PriorityEncoder extends InstanceFactory {
 		if (attr == StdAttr.FACING || attr == Plexers.ATTR_SELECT) {
 			instance.recomputeBounds();
 			updatePorts(instance);
-		} else if (attr == Plexers.ATTR_SELECT) {
-			updatePorts(instance);
 		} else if (attr == Plexers.ATTR_DISABLED) {
 			instance.fireInvalidated();
 		}

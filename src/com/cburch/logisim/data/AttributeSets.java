@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class AttributeSets {
 	public static final AttributeSet EMPTY = new AttributeSet() {
 		@Override
@@ -86,7 +87,7 @@ public class AttributeSets {
 		private boolean readOnly = false;
 
 		SingletonSet(Attribute<?> attr, Object initValue) {
-			this.attrs = new ArrayList<Attribute<?>>(1);
+			this.attrs = new ArrayList<>(1);
 			this.attrs.add(attr);
 			this.value = initValue;
 		}

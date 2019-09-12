@@ -30,7 +30,7 @@ public class Decoder extends InstanceFactory {
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		if (attr == Plexers.ATTR_ENABLE) {
 			int newer = ver.compareTo(LogisimVersion.get(2, 6, 3, 220));
-			return Boolean.valueOf(newer >= 0);
+			return newer >= 0;
 		} else {
 			return super.getDefaultAttributeValue(attr, ver);
 		}
@@ -70,11 +70,10 @@ public class Decoder extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING || attr == Plexers.ATTR_SELECT_LOC
-			|| attr == Plexers.ATTR_SELECT) {
+		if (attr == StdAttr.FACING || attr == Plexers.ATTR_SELECT_LOC || attr == Plexers.ATTR_SELECT) {
 			instance.recomputeBounds();
 			updatePorts(instance);
-		} else if (attr == Plexers.ATTR_SELECT || attr == Plexers.ATTR_ENABLE) {
+		} else if (attr == Plexers.ATTR_ENABLE) {
 			updatePorts(instance);
 		} else if (attr == Plexers.ATTR_TRISTATE || attr == Plexers.ATTR_DISABLED) {
 			instance.fireInvalidated();
@@ -85,7 +84,7 @@ public class Decoder extends InstanceFactory {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		Object selectLoc = instance.getAttributeValue(Plexers.ATTR_SELECT_LOC);
 		BitWidth select = instance.getAttributeValue(Plexers.ATTR_SELECT);
-		boolean enable = instance.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = instance.getAttributeValue(Plexers.ATTR_ENABLE);
 		int outputs = 1 << select.getWidth();
 		Port[] ps = new Port[outputs + (enable ? 2 : 1)];
 		if (outputs == 2) {
@@ -155,12 +154,12 @@ public class Decoder extends InstanceFactory {
 		BitWidth data = BitWidth.ONE;
 		BitWidth select = state.getAttributeValue(Plexers.ATTR_SELECT);
 		Boolean threeState = state.getAttributeValue(Plexers.ATTR_TRISTATE);
-		boolean enable = state.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = state.getAttributeValue(Plexers.ATTR_ENABLE);
 		int outputs = 1 << select.getWidth();
 
 		// determine default output values
 		Value others; // the default output
-		if (threeState.booleanValue()) {
+		if (threeState) {
 			others = Value.UNKNOWN;
 		} else {
 			others = Value.FALSE;
@@ -209,7 +208,7 @@ public class Decoder extends InstanceFactory {
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
 		Object selectLoc = painter.getAttributeValue(Plexers.ATTR_SELECT_LOC);
 		BitWidth select = painter.getAttributeValue(Plexers.ATTR_SELECT);
-		boolean enable = painter.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = painter.getAttributeValue(Plexers.ATTR_ENABLE);
 		int selMult = selectLoc == Plexers.SELECT_TOP_RIGHT ? -1 : 1;
 		int outputs = 1 << select.getWidth();
 

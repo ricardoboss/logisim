@@ -20,22 +20,22 @@ import java.util.*;
 
 class SelectionBase {
 	static final Set<Component> NO_COMPONENTS = Collections.emptySet();
-	final HashSet<Component> selected = new HashSet<Component>(); // of selected Components in circuit
-	final HashSet<Component> lifted = new HashSet<Component>(); // of selected Components removed
-	final HashSet<Component> suppressHandles = new HashSet<Component>(); // of Components
+	final HashSet<Component> selected = new HashSet<>(); // of selected Components in circuit
+	final HashSet<Component> lifted = new HashSet<>(); // of selected Components removed
+	final HashSet<Component> suppressHandles = new HashSet<>(); // of Components
 	final Set<Component> unionSet = CollectionUtil.createUnmodifiableSetUnion(selected, lifted);
-	Project proj;
-	private ArrayList<Selection.Listener> listeners = new ArrayList<Selection.Listener>();
+	private final Project proj;
+	private final ArrayList<Selection.Listener> listeners = new ArrayList<>();
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;
 	private boolean shouldSnap = false;
 
-	public SelectionBase(Project proj) {
+	SelectionBase(Project proj) {
 		this.proj = proj;
 	}
 
 	private static boolean shouldSnapComponent(Component comp) {
 		Boolean shouldSnapValue = (Boolean) comp.getFactory().getFeature(ComponentFactory.SHOULD_SNAP, comp.getAttributeSet());
-		return shouldSnapValue == null ? true : shouldSnapValue.booleanValue();
+		return shouldSnapValue == null || shouldSnapValue;
 	}
 
 	private static Bounds computeBounds(Collection<Component> components) {
@@ -64,7 +64,7 @@ class SelectionBase {
 		listeners.remove(l);
 	}
 
-	public void fireSelectionChanged() {
+	void fireSelectionChanged() {
 		bounds = null;
 		computeShouldSnap();
 		Selection.Event e = new Selection.Event(this);
@@ -148,12 +148,12 @@ class SelectionBase {
 		}
 	}
 
-	void clear(CircuitMutation xn) {
+	private void clear(CircuitMutation xn) {
 		clear(xn, true);
 	}
 
 	// removes all from selection - NOT from circuit
-	void clear(CircuitMutation xn, boolean dropLifted) {
+	private void clear(CircuitMutation xn, boolean dropLifted) {
 		if (selected.isEmpty() && lifted.isEmpty()) return;
 
 		if (dropLifted && !lifted.isEmpty()) {
@@ -174,7 +174,7 @@ class SelectionBase {
 	}
 
 	void duplicateHelper(CircuitMutation xn) {
-		HashSet<Component> oldSelected = new HashSet<Component>(selected);
+		HashSet<Component> oldSelected = new HashSet<>(selected);
 		oldSelected.addAll(lifted);
 		pasteHelper(xn, oldSelected);
 	}
@@ -296,14 +296,14 @@ class SelectionBase {
 
 	private HashMap<Component, Component> copyComponents(Collection<Component> components,
 														 int dx, int dy) {
-		HashMap<Component, Component> ret = new HashMap<Component, Component>();
+		HashMap<Component, Component> ret = new HashMap<>();
 		for (Component comp : components) {
 			Location oldLoc = comp.getLocation();
 			AttributeSet attrs = (AttributeSet) comp.getAttributeSet().clone();
 			int newX = oldLoc.getX() + dx;
 			int newY = oldLoc.getY() + dy;
 			Object snap = comp.getFactory().getFeature(ComponentFactory.SHOULD_SNAP, attrs);
-			if (snap == null || ((Boolean) snap).booleanValue()) {
+			if (snap == null || (Boolean) snap) {
 				newX = Canvas.snapXToGrid(newX);
 				newY = Canvas.snapYToGrid(newY);
 			}
@@ -316,7 +316,7 @@ class SelectionBase {
 	}
 
 	// debugging methods
-	public void print() {
+	void print() {
 		System.err.println(" shouldSnap: " + shouldSnap()); //OK
 
 		boolean hasPrinted = false;

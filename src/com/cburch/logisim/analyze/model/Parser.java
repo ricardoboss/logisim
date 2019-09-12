@@ -22,6 +22,7 @@ public class Parser {
 	private static final int TOKEN_CONST = 8;
 	private static final int TOKEN_WHITE = 9;
 	private static final int TOKEN_ERROR = 10;
+
 	private Parser() {
 	}
 
@@ -38,16 +39,21 @@ public class Parser {
 				if (index < 0) {
 					// ok; but maybe this is an operator
 					String opText = token.text.toUpperCase();
-					if (opText.equals("NOT")) {
-						token.type = TOKEN_NOT;
-					} else if (opText.equals("AND")) {
-						token.type = TOKEN_AND;
-					} else if (opText.equals("XOR")) {
-						token.type = TOKEN_XOR;
-					} else if (opText.equals("OR")) {
-						token.type = TOKEN_OR;
-					} else {
-						throw token.error(Strings.getter("badVariableName", token.text));
+					switch (opText) {
+						case "NOT":
+							token.type = TOKEN_NOT;
+							break;
+						case "AND":
+							token.type = TOKEN_AND;
+							break;
+						case "XOR":
+							token.type = TOKEN_XOR;
+							break;
+						case "OR":
+							token.type = TOKEN_OR;
+							break;
+						default:
+							throw token.error(Strings.getter("badVariableName", token.text));
 					}
 				}
 			}
@@ -105,7 +111,7 @@ public class Parser {
 	}
 
 	private static ArrayList<Token> toTokens(String in, boolean includeWhite) {
-		ArrayList<Token> tokens = new ArrayList<Token>();
+		ArrayList<Token> tokens = new ArrayList<>();
 
 		// Guarantee that we will stop just after reading whitespace,
 		// not in the middle of a token.
@@ -175,7 +181,7 @@ public class Parser {
 	}
 
 	private static Expression parse(ArrayList<Token> tokens) throws ParserException {
-		ArrayList<Context> stack = new ArrayList<Context>();
+		ArrayList<Context> stack = new ArrayList<>();
 		Expression current = null;
 		for (int i = 0; i < tokens.size(); i++) {
 			Token t = tokens.get(i);
@@ -294,10 +300,10 @@ public class Parser {
 	}
 
 	private static class Token {
+		final int offset;
+		final int length;
+		final String text;
 		int type;
-		int offset;
-		int length;
-		String text;
 
 		Token(int type, int offset, String text) {
 			this(type, offset, text.length(), text);
@@ -319,9 +325,9 @@ public class Parser {
 	// parsing code
 	//
 	private static class Context {
-		int level;
-		Expression current;
-		Token cause;
+		final int level;
+		final Expression current;
+		final Token cause;
 
 		Context(Expression current, int level, Token cause) {
 			this.level = level;

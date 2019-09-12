@@ -11,11 +11,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PropertyChangeWeakSupport {
 	private static final String ALL_PROPERTIES = "ALL PROPERTIES";
-	private Object source;
-	private ConcurrentLinkedQueue<ListenerData> listeners;
+	private final Object source;
+	private final ConcurrentLinkedQueue<ListenerData> listeners;
+
 	public PropertyChangeWeakSupport(Object source) {
 		this.source = source;
-		this.listeners = new ConcurrentLinkedQueue<ListenerData>();
+		this.listeners = new ConcurrentLinkedQueue<>();
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -49,7 +50,7 @@ public class PropertyChangeWeakSupport {
 			PropertyChangeListener l = data.listener.get();
 			if (l == null) {
 				it.remove();
-			} else if (data.property == ALL_PROPERTIES
+			} else if (data.property.equals(ALL_PROPERTIES)
 				|| data.property.equals(property)) {
 				if (e == null) {
 					e = new PropertyChangeEvent(source, property, oldValue, newValue);
@@ -66,11 +67,11 @@ public class PropertyChangeWeakSupport {
 			PropertyChangeListener l = data.listener.get();
 			if (l == null) {
 				it.remove();
-			} else if (data.property == ALL_PROPERTIES
+			} else if (data.property.equals(ALL_PROPERTIES)
 				|| data.property.equals(property)) {
 				if (e == null) {
 					e = new PropertyChangeEvent(source, property,
-						Integer.valueOf(oldValue), Integer.valueOf(newValue));
+						oldValue, newValue);
 				}
 				l.propertyChange(e);
 			}
@@ -84,11 +85,11 @@ public class PropertyChangeWeakSupport {
 			PropertyChangeListener l = data.listener.get();
 			if (l == null) {
 				it.remove();
-			} else if (data.property == ALL_PROPERTIES
+			} else if (data.property.equals(ALL_PROPERTIES)
 				|| data.property.equals(property)) {
 				if (e == null) {
 					e = new PropertyChangeEvent(source, property,
-						Boolean.valueOf(oldValue), Boolean.valueOf(newValue));
+						oldValue, newValue);
 				}
 				l.propertyChange(e);
 			}
@@ -96,12 +97,12 @@ public class PropertyChangeWeakSupport {
 	}
 
 	private static class ListenerData {
-		String property;
-		WeakReference<PropertyChangeListener> listener;
+		final String property;
+		final WeakReference<PropertyChangeListener> listener;
 
 		ListenerData(String property, PropertyChangeListener listener) {
 			this.property = property;
-			this.listener = new WeakReference<PropertyChangeListener>(listener);
+			this.listener = new WeakReference<>(listener);
 		}
 	}
 

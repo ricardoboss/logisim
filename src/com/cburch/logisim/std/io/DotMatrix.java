@@ -14,31 +14,31 @@ import java.util.Arrays;
 // TODO repropagate when rows/cols change
 
 public class DotMatrix extends InstanceFactory {
-	static final AttributeOption INPUT_SELECT
+	private static final AttributeOption INPUT_SELECT
 		= new AttributeOption("select", Strings.getter("ioInputSelect"));
-	static final AttributeOption INPUT_COLUMN
+	private static final AttributeOption INPUT_COLUMN
 		= new AttributeOption("column", Strings.getter("ioInputColumn"));
-	static final AttributeOption INPUT_ROW
+	private static final AttributeOption INPUT_ROW
 		= new AttributeOption("row", Strings.getter("ioInputRow"));
 
-	static final AttributeOption SHAPE_CIRCLE
+	private static final AttributeOption SHAPE_CIRCLE
 		= new AttributeOption("circle", Strings.getter("ioShapeCircle"));
-	static final AttributeOption SHAPE_SQUARE
+	private static final AttributeOption SHAPE_SQUARE
 		= new AttributeOption("square", Strings.getter("ioShapeSquare"));
 
-	static final Attribute<AttributeOption> ATTR_INPUT_TYPE
+	private static final Attribute<AttributeOption> ATTR_INPUT_TYPE
 		= Attributes.forOption("inputtype", Strings.getter("ioMatrixInput"),
 		new AttributeOption[]{INPUT_COLUMN, INPUT_ROW, INPUT_SELECT});
-	static final Attribute<Integer> ATTR_MATRIX_COLS
+	private static final Attribute<Integer> ATTR_MATRIX_COLS
 		= Attributes.forIntegerRange("matrixcols",
 		Strings.getter("ioMatrixCols"), 1, Value.MAX_WIDTH);
-	static final Attribute<Integer> ATTR_MATRIX_ROWS
+	private static final Attribute<Integer> ATTR_MATRIX_ROWS
 		= Attributes.forIntegerRange("matrixrows",
 		Strings.getter("ioMatrixRows"), 1, Value.MAX_WIDTH);
-	static final Attribute<AttributeOption> ATTR_DOT_SHAPE
+	private static final Attribute<AttributeOption> ATTR_DOT_SHAPE
 		= Attributes.forOption("dotshape", Strings.getter("ioMatrixShape"),
 		new AttributeOption[]{SHAPE_CIRCLE, SHAPE_SQUARE});
-	static final Attribute<Integer> ATTR_PERSIST = new DurationAttribute("persist",
+	private static final Attribute<Integer> ATTR_PERSIST = new DurationAttribute("persist",
 		Strings.getter("ioMatrixPersistenceAttr"), 0, Integer.MAX_VALUE);
 
 	public DotMatrix() {
@@ -48,8 +48,8 @@ public class DotMatrix extends InstanceFactory {
 			Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR,
 			ATTR_PERSIST, ATTR_DOT_SHAPE
 		}, new Object[]{
-			INPUT_COLUMN, Integer.valueOf(5), Integer.valueOf(7),
-			Color.GREEN, Color.DARK_GRAY, Integer.valueOf(0), SHAPE_SQUARE
+			INPUT_COLUMN, 5, 7,
+			Color.GREEN, Color.DARK_GRAY, 0, SHAPE_SQUARE
 		});
 		setIconName("dotmat.gif");
 	}
@@ -57,8 +57,8 @@ public class DotMatrix extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Object input = attrs.getValue(ATTR_INPUT_TYPE);
-		int cols = attrs.getValue(ATTR_MATRIX_COLS).intValue();
-		int rows = attrs.getValue(ATTR_MATRIX_ROWS).intValue();
+		int cols = attrs.getValue(ATTR_MATRIX_COLS);
+		int rows = attrs.getValue(ATTR_MATRIX_ROWS);
 		if (input == INPUT_COLUMN) {
 			return Bounds.create(-5, -10 * rows, 10 * cols, 10 * rows);
 		} else if (input == INPUT_ROW) {
@@ -89,8 +89,8 @@ public class DotMatrix extends InstanceFactory {
 
 	private void updatePorts(Instance instance) {
 		Object input = instance.getAttributeValue(ATTR_INPUT_TYPE);
-		int rows = instance.getAttributeValue(ATTR_MATRIX_ROWS).intValue();
-		int cols = instance.getAttributeValue(ATTR_MATRIX_COLS).intValue();
+		int rows = instance.getAttributeValue(ATTR_MATRIX_ROWS);
+		int cols = instance.getAttributeValue(ATTR_MATRIX_COLS);
 		Port[] ps;
 		if (input == INPUT_COLUMN) {
 			ps = new Port[cols];
@@ -118,8 +118,8 @@ public class DotMatrix extends InstanceFactory {
 	}
 
 	private State getState(InstanceState state) {
-		int rows = state.getAttributeValue(ATTR_MATRIX_ROWS).intValue();
-		int cols = state.getAttributeValue(ATTR_MATRIX_COLS).intValue();
+		int rows = state.getAttributeValue(ATTR_MATRIX_ROWS);
+		int cols = state.getAttributeValue(ATTR_MATRIX_COLS);
 		long clock = state.getTickCount();
 
 		State data = (State) state.getData();
@@ -135,10 +135,10 @@ public class DotMatrix extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		Object type = state.getAttributeValue(ATTR_INPUT_TYPE);
-		int rows = state.getAttributeValue(ATTR_MATRIX_ROWS).intValue();
-		int cols = state.getAttributeValue(ATTR_MATRIX_COLS).intValue();
+		int rows = state.getAttributeValue(ATTR_MATRIX_ROWS);
+		int cols = state.getAttributeValue(ATTR_MATRIX_COLS);
 		long clock = state.getTickCount();
-		long persist = clock + state.getAttributeValue(ATTR_PERSIST).intValue();
+		long persist = clock + state.getAttributeValue(ATTR_PERSIST);
 
 		State data = getState(state);
 		if (type == INPUT_ROW) {
@@ -202,7 +202,7 @@ public class DotMatrix extends InstanceFactory {
 		private Value[] grid;
 		private long[] persistTo;
 
-		public State(int rows, int cols, long curClock) {
+		State(int rows, int cols, long curClock) {
 			this.rows = -1;
 			this.cols = -1;
 			updateSize(rows, cols, curClock);

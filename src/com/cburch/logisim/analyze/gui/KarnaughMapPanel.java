@@ -29,8 +29,7 @@ class KarnaughMapPanel extends JPanel implements TruthTablePanel {
 	private static final int CELL_VERT_SEP = 10;
 	private static final int IMP_INSET = 4;
 	private static final int IMP_RADIUS = 5;
-	private MyListener myListener = new MyListener();
-	private AnalyzerModel model;
+	private final AnalyzerModel model;
 	private String output;
 	private int headHeight;
 	private int cellWidth = 1;
@@ -40,15 +39,17 @@ class KarnaughMapPanel extends JPanel implements TruthTablePanel {
 	private int provisionalX;
 	private int provisionalY;
 	private Entry provisionalValue = null;
+
 	public KarnaughMapPanel(AnalyzerModel model) {
 		this.model = model;
+		MyListener myListener = new MyListener();
 		model.getOutputExpressions().addOutputExpressionsListener(myListener);
 		model.getTruthTable().addTruthTableListener(myListener);
 		setToolTipText(" ");
 	}
 
 	public void setOutput(String value) {
-		boolean recompute = (output == null || value == null) && output != value;
+		boolean recompute = (output == null || value == null) && !output.equals(value);
 		output = value;
 		if (recompute) computePreferredSize();
 		else repaint();

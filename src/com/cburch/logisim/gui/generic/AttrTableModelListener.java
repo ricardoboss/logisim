@@ -3,10 +3,10 @@
 
 package com.cburch.logisim.gui.generic;
 
-public interface AttrTableModelListener {
-	public void attrTitleChanged(AttrTableModelEvent event);
+interface AttrTableModelListener {
+	void attrTitleChanged(AttrTableModelEvent event);
 
-	public void attrStructureChanged(AttrTableModelEvent event);
+	void attrStructureChanged(AttrTableModelEvent event);
 
-	public void attrValueChanged(AttrTableModelEvent event);
+	void attrValueChanged(AttrTableModelEvent event);
 }

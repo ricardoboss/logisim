@@ -4,7 +4,7 @@
 package com.cburch.logisim.file;
 
 public class LoadFailedException extends Exception {
-	private boolean shown;
+	private final boolean shown;
 
 	LoadFailedException(String desc) {
 		this(desc, false);
@@ -16,6 +16,6 @@ public class LoadFailedException extends Exception {
 	}
 
 	public boolean isShown() {
-		return shown;
+		return !shown;
 	}
 }

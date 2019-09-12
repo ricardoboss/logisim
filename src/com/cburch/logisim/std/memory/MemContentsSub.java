@@ -37,9 +37,9 @@ class MemContentsSub {
 
 		boolean matches(int[] values, int start, int mask) {
 			for (int i = 0; i < values.length; i++) {
-				if (get(start + i) != (values[i] & mask)) return false;
+				if (get(start + i) != (values[i] & mask)) return true;
 			}
-			return true;
+			return false;
 		}
 
 		int[] get(int start, int len) {
@@ -59,7 +59,7 @@ class MemContentsSub {
 	private static class ByteContents extends ContentsInterface {
 		private byte[] data;
 
-		public ByteContents(int size) {
+		ByteContents(int size) {
 			data = new byte[size];
 		}
 
@@ -111,7 +111,7 @@ class MemContentsSub {
 	private static class ShortContents extends ContentsInterface {
 		private short[] data;
 
-		public ShortContents(int size) {
+		ShortContents(int size) {
 			data = new short[size];
 		}
 
@@ -163,7 +163,7 @@ class MemContentsSub {
 	private static class IntContents extends ContentsInterface {
 		private int[] data;
 
-		public IntContents(int size) {
+		IntContents(int size) {
 			data = new int[size];
 		}
 

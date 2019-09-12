@@ -33,7 +33,7 @@ public class Demultiplexer extends InstanceFactory {
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		if (attr == Plexers.ATTR_ENABLE) {
 			int newer = ver.compareTo(LogisimVersion.get(2, 6, 3, 220));
-			return Boolean.valueOf(newer >= 0);
+			return newer >= 0;
 		} else {
 			return super.getDefaultAttributeValue(attr, ver);
 		}
@@ -84,7 +84,7 @@ public class Demultiplexer extends InstanceFactory {
 		Object selectLoc = instance.getAttributeValue(Plexers.ATTR_SELECT_LOC);
 		BitWidth data = instance.getAttributeValue(StdAttr.WIDTH);
 		BitWidth select = instance.getAttributeValue(Plexers.ATTR_SELECT);
-		boolean enable = instance.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = instance.getAttributeValue(Plexers.ATTR_ENABLE);
 		int outputs = 1 << select.getWidth();
 		Port[] ps = new Port[outputs + (enable ? 3 : 2)];
 		Location sel;
@@ -164,13 +164,13 @@ public class Demultiplexer extends InstanceFactory {
 		BitWidth data = state.getAttributeValue(StdAttr.WIDTH);
 		BitWidth select = state.getAttributeValue(Plexers.ATTR_SELECT);
 		Boolean threeState = state.getAttributeValue(Plexers.ATTR_TRISTATE);
-		boolean enable = state.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = state.getAttributeValue(Plexers.ATTR_ENABLE);
 		int outputs = 1 << select.getWidth();
 		Value en = enable ? state.getPort(outputs + 1) : Value.TRUE;
 
 		// determine output values
 		Value others; // the default output
-		if (threeState.booleanValue()) {
+		if (threeState) {
 			others = Value.createUnknown(data);
 		} else {
 			others = Value.createKnown(data, 0);
@@ -215,7 +215,7 @@ public class Demultiplexer extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
 		BitWidth select = painter.getAttributeValue(Plexers.ATTR_SELECT);
-		boolean enable = painter.getAttributeValue(Plexers.ATTR_ENABLE).booleanValue();
+		boolean enable = painter.getAttributeValue(Plexers.ATTR_ENABLE);
 		int outputs = 1 << select.getWidth();
 
 		// draw select and enable inputs

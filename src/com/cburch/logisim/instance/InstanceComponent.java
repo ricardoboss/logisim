@@ -20,17 +20,17 @@ import java.util.Iterator;
 import java.util.List;
 
 class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
+	private final InstanceFactory factory;
+	private final Instance instance;
+	private final Location loc;
+	private final AttributeSet attrs;
 	private EventSourceWeakSupport<ComponentListener> listeners;
-	private InstanceFactory factory;
-	private Instance instance;
-	private Location loc;
 	private Bounds bounds;
 	private List<Port> portList;
 	private EndData[] endArray;
 	private List<EndData> endList;
 	private boolean hasToolTips;
 	private HashSet<Attribute<BitWidth>> widthAttrs;
-	private AttributeSet attrs;
 	private boolean attrListenRequested;
 	private InstanceTextField textField;
 
@@ -75,8 +75,8 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 			if (oldEnd == null || !oldEnd.equals(newEnd)) {
 				if (newEnd != null) es[i] = newEnd;
 				if (endsChangedOld == null) {
-					endsChangedOld = new ArrayList<EndData>();
-					endsChangedNew = new ArrayList<EndData>();
+					endsChangedOld = new ArrayList<>();
+					endsChangedNew = new ArrayList<>();
 				}
 				endsChangedOld.add(oldEnd);
 				endsChangedNew.add(newEnd);
@@ -86,7 +86,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 				Attribute<BitWidth> attr = p.getWidthAttribute();
 				if (attr != null) {
 					if (wattrs == null) {
-						wattrs = new HashSet<Attribute<BitWidth>>();
+						wattrs = new HashSet<>();
 					}
 					wattrs.add(attr);
 				}
@@ -104,7 +104,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 		}
 		if (es != esOld) {
 			endArray = es;
-			endList = new UnmodifiableList<EndData>(es);
+			endList = new UnmodifiableList<>(es);
 		}
 		widthAttrs = wattrs;
 		hasToolTips = toolTipFound;
@@ -119,7 +119,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	public void addComponentListener(ComponentListener l) {
 		EventSourceWeakSupport<ComponentListener> ls = listeners;
 		if (ls == null) {
-			ls = new EventSourceWeakSupport<ComponentListener>();
+			ls = new EventSourceWeakSupport<>();
 			ls.add(l);
 			listeners = ls;
 		} else {
@@ -176,8 +176,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 			Object defaultTip = factory.getDefaultToolTip();
 			if (hasToolTips || defaultTip != null) return this;
 		} else if (key == TextEditable.class) {
-			InstanceTextField field = textField;
-			if (field != null) return field;
+			return textField;
 		}
 		return null;
 	}
@@ -225,8 +224,8 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 
 	public boolean endsAt(Location pt) {
 		EndData[] ends = endArray;
-		for (int i = 0; i < ends.length; i++) {
-			if (ends[i].getLocation().equals(pt)) return true;
+		for (EndData end : ends) {
+			if (end.getLocation().equals(pt)) return true;
 		}
 		return false;
 	}
@@ -299,7 +298,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 
 	void setPorts(Port[] ports) {
 		Port[] portsCopy = ports.clone();
-		portList = new UnmodifiableList<Port>(portsCopy);
+		portList = new UnmodifiableList<>(portsCopy);
 		computeEnds();
 	}
 

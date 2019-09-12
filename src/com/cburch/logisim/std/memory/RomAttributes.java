@@ -14,17 +14,16 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 class RomAttributes extends AbstractAttributeSet {
-	private static List<Attribute<?>> ATTRIBUTES = Arrays.asList(new Attribute<?>[]{
-		Mem.ADDR_ATTR, Mem.DATA_ATTR, Rom.CONTENTS_ATTR
-	});
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays.asList(Mem.ADDR_ATTR, Mem.DATA_ATTR, Rom.CONTENTS_ATTR);
 
-	private static WeakHashMap<MemContents, RomContentsListener> listenerRegistry
-		= new WeakHashMap<MemContents, RomContentsListener>();
-	private static WeakHashMap<MemContents, HexFrame> windowRegistry
-		= new WeakHashMap<MemContents, HexFrame>();
+	private static final WeakHashMap<MemContents, RomContentsListener> listenerRegistry
+		= new WeakHashMap<>();
+	private static final WeakHashMap<MemContents, HexFrame> windowRegistry
+		= new WeakHashMap<>();
 	private BitWidth addrBits = BitWidth.create(8);
 	private BitWidth dataBits = BitWidth.create(8);
 	private MemContents contents;
+
 	RomAttributes() {
 		contents = MemContents.create(addrBits.getWidth(), dataBits.getWidth());
 	}

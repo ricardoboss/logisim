@@ -11,12 +11,12 @@ import com.cburch.logisim.util.StringGetter;
 import java.util.*;
 
 public final class CircuitMutation extends CircuitTransaction {
-	private Circuit primary;
-	private List<CircuitChange> changes;
+	private final Circuit primary;
+	private final List<CircuitChange> changes;
 
 	public CircuitMutation(Circuit circuit) {
 		this.primary = circuit;
-		this.changes = new ArrayList<CircuitChange>();
+		this.changes = new ArrayList<>();
 	}
 
 	CircuitMutation() {
@@ -53,7 +53,7 @@ public final class CircuitMutation extends CircuitTransaction {
 	}
 
 	public void replace(ReplacementMap replacements) {
-		if (!replacements.isEmpty()) {
+		if (replacements.isEmpty()) {
 			replacements.freeze();
 			changes.add(CircuitChange.replace(primary, replacements));
 		}
@@ -78,8 +78,8 @@ public final class CircuitMutation extends CircuitTransaction {
 
 	@Override
 	protected Map<Circuit, Integer> getAccessedCircuits() {
-		HashMap<Circuit, Integer> accessMap = new HashMap<Circuit, Integer>();
-		HashSet<Circuit> supercircsDone = new HashSet<Circuit>();
+		HashMap<Circuit, Integer> accessMap = new HashMap<>();
+		HashSet<Circuit> supercircsDone = new HashSet<>();
 		for (CircuitChange change : changes) {
 			Circuit circ = change.getCircuit();
 			accessMap.put(circ, READ_WRITE);

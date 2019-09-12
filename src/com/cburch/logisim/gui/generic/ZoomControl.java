@@ -11,10 +11,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class ZoomControl extends JPanel {
+	private final JSpinner spinner;
+	private final GridIcon grid;
 	private ZoomModel model;
-	private JSpinner spinner;
 	private SpinnerModel spinnerModel;
-	private GridIcon grid;
+
 	public ZoomControl(ZoomModel model) {
 		super(new BorderLayout());
 		this.model = model;
@@ -56,8 +57,8 @@ public class ZoomControl extends JPanel {
 			double zoom = model.getZoomFactor();
 			double[] choices = model.getZoomOptions();
 			double factor = zoom * 100.0 * 1.001;
-			for (int i = 0; i < choices.length; i++) {
-				if (choices[i] > factor) return toString(choices[i]);
+			for (double choice : choices) {
+				if (choice > factor) return toString(choice);
 			}
 			return null;
 		}
@@ -85,7 +86,7 @@ public class ZoomControl extends JPanel {
 				try {
 					double zoom = Double.parseDouble(s) / 100.0;
 					model.setZoomFactor(zoom);
-				} catch (NumberFormatException e) {
+				} catch (NumberFormatException ignored) {
 				}
 			}
 		}
@@ -109,7 +110,7 @@ public class ZoomControl extends JPanel {
 		implements MouseListener, PropertyChangeListener {
 		boolean state = true;
 
-		public GridIcon() {
+		GridIcon() {
 			addMouseListener(this);
 			setPreferredSize(new Dimension(15, 15));
 			setToolTipText("");

@@ -10,10 +10,10 @@ import com.cburch.logisim.instance.InstanceData;
 import java.util.Arrays;
 
 class TtyState implements InstanceData, Cloneable {
+	private final StringBuffer lastRow;
 	private Value lastClock;
 	private String[] rowData;
 	private int colCount;
-	private StringBuffer lastRow;
 	private int row;
 	private boolean sendStdout;
 

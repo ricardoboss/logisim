@@ -17,18 +17,15 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 class MenuSimulate extends Menu {
-	private LogisimMenuBar menubar;
-	private MyListener myListener = new MyListener();
-	private CircuitState currentState = null;
-	private CircuitState bottomState = null;
-	private Simulator currentSim = null;
-	private MenuItemCheckImpl run;
-	private JMenuItem reset = new JMenuItem();
-	private MenuItemImpl step;
-	private MenuItemCheckImpl ticksEnabled;
-	private MenuItemImpl tickOnce;
-	private JMenu tickFreq = new JMenu();
-	private TickFrequencyChoice[] tickFreqs = {
+	private final LogisimMenuBar menubar;
+	private final MyListener myListener = new MyListener();
+	private final MenuItemCheckImpl run;
+	private final JMenuItem reset = new JMenuItem();
+	private final MenuItemImpl step;
+	private final MenuItemCheckImpl ticksEnabled;
+	private final MenuItemImpl tickOnce;
+	private final JMenu tickFreq = new JMenu();
+	private final TickFrequencyChoice[] tickFreqs = {
 		new TickFrequencyChoice(4096),
 		new TickFrequencyChoice(2048),
 		new TickFrequencyChoice(1024),
@@ -45,13 +42,17 @@ class MenuSimulate extends Menu {
 		new TickFrequencyChoice(0.5),
 		new TickFrequencyChoice(0.25),
 	};
-	private JMenu downStateMenu = new JMenu();
-	private ArrayList<CircuitStateMenuItem> downStateItems
-		= new ArrayList<CircuitStateMenuItem>();
-	private JMenu upStateMenu = new JMenu();
-	private ArrayList<CircuitStateMenuItem> upStateItems
-		= new ArrayList<CircuitStateMenuItem>();
-	private JMenuItem log = new JMenuItem();
+	private final JMenu downStateMenu = new JMenu();
+	private final ArrayList<CircuitStateMenuItem> downStateItems
+		= new ArrayList<>();
+	private final JMenu upStateMenu = new JMenu();
+	private final ArrayList<CircuitStateMenuItem> upStateItems
+		= new ArrayList<>();
+	private final JMenuItem log = new JMenuItem();
+	private CircuitState currentState = null;
+	private CircuitState bottomState = null;
+	private Simulator currentSim = null;
+
 	public MenuSimulate(LogisimMenuBar menubar) {
 		this.menubar = menubar;
 
@@ -65,7 +66,7 @@ class MenuSimulate extends Menu {
 		menubar.registerItem(LogisimMenuBar.TICK_ENABLE, ticksEnabled);
 		menubar.registerItem(LogisimMenuBar.TICK_STEP, tickOnce);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMask();
+		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
 		run.setAccelerator(KeyStroke.getKeyStroke(
 			KeyEvent.VK_E, menuMask));
 		reset.setAccelerator(KeyStroke.getKeyStroke(
@@ -78,9 +79,9 @@ class MenuSimulate extends Menu {
 			KeyEvent.VK_K, menuMask));
 
 		ButtonGroup bgroup = new ButtonGroup();
-		for (int i = 0; i < tickFreqs.length; i++) {
-			bgroup.add(tickFreqs[i]);
-			tickFreq.add(tickFreqs[i]);
+		for (TickFrequencyChoice freq : tickFreqs) {
+			bgroup.add(freq);
+			tickFreq.add(freq);
 		}
 
 		add(run);
@@ -129,8 +130,8 @@ class MenuSimulate extends Menu {
 		tickOnce.setText(Strings.get("simulateTickOnceItem"));
 		ticksEnabled.setText(Strings.get("simulateTickItem"));
 		tickFreq.setText(Strings.get("simulateTickFreqMenu"));
-		for (int i = 0; i < tickFreqs.length; i++) {
-			tickFreqs[i].localeChanged();
+		for (TickFrequencyChoice freq : tickFreqs) {
+			freq.localeChanged();
 		}
 		downStateMenu.setText(Strings.get("simulateDownStateMenu"));
 		upStateMenu.setText(Strings.get("simulateUpStateMenu"));
@@ -163,8 +164,8 @@ class MenuSimulate extends Menu {
 
 		if (currentSim != oldSim) {
 			double freq = currentSim == null ? 1.0 : currentSim.getTickFrequency();
-			for (int i = 0; i < tickFreqs.length; i++) {
-				tickFreqs[i].setSelected(Math.abs(tickFreqs[i].freq - freq) < 0.001);
+			for (TickFrequencyChoice tickFrequencyChoice : tickFreqs) {
+				tickFrequencyChoice.setSelected(Math.abs(tickFrequencyChoice.freq - freq) < 0.001);
 			}
 
 			if (oldSim != null) oldSim.removeSimulatorListener(myListener);
@@ -204,7 +205,7 @@ class MenuSimulate extends Menu {
 		menu.removeAll();
 		menu.setEnabled(items.size() > 0);
 		boolean first = true;
-		int mask = getToolkit().getMenuShortcutKeyMask();
+		int mask = getToolkit().getMenuShortcutKeyMaskEx();
 		for (int i = items.size() - 1; i >= 0; i--) {
 			JMenuItem item = items.get(i);
 			menu.add(item);
@@ -236,9 +237,9 @@ class MenuSimulate extends Menu {
 
 	private class TickFrequencyChoice extends JRadioButtonMenuItem
 		implements ActionListener {
-		private double freq;
+		private final double freq;
 
-		public TickFrequencyChoice(double value) {
+		TickFrequencyChoice(double value) {
 			freq = value;
 			addActionListener(this);
 		}
@@ -247,7 +248,7 @@ class MenuSimulate extends Menu {
 			if (currentSim != null) currentSim.setTickFrequency(freq);
 		}
 
-		public void localeChanged() {
+		void localeChanged() {
 			double f = freq;
 			if (f < 1000) {
 				String hzStr;
@@ -272,9 +273,9 @@ class MenuSimulate extends Menu {
 
 	private class CircuitStateMenuItem extends JMenuItem
 		implements CircuitListener, ActionListener {
-		private CircuitState circuitState;
+		private final CircuitState circuitState;
 
-		public CircuitStateMenuItem(CircuitState circuitState) {
+		CircuitStateMenuItem(CircuitState circuitState) {
 			this.circuitState = circuitState;
 
 			Circuit circuit = circuitState.getCircuit();
@@ -337,8 +338,7 @@ class MenuSimulate extends Menu {
 			run.setSelected(sim.isRunning());
 			ticksEnabled.setSelected(sim.isTicking());
 			double freq = sim.getTickFrequency();
-			for (int i = 0; i < tickFreqs.length; i++) {
-				TickFrequencyChoice item = tickFreqs[i];
+			for (TickFrequencyChoice item : tickFreqs) {
 				item.setSelected(freq == item.freq);
 			}
 		}

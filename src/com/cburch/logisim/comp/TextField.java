@@ -19,14 +19,13 @@ public class TextField {
 	public static final int V_CENTER_OVERALL = GraphicsUtil.V_CENTER_OVERALL;
 	public static final int V_BASELINE = GraphicsUtil.V_BASELINE;
 	public static final int V_BOTTOM = GraphicsUtil.V_BOTTOM;
-
+	private final LinkedList<TextFieldListener> listeners = new LinkedList<>();
 	private int x;
 	private int y;
 	private int halign;
 	private int valign;
 	private Font font;
 	private String text = "";
-	private LinkedList<TextFieldListener> listeners = new LinkedList<TextFieldListener>();
 
 	public TextField(int x, int y, int halign, int valign) {
 		this(x, y, halign, valign, null);
@@ -52,8 +51,8 @@ public class TextField {
 		listeners.remove(l);
 	}
 
-	public void fireTextChanged(TextFieldEvent e) {
-		for (TextFieldListener l : new ArrayList<TextFieldListener>(listeners)) {
+	private void fireTextChanged(TextFieldEvent e) {
+		for (TextFieldListener l : new ArrayList<>(listeners)) {
 			l.textChanged(e);
 		}
 	}

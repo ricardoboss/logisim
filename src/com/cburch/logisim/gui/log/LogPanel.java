@@ -9,9 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 
 abstract class LogPanel extends JPanel {
-	private LogFrame logFrame;
+	private final LogFrame logFrame;
 
-	public LogPanel(LogFrame frame) {
+	LogPanel(LogFrame frame) {
 		super();
 		this.logFrame = frame;
 	}

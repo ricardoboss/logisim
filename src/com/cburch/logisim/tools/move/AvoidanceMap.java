@@ -19,13 +19,13 @@ class AvoidanceMap {
 	}
 
 	static AvoidanceMap create(Collection<Component> elements, int dx, int dy) {
-		AvoidanceMap ret = new AvoidanceMap(new HashMap<Location, String>());
+		AvoidanceMap ret = new AvoidanceMap(new HashMap<>());
 		ret.markAll(elements, dx, dy);
 		return ret;
 	}
 
 	public AvoidanceMap cloneMap() {
-		return new AvoidanceMap(new HashMap<Location, String>(avoid));
+		return new AvoidanceMap(new HashMap<>(avoid));
 	}
 
 	public Object get(Location loc) {
@@ -44,7 +44,7 @@ class AvoidanceMap {
 		}
 	}
 
-	public void markComponent(Component comp, int dx, int dy) {
+	private void markComponent(Component comp, int dx, int dy) {
 		HashMap<Location, String> avoid = this.avoid;
 		boolean translated = dx != 0 || dy != 0;
 		Bounds bds = comp.getBounds();
@@ -61,7 +61,7 @@ class AvoidanceMap {
 				// put it into the map as if it is - and in the rare event
 				// that loc isn't in the component, we can remove it.
 				String prev = avoid.put(loc, Connector.ALLOW_NEITHER);
-				if (prev != Connector.ALLOW_NEITHER) {
+				if (!prev.equals(Connector.ALLOW_NEITHER)) {
 					Location baseLoc = translated ? loc.translate(-dx, -dy) : loc;
 					if (!comp.contains(baseLoc)) {
 						if (prev == null) {
@@ -147,10 +147,10 @@ class AvoidanceMap {
 	}
 
 	public void print(PrintStream stream) {
-		ArrayList<Location> list = new ArrayList<Location>(avoid.keySet());
+		ArrayList<Location> list = new ArrayList<>(avoid.keySet());
 		Collections.sort(list);
-		for (int i = 0, n = list.size(); i < n; i++) {
-			stream.println(list.get(i) + ": " + avoid.get(list.get(i)));
+		for (Location location : list) {
+			stream.println(location + ": " + avoid.get(location));
 		}
 	}
 }

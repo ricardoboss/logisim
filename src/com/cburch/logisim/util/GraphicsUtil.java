@@ -55,7 +55,6 @@ public class GraphicsUtil {
 				ret.translate(-width, 0);
 				break;
 			default:
-				;
 		}
 		switch (valign) {
 			case V_TOP:
@@ -73,7 +72,6 @@ public class GraphicsUtil {
 				ret.translate(0, -height);
 				break;
 			default:
-				;
 		}
 		return ret;
 	}

@@ -18,11 +18,12 @@ import java.util.Enumeration;
 
 class SimulationTreeCircuitNode extends SimulationTreeNode
 	implements CircuitListener, AttributeListener, Comparator<Component> {
-	private SimulationTreeModel model;
-	private SimulationTreeCircuitNode parent;
-	private CircuitState circuitState;
-	private Component subcircComp;
+	private final SimulationTreeModel model;
+	private final SimulationTreeCircuitNode parent;
+	private final CircuitState circuitState;
+	private final Component subcircComp;
 	private ArrayList<TreeNode> children;
+
 	public SimulationTreeCircuitNode(SimulationTreeModel model,
 									 SimulationTreeCircuitNode parent, CircuitState circuitState,
 									 Component subcircComp) {
@@ -30,7 +31,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 		this.parent = parent;
 		this.circuitState = circuitState;
 		this.subcircComp = subcircComp;
-		this.children = new ArrayList<TreeNode>();
+		this.children = new ArrayList<>();
 		circuitState.getCircuit().addCircuitListener(this);
 		if (subcircComp != null) {
 			subcircComp.getAttributeSet().addAttributeListener(this);
@@ -117,8 +118,8 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 
 	// returns true if changed
 	private boolean computeChildren() {
-		ArrayList<TreeNode> newChildren = new ArrayList<TreeNode>();
-		ArrayList<Component> subcircs = new ArrayList<Component>();
+		ArrayList<TreeNode> newChildren = new ArrayList<>();
+		ArrayList<Component> subcircs = new ArrayList<>();
 		for (Component comp : circuitState.getCircuit().getNonWires()) {
 			if (comp.getFactory() instanceof SubcircuitFactory) {
 				subcircs.add(comp);
@@ -129,8 +130,8 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 				}
 			}
 		}
-		Collections.sort(newChildren, new CompareByName());
-		Collections.sort(subcircs, this);
+		newChildren.sort(new CompareByName());
+		subcircs.sort(this);
 		for (Component comp : subcircs) {
 			SubcircuitFactory factory = (SubcircuitFactory) comp.getFactory();
 			CircuitState state = factory.getSubstate(circuitState, comp);

@@ -4,8 +4,8 @@
 package com.cburch.hex;
 
 public interface HexModelListener {
-    public void metainfoChanged(HexModel source);
+	void metainfoChanged(HexModel source);
 
-    public void bytesChanged(HexModel source, long start, long numBytes,
-                             int[] oldValues);
+	void bytesChanged(HexModel source, long start, long numBytes,
+					  int[] oldValues);
 }

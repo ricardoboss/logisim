@@ -89,7 +89,7 @@ public class CircuitBuilder {
 			ComponentFactory factory = Constant.FACTORY;
 			AttributeSet attrs = factory.createAttributeSet();
 			attrs.setValue(Constant.ATTR_VALUE,
-				Integer.valueOf(value.getValue()));
+				value.getValue());
 			Bounds bds = factory.getOffsetBounds(attrs);
 			return new Layout(bds.getWidth(), bds.getHeight(),
 				-bds.getY(), factory, attrs,
@@ -111,7 +111,7 @@ public class CircuitBuilder {
 
 				AttributeSet attrs = factory.createAttributeSet();
 				attrs.setValue(GateAttributes.ATTR_SIZE, GateAttributes.SIZE_NARROW);
-				attrs.setValue(GateAttributes.ATTR_INPUTS, Integer.valueOf(2));
+				attrs.setValue(GateAttributes.ATTR_INPUTS, 2);
 
 				// determine layout's width
 				Bounds bds = factory.getOffsetBounds(attrs);
@@ -165,7 +165,7 @@ public class CircuitBuilder {
 			attrs.setValue(GateAttributes.ATTR_SIZE, GateAttributes.SIZE_NARROW);
 
 			int ins = sub.length;
-			attrs.setValue(GateAttributes.ATTR_INPUTS, Integer.valueOf(ins));
+			attrs.setValue(GateAttributes.ATTR_INPUTS, ins);
 		}
 
 		// determine layout's width
@@ -193,7 +193,7 @@ public class CircuitBuilder {
 			// we have to shift everything down because otherwise
 			// the component will peek over the rectangle's top.
 			int dy = minOutputY - outputY;
-			for (int i = 0; i < sub.length; i++) sub[i].y += dy;
+			for (Layout layout : sub) layout.y += dy;
 			height += dy;
 			outputY += dy;
 		}
@@ -232,7 +232,7 @@ public class CircuitBuilder {
 	}
 
 	/**
-	 * @param circuit   the circuit where to place the components.
+	 * @param result    the circuit where to place the components.
 	 * @param layout    the layout specifying the gates to place there.
 	 * @param x         the left edge of where the layout should be placed.
 	 * @param y         the top edge of where the layout should be placed.
@@ -285,7 +285,7 @@ public class CircuitBuilder {
 			Object factory = parent.getFactory();
 			if (factory instanceof AbstractGate) {
 				Value val = ((AbstractGate) factory).getIdentity();
-				Integer valInt = Integer.valueOf(val.toIntValue());
+				Integer valInt = val.toIntValue();
 				Location loc = parent.getEnd(index).getLocation();
 				AttributeSet attrs = Constant.FACTORY.createAttributeSet();
 				attrs.setValue(Constant.ATTR_VALUE, valInt);
@@ -357,7 +357,7 @@ public class CircuitBuilder {
 	// placeInputs
 	//
 	private static void placeInputs(CircuitMutation result, InputData inputData) {
-		ArrayList<Location> forbiddenYs = new ArrayList<Location>();
+		ArrayList<Location> forbiddenYs = new ArrayList<>();
 		Comparator<Location> compareYs = new CompareYs();
 		int curX = 40;
 		int curY = 30;
@@ -372,7 +372,7 @@ public class CircuitBuilder {
 				// search for a Y that won't intersect with others
 				// (we needn't bother if the pin doesn't connect
 				// with anything anyway.)
-				Collections.sort(forbiddenYs, compareYs);
+				forbiddenYs.sort(compareYs);
 				while (Collections.binarySearch(forbiddenYs, spineLoc, compareYs) >= 0) {
 					curY += 10;
 					spineLoc = Location.create(spineX, curY);
@@ -410,7 +410,7 @@ public class CircuitBuilder {
 				// }
 
 				// create spine
-				Collections.sort(spine, compareYs);
+				spine.sort(compareYs);
 				Location prev = spine.get(0);
 				for (int k = 1, n = spine.size(); k < n; k++) {
 					Location cur = spine.get(k);
@@ -432,18 +432,17 @@ public class CircuitBuilder {
 	//
 
 	private static class Layout {
+		// initialized by self
+		final int width;
+		// (or edge corresponding to input)
+		final int height;
+		final ComponentFactory factory;
+		final AttributeSet attrs;
+		final int outputY; // where output is relative to my top edge
+		final int subX; // where right edge of sublayouts should be relative to my left edge
+		final Layout[] subLayouts;
 		// initialized by parent
 		int y; // top edge relative to parent's top edge
-		// (or edge corresponding to input)
-
-		// initialized by self
-		int width;
-		int height;
-		ComponentFactory factory;
-		AttributeSet attrs;
-		int outputY; // where output is relative to my top edge
-		int subX; // where right edge of sublayouts should be relative to my left edge
-		Layout[] subLayouts;
 		String inputName; // for references directly to inputs
 
 		Layout(int width, int height, int outputY,
@@ -466,9 +465,9 @@ public class CircuitBuilder {
 	}
 
 	private static class InputData {
+		final HashMap<String, SingleInput> inputs = new HashMap<>();
 		int startX;
 		String[] names;
-		HashMap<String, SingleInput> inputs = new HashMap<String, SingleInput>();
 
 		InputData() {
 		}
@@ -489,8 +488,8 @@ public class CircuitBuilder {
 	}
 
 	private static class SingleInput {
-		int spineX;
-		ArrayList<Location> ys = new ArrayList<Location>();
+		final int spineX;
+		final ArrayList<Location> ys = new ArrayList<>();
 
 		SingleInput(int spineX) {
 			this.spineX = spineX;

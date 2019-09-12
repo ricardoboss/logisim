@@ -35,7 +35,7 @@ public class Tty extends InstanceFactory {
 			ATTR_ROWS, ATTR_COLUMNS, StdAttr.EDGE_TRIGGER,
 			Io.ATTR_COLOR, Io.ATTR_BACKGROUND
 		}, new Object[]{
-			Integer.valueOf(8), Integer.valueOf(32), StdAttr.TRIG_RISING,
+			8, 32, StdAttr.TRIG_RISING,
 			Color.BLACK, DEFAULT_BACKGROUND
 		});
 		setIconName("tty.gif");
@@ -53,12 +53,12 @@ public class Tty extends InstanceFactory {
 	}
 
 	private static int getRowCount(Object val) {
-		if (val instanceof Integer) return ((Integer) val).intValue();
+		if (val instanceof Integer) return (Integer) val;
 		else return 4;
 	}
 
 	private static int getColumnCount(Object val) {
-		if (val instanceof Integer) return ((Integer) val).intValue();
+		if (val instanceof Integer) return (Integer) val;
 		else return 16;
 	}
 

@@ -22,14 +22,12 @@ import java.awt.*;
 import java.util.*;
 
 public class Selection extends SelectionBase {
-	private MyListener myListener;
-	private boolean isVisible = true;
-	private SelectionAttributes attrs;
+	private final SelectionAttributes attrs;
 
 	public Selection(Project proj, Canvas canvas) {
 		super(proj);
 
-		myListener = new MyListener();
+		MyListener myListener = new MyListener();
 		attrs = new SelectionAttributes(canvas, this);
 		proj.addProjectListener(myListener);
 		proj.addCircuitListener(myListener);
@@ -67,7 +65,7 @@ public class Selection extends SelectionBase {
 	}
 
 	public Collection<Component> getComponentsContaining(Location query) {
-		HashSet<Component> ret = new HashSet<Component>();
+		HashSet<Component> ret = new HashSet<>();
 		for (Component comp : unionSet) {
 			if (comp.contains(query)) ret.add(comp);
 		}
@@ -75,7 +73,7 @@ public class Selection extends SelectionBase {
 	}
 
 	public Collection<Component> getComponentsContaining(Location query, Graphics g) {
-		HashSet<Component> ret = new HashSet<Component>();
+		HashSet<Component> ret = new HashSet<>();
 		for (Component comp : unionSet) {
 			if (comp.contains(query, g)) ret.add(comp);
 		}
@@ -83,7 +81,7 @@ public class Selection extends SelectionBase {
 	}
 
 	public Collection<Component> getComponentsWithin(Bounds bds) {
-		HashSet<Component> ret = new HashSet<Component>();
+		HashSet<Component> ret = new HashSet<>();
 		for (Component comp : unionSet) {
 			if (bds.contains(comp.getBounds())) ret.add(comp);
 		}
@@ -91,7 +89,7 @@ public class Selection extends SelectionBase {
 	}
 
 	public Collection<Component> getComponentsWithin(Bounds bds, Graphics g) {
-		HashSet<Component> ret = new HashSet<Component>();
+		HashSet<Component> ret = new HashSet<>();
 		for (Component comp : unionSet) {
 			if (bds.contains(comp.getBounds(g))) ret.add(comp);
 		}
@@ -159,16 +157,17 @@ public class Selection extends SelectionBase {
 
 	@Override
 	public void print() {
-		System.err.println(" isVisible: " + isVisible); //OK
+		boolean isVisible = true;
+		System.err.println(" isVisible: " + true); //OK
 		super.print();
 	}
 
-	public static interface Listener {
-		public void selectionChanged(Selection.Event event);
+	public interface Listener {
+		void selectionChanged(Selection.Event event);
 	}
 
 	public static class Event {
-		Object source;
+		final Object source;
 
 		Event(Object source) {
 			this.source = source;
@@ -180,10 +179,10 @@ public class Selection extends SelectionBase {
 	}
 
 	private class MyListener implements ProjectListener, CircuitListener {
-		private WeakHashMap<Action, SelectionSave> savedSelections;
+		private final WeakHashMap<Action, SelectionSave> savedSelections;
 
 		MyListener() {
-			savedSelections = new WeakHashMap<Action, SelectionSave>();
+			savedSelections = new WeakHashMap<>();
 		}
 
 		public void projectChanged(ProjectEvent event) {
@@ -233,7 +232,7 @@ public class Selection extends SelectionBase {
 				boolean change = false;
 
 				ArrayList<Component> oldAnchored;
-				oldAnchored = new ArrayList<Component>(getComponents());
+				oldAnchored = new ArrayList<>(getComponents());
 				for (Component comp : oldAnchored) {
 					Collection<Component> replacedBy = repl.get(comp);
 					if (replacedBy != null) {

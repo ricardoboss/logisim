@@ -9,8 +9,8 @@ import com.cburch.logisim.data.Value;
 import com.cburch.logisim.util.SmallSet;
 
 class WireBundle {
+	final SmallSet<Location> points = new SmallSet<>(); // points bundle hits
 	WireThread[] threads = null;
-	SmallSet<Location> points = new SmallSet<Location>(); // points bundle hits
 	private BitWidth width = BitWidth.UNKNOWN;
 	private Value pullValue = Value.UNKNOWN;
 	private WireBundle parent;

@@ -13,12 +13,12 @@ import java.util.List;
 
 class ExplorerToolbarModel extends AbstractToolbarModel
 	implements MenuListener.EnabledListener {
-	private Frame frame;
-	private LogisimToolbarItem itemToolbox;
-	private LogisimToolbarItem itemSimulation;
-	private LogisimToolbarItem itemLayout;
-	private LogisimToolbarItem itemAppearance;
-	private List<ToolbarItem> items;
+	private final Frame frame;
+	private final LogisimToolbarItem itemToolbox;
+	private final LogisimToolbarItem itemSimulation;
+	private final LogisimToolbarItem itemLayout;
+	private final LogisimToolbarItem itemAppearance;
+	private final List<ToolbarItem> items;
 
 	public ExplorerToolbarModel(Frame frame, MenuListener menu) {
 		this.frame = frame;

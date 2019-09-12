@@ -17,10 +17,9 @@ import java.awt.event.WindowEvent;
 
 public class PreferencesFrame extends LFrame {
 	private static WindowMenuManager MENU_MANAGER = null;
-	private MyListener myListener = new MyListener();
-	private OptionsPanel[] panels;
-	private JTabbedPane tabbedPane;
-	private JButton close = new JButton();
+	private final OptionsPanel[] panels;
+	private final JTabbedPane tabbedPane;
+	private final JButton close = new JButton();
 
 	private PreferencesFrame() {
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -43,6 +42,7 @@ public class PreferencesFrame extends LFrame {
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(close);
+		MyListener myListener = new MyListener();
 		close.addActionListener(myListener);
 
 		Container contents = getContentPane();

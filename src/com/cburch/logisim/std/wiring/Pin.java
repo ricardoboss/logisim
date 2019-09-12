@@ -30,22 +30,20 @@ public class Pin extends InstanceFactory {
 
 	public static final AttributeOption PULL_NONE
 		= new AttributeOption("none", Strings.getter("pinPullNoneOption"));
-	public static final AttributeOption PULL_UP
+	public static final Pin FACTORY = new Pin();
+	private static final AttributeOption PULL_UP
 		= new AttributeOption("up", Strings.getter("pinPullUpOption"));
-	public static final AttributeOption PULL_DOWN
+	private static final AttributeOption PULL_DOWN
 		= new AttributeOption("down", Strings.getter("pinPullDownOption"));
 	public static final Attribute<AttributeOption> ATTR_PULL
 		= Attributes.forOption("pull", Strings.getter("pinPullAttr"),
 		new AttributeOption[]{PULL_NONE, PULL_UP, PULL_DOWN});
-
-	public static final Pin FACTORY = new Pin();
-
 	private static final Icon ICON_IN = Icons.getIcon("pinInput.gif");
 	private static final Icon ICON_OUT = Icons.getIcon("pinOutput.gif");
 	private static final Font ICON_WIDTH_FONT = new Font("SansSerif", Font.BOLD, 9);
 	private static final Color ICON_WIDTH_COLOR = Value.WIDTH_ERROR_COLOR.darker();
 
-	public Pin() {
+	private Pin() {
 		super("Pin", Strings.getter("pinComponent"));
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(JoinedConfigurator.create(
@@ -364,7 +362,7 @@ public class Pin extends InstanceFactory {
 		Value intendedValue;
 		Value foundValue;
 
-		public PinState(Value sending, Value receiving) {
+		PinState(Value sending, Value receiving) {
 			this.intendedValue = sending;
 			this.foundValue = receiving;
 		}

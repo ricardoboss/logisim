@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 class TruthTableMouseListener implements MouseListener {
 	private int cellX;
 	private int cellY;
-	private Entry oldValue;
 	private Entry newValue;
 
 	public void mousePressed(MouseEvent event) {
@@ -23,7 +22,7 @@ class TruthTableMouseListener implements MouseListener {
 		cellX = source.getOutputColumn(event);
 		cellY = source.getRow(event);
 		if (cellX < 0 || cellY < 0 || cellX >= cols || cellY >= rows) return;
-		oldValue = source.getTruthTable().getOutputEntry(cellY, cellX);
+		Entry oldValue = source.getTruthTable().getOutputEntry(cellY, cellX);
 		if (oldValue == Entry.ZERO) newValue = Entry.ONE;
 		else if (oldValue == Entry.ONE) newValue = Entry.DONT_CARE;
 		else newValue = Entry.ZERO;

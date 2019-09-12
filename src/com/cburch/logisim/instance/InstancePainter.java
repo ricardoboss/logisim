@@ -13,7 +13,7 @@ import com.cburch.logisim.proj.Project;
 import java.awt.*;
 
 public class InstancePainter implements InstanceState {
-	private ComponentDrawContext context;
+	private final ComponentDrawContext context;
 	private InstanceComponent comp;
 	private InstanceFactory factory;
 	private AttributeSet attrs;
@@ -70,7 +70,7 @@ public class InstancePainter implements InstanceState {
 	}
 
 	public boolean isCircuitRoot() {
-		return !context.getCircuitState().isSubstate();
+		return context.getCircuitState().isSubstate();
 	}
 
 	public long getTickCount() {

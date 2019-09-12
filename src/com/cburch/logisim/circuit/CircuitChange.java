@@ -11,21 +11,21 @@ import com.cburch.logisim.std.wiring.Pin;
 import java.util.Collection;
 
 class CircuitChange {
-	static final int CLEAR = 0;
-	static final int ADD = 1;
-	static final int ADD_ALL = 2;
-	static final int REMOVE = 3;
-	static final int REMOVE_ALL = 4;
-	static final int REPLACE = 5;
-	static final int SET = 6;
-	static final int SET_FOR_CIRCUIT = 7;
-	private Circuit circuit;
-	private int type;
-	private Component comp;
+	private static final int CLEAR = 0;
+	private static final int ADD = 1;
+	private static final int ADD_ALL = 2;
+	private static final int REMOVE = 3;
+	private static final int REMOVE_ALL = 4;
+	private static final int REPLACE = 5;
+	private static final int SET = 6;
+	private static final int SET_FOR_CIRCUIT = 7;
+	private final Circuit circuit;
+	private final int type;
+	private final Component comp;
+	private final Attribute<?> attr;
+	private final Object oldValue;
+	private final Object newValue;
 	private Collection<? extends Component> comps;
-	private Attribute<?> attr;
-	private Object oldValue;
-	private Object newValue;
 
 	private CircuitChange(Circuit circuit, int type, Component comp) {
 		this(circuit, type, comp, null, null, null);
@@ -123,6 +123,7 @@ class CircuitChange {
 	CircuitChange getReverseChange() {
 		switch (type) {
 			case CLEAR:
+			case REMOVE_ALL:
 				return CircuitChange.addAll(circuit, comps);
 			case ADD:
 				return CircuitChange.remove(circuit, comp);
@@ -130,8 +131,6 @@ class CircuitChange {
 				return CircuitChange.removeAll(circuit, comps);
 			case REMOVE:
 				return CircuitChange.add(circuit, comp);
-			case REMOVE_ALL:
-				return CircuitChange.addAll(circuit, comps);
 			case SET:
 				return CircuitChange.set(circuit, comp, attr, newValue, oldValue);
 			case SET_FOR_CIRCUIT:

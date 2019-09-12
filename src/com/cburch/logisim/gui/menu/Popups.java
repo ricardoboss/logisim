@@ -37,12 +37,12 @@ public class Popups {
 
 	private static class ProjectPopup extends JPopupMenu
 		implements ActionListener {
-		Project proj;
-		JMenuItem add = new JMenuItem(Strings.get("projectAddCircuitItem"));
-		JMenu load = new JMenu(Strings.get("projectLoadLibraryItem"));
-		JMenuItem loadBuiltin = new JMenuItem(Strings.get("projectLoadBuiltinItem"));
-		JMenuItem loadLogisim = new JMenuItem(Strings.get("projectLoadLogisimItem"));
-		JMenuItem loadJar = new JMenuItem(Strings.get("projectLoadJarItem"));
+		final Project proj;
+		final JMenuItem add = new JMenuItem(Strings.get("projectAddCircuitItem"));
+		final JMenu load = new JMenu(Strings.get("projectLoadLibraryItem"));
+		final JMenuItem loadBuiltin = new JMenuItem(Strings.get("projectLoadBuiltinItem"));
+		final JMenuItem loadLogisim = new JMenuItem(Strings.get("projectLoadLogisimItem"));
+		final JMenuItem loadJar = new JMenuItem(Strings.get("projectLoadJarItem"));
 
 		ProjectPopup(Project proj) {
 			super(Strings.get("projMenu"));
@@ -76,10 +76,10 @@ public class Popups {
 
 	private static class LibraryPopup extends JPopupMenu
 		implements ActionListener {
-		Project proj;
-		Library lib;
-		JMenuItem unload = new JMenuItem(Strings.get("projectUnloadLibraryItem"));
-		JMenuItem reload = new JMenuItem(Strings.get("projectReloadLibraryItem"));
+		final Project proj;
+		final Library lib;
+		final JMenuItem unload = new JMenuItem(Strings.get("projectUnloadLibraryItem"));
+		final JMenuItem reload = new JMenuItem(Strings.get("projectReloadLibraryItem"));
 
 		LibraryPopup(Project proj, Library lib, boolean is_top) {
 			super(Strings.get("libMenu"));
@@ -107,15 +107,15 @@ public class Popups {
 
 	private static class CircuitPopup extends JPopupMenu
 		implements ActionListener {
-		Project proj;
-		Tool tool;
-		Circuit circuit;
-		JMenuItem analyze = new JMenuItem(Strings.get("projectAnalyzeCircuitItem"));
-		JMenuItem stats = new JMenuItem(Strings.get("projectGetCircuitStatisticsItem"));
-		JMenuItem main = new JMenuItem(Strings.get("projectSetAsMainItem"));
-		JMenuItem remove = new JMenuItem(Strings.get("projectRemoveCircuitItem"));
-		JMenuItem editLayout = new JMenuItem(Strings.get("projectEditCircuitLayoutItem"));
-		JMenuItem editAppearance = new JMenuItem(Strings.get("projectEditCircuitAppearanceItem"));
+		final Project proj;
+		final Tool tool;
+		final Circuit circuit;
+		final JMenuItem analyze = new JMenuItem(Strings.get("projectAnalyzeCircuitItem"));
+		final JMenuItem stats = new JMenuItem(Strings.get("projectGetCircuitStatisticsItem"));
+		final JMenuItem main = new JMenuItem(Strings.get("projectSetAsMainItem"));
+		final JMenuItem remove = new JMenuItem(Strings.get("projectRemoveCircuitItem"));
+		final JMenuItem editLayout = new JMenuItem(Strings.get("projectEditCircuitLayoutItem"));
+		final JMenuItem editAppearance = new JMenuItem(Strings.get("projectEditCircuitAppearanceItem"));
 
 		CircuitPopup(Project proj, Tool tool, Circuit circuit) {
 			super(Strings.get("circuitMenu"));

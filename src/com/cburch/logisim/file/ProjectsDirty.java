@@ -12,8 +12,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 class ProjectsDirty {
-	private static ProjectListListener projectListListener = new ProjectListListener();
-	private static ArrayList<DirtyListener> listeners = new ArrayList<DirtyListener>();
+	private static final ProjectListListener projectListListener = new ProjectListListener();
+	private static final ArrayList<DirtyListener> listeners = new ArrayList<>();
 
 	private ProjectsDirty() {
 	}
@@ -23,7 +23,7 @@ class ProjectsDirty {
 	}
 
 	private static class DirtyListener implements LibraryListener {
-		Project proj;
+		final Project proj;
 
 		DirtyListener(Project proj) {
 			this.proj = proj;

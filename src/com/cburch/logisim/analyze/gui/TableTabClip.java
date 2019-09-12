@@ -14,7 +14,7 @@ import java.util.StringTokenizer;
 
 class TableTabClip implements ClipboardOwner {
 	private static final DataFlavor binaryFlavor = new DataFlavor(Data.class, "Binary data");
-	private TableTab table;
+	private final TableTab table;
 
 	TableTabClip(TableTab table) {
 		this.table = table;
@@ -94,9 +94,7 @@ class TableTabClip implements ClipboardOwner {
 					}
 					entries[i] = row;
 				}
-			} catch (UnsupportedFlavorException e) {
-				return;
-			} catch (IOException e) {
+			} catch (UnsupportedFlavorException | IOException e) {
 				return;
 			}
 		} else if (xfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -132,9 +130,7 @@ class TableTabClip implements ClipboardOwner {
 					entries[cur] = ents;
 					cur++;
 				}
-			} catch (UnsupportedFlavorException e) {
-				return;
-			} catch (IOException e) {
+			} catch (UnsupportedFlavorException | IOException e) {
 				return;
 			}
 		} else {
@@ -199,8 +195,8 @@ class TableTabClip implements ClipboardOwner {
 	}
 
 	private static class Data implements Transferable, Serializable {
-		private String[] headers;
-		private String[][] contents;
+		private final String[] headers;
+		private final String[][] contents;
 
 		Data(String[] headers, String[][] contents) {
 			this.headers = headers;
@@ -215,7 +211,7 @@ class TableTabClip implements ClipboardOwner {
 			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
 		}
 
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
 			if (flavor == binaryFlavor) {
 				return this;
 			} else if (flavor == DataFlavor.stringFlavor) {
@@ -224,10 +220,10 @@ class TableTabClip implements ClipboardOwner {
 					buf.append(headers[i]);
 					buf.append(i == headers.length - 1 ? '\n' : '\t');
 				}
-				for (int i = 0; i < contents.length; i++) {
-					for (int j = 0; j < contents[i].length; j++) {
-						buf.append(contents[i][j]);
-						buf.append(j == contents[i].length - 1 ? '\n' : '\t');
+				for (String[] content : contents) {
+					for (int j = 0; j < content.length; j++) {
+						buf.append(content[j]);
+						buf.append(j == content.length - 1 ? '\n' : '\t');
 					}
 				}
 				return buf.toString();

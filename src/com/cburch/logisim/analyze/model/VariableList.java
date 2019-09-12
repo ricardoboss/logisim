@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class VariableList {
-	private ArrayList<VariableListListener> listeners = new ArrayList<VariableListListener>();
-	private int maxSize;
-	private ArrayList<String> data;
-	private List<String> dataView;
+	private final ArrayList<VariableListListener> listeners = new ArrayList<>();
+	private final int maxSize;
+	private final ArrayList<String> data;
+	private final List<String> dataView;
 
 	public VariableList(int maxSize) {
 		this.maxSize = maxSize;
-		data = maxSize > 16 ? new ArrayList<String>() : new ArrayList<String>(maxSize);
+		data = maxSize > 16 ? new ArrayList<>() : new ArrayList<>(maxSize);
 		dataView = Collections.unmodifiableList(data);
 	}
 
@@ -107,7 +107,7 @@ public class VariableList {
 		int index = data.indexOf(name);
 		if (index < 0) throw new NoSuchElementException("input " + name);
 		data.remove(index);
-		fireEvent(VariableListEvent.REMOVE, name, Integer.valueOf(index));
+		fireEvent(VariableListEvent.REMOVE, name, index);
 	}
 
 	public void move(String name, int delta) {
@@ -125,7 +125,7 @@ public class VariableList {
 		if (index == newIndex) return;
 		data.remove(index);
 		data.add(newIndex, name);
-		fireEvent(VariableListEvent.MOVE, name, Integer.valueOf(newIndex - index));
+		fireEvent(VariableListEvent.MOVE, name, newIndex - index);
 	}
 
 	public void replace(String oldName, String newName) {
@@ -133,7 +133,7 @@ public class VariableList {
 		if (index < 0) throw new NoSuchElementException(oldName);
 		if (oldName.equals(newName)) return;
 		data.set(index, newName);
-		fireEvent(VariableListEvent.REPLACE, oldName, Integer.valueOf(index));
+		fireEvent(VariableListEvent.REPLACE, oldName, index);
 	}
 
 }

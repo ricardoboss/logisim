@@ -12,7 +12,7 @@ import java.util.Locale;
 
 class LocaleSelector extends JList
 	implements LocaleListener, ListSelectionListener {
-	private LocaleOption[] items;
+	private final LocaleOption[] items;
 
 	LocaleSelector(Locale[] locales) {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -32,9 +32,9 @@ class LocaleSelector extends JList
 	public void localeChanged() {
 		Locale current = LocaleManager.getLocale();
 		LocaleOption sel = null;
-		for (int i = 0; i < items.length; i++) {
-			items[i].update(current);
-			if (current.equals(items[i].locale)) sel = items[i];
+		for (LocaleOption item : items) {
+			item.update(current);
+			if (current.equals(item.locale)) sel = item;
 		}
 		if (sel != null) {
 			setSelectedValue(sel, true);
@@ -49,7 +49,7 @@ class LocaleSelector extends JList
 	}
 
 	private static class LocaleOption implements Runnable {
-		private Locale locale;
+		private final Locale locale;
 		private String text;
 
 		LocaleOption(Locale locale) {

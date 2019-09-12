@@ -16,31 +16,31 @@ import java.awt.*;
  * there is only one ComponentFactory created for any particular category.
  */
 public interface ComponentFactory extends AttributeDefaultProvider {
-	public static final Object SHOULD_SNAP = new Object();
-	public static final Object TOOL_TIP = new Object();
-	public static final Object FACING_ATTRIBUTE_KEY = new Object();
+	Object SHOULD_SNAP = new Object();
+	Object TOOL_TIP = new Object();
+	Object FACING_ATTRIBUTE_KEY = new Object();
 
-	public String getName();
+	String getName();
 
-	public String getDisplayName();
+	String getDisplayName();
 
-	public StringGetter getDisplayGetter();
+	StringGetter getDisplayGetter();
 
-	public Component createComponent(Location loc, AttributeSet attrs);
+	Component createComponent(Location loc, AttributeSet attrs);
 
-	public Bounds getOffsetBounds(AttributeSet attrs);
+	Bounds getOffsetBounds(AttributeSet attrs);
 
-	public AttributeSet createAttributeSet();
+	AttributeSet createAttributeSet();
 
-	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
+	boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
 
-	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver);
+	Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver);
 
-	public void drawGhost(ComponentDrawContext context, Color color,
-						  int x, int y, AttributeSet attrs);
+	void drawGhost(ComponentDrawContext context, Color color,
+				   int x, int y, AttributeSet attrs);
 
-	public void paintIcon(ComponentDrawContext context,
-						  int x, int y, AttributeSet attrs);
+	void paintIcon(ComponentDrawContext context,
+				   int x, int y, AttributeSet attrs);
 
 	/**
 	 * Retrieves special-purpose features for this factory. This technique
@@ -61,5 +61,5 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	 * supports the feature, or <code>null</code> if it does not support
 	 * the feature.
 	 */
-	public Object getFeature(Object key, AttributeSet attrs);
+	Object getFeature(Object key, AttributeSet attrs);
 }

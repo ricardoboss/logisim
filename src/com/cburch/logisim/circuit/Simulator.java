@@ -29,28 +29,28 @@ public class Simulator {
 	}
 	//end DEBUGGING*/
 
+	private final PropagationManager manager;
+	private final SimulatorTicker ticker;
+	private final ArrayList<SimulatorListener> listeners
+		= new ArrayList<>();
 	private boolean isRunning = true;
 	private boolean isTicking = false;
 	private boolean exceptionEncountered = false;
-	private double tickFrequency = 1.0;
-	private PropagationManager manager;
-	private SimulatorTicker ticker;
-	private ArrayList<SimulatorListener> listeners
-		= new ArrayList<SimulatorListener>();
+	private double tickFrequency;
+
 	public Simulator() {
 		manager = new PropagationManager();
 		ticker = new SimulatorTicker(manager);
 		try {
 			manager.setPriority(manager.getPriority() - 1);
 			ticker.setPriority(ticker.getPriority() - 1);
-		} catch (SecurityException e) {
-		} catch (IllegalArgumentException e) {
+		} catch (SecurityException | IllegalArgumentException ignored) {
 		}
 		manager.start();
 		ticker.start();
 
 		tickFrequency = 0.0;
-		setTickFrequency(AppPreferences.TICK_FREQUENCY.get().doubleValue());
+		setTickFrequency(AppPreferences.TICK_FREQUENCY.get());
 	}
 
 	public void shutDown() {
@@ -160,69 +160,69 @@ public class Simulator {
 		listeners.remove(l);
 	}
 
-	void firePropagationCompleted() {
+	private void firePropagationCompleted() {
 		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+		for (SimulatorListener l : new ArrayList<>(listeners)) {
 			l.propagationCompleted(e);
 		}
 	}
 
-	void fireTickCompleted() {
+	private void fireTickCompleted() {
 		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+		for (SimulatorListener l : new ArrayList<>(listeners)) {
 			l.tickCompleted(e);
 		}
 	}
 
-	void fireSimulatorStateChanged() {
+	private void fireSimulatorStateChanged() {
 		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+		for (SimulatorListener l : new ArrayList<>(listeners)) {
 			l.simulatorStateChanged(e);
 		}
 	}
 
 	class PropagationManager extends Thread {
+		private final PropagationPoints stepPoints = new PropagationPoints();
 		// These variables apply only if PRINT_TICK_RATE is set
 		int tickRateTicks = 0;
 		long tickRateStart = System.currentTimeMillis();
 		private Propagator propagator = null;
-		private PropagationPoints stepPoints = new PropagationPoints();
 		private volatile int ticksRequested = 0;
 		private volatile int stepsRequested = 0;
 		private volatile boolean resetRequested = false;
 		private volatile boolean propagateRequested = false;
 		private volatile boolean complete = false;
 
-		public Propagator getPropagator() {
+		Propagator getPropagator() {
 			return propagator;
 		}
 
-		public void setPropagator(Propagator value) {
+		void setPropagator(Propagator value) {
 			propagator = value;
 		}
 
-		public synchronized void requestPropagate() {
+		synchronized void requestPropagate() {
 			if (!propagateRequested) {
 				propagateRequested = true;
 				notifyAll();
 			}
 		}
 
-		public synchronized void requestReset() {
+		synchronized void requestReset() {
 			if (!resetRequested) {
 				resetRequested = true;
 				notifyAll();
 			}
 		}
 
-		public synchronized void requestTick() {
+		synchronized void requestTick() {
 			if (ticksRequested < 16) {
 				ticksRequested++;
 			}
 			notifyAll();
 		}
 
-		public synchronized void shutDown() {
+		synchronized void shutDown() {
 			complete = true;
 			notifyAll();
 		}
@@ -236,7 +236,7 @@ public class Simulator {
 						&& stepsRequested == 0) {
 						try {
 							wait();
-						} catch (InterruptedException e) {
+						} catch (InterruptedException ignored) {
 						}
 					}
 				}
@@ -245,7 +245,9 @@ public class Simulator {
 					resetRequested = false;
 					if (propagator != null) propagator.reset();
 					firePropagationCompleted();
-					propagateRequested |= isRunning;
+					synchronized (this) {
+						propagateRequested |= isRunning;
+					}
 				}
 
 				if (propagateRequested || ticksRequested > 0 || stepsRequested > 0) {

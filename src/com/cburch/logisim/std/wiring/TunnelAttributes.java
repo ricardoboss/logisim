@@ -10,12 +10,11 @@ import com.cburch.logisim.instance.StdAttr;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 class TunnelAttributes extends AbstractAttributeSet {
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT
-	});
+		= Arrays.asList(StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT);
 
 	private Direction facing;
 	private BitWidth width;
@@ -70,7 +69,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 
 	boolean setOffsetBounds(Bounds value) {
 		Bounds old = offsetBounds;
-		boolean same = old == null ? value == null : old.equals(value);
+		boolean same = Objects.equals(old, value);
 		if (!same) {
 			offsetBounds = value;
 		}
@@ -79,7 +78,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 
 	@Override
 	protected void copyInto(AbstractAttributeSet destObj) {
-		; // nothing to do
+		// nothing to do
 	}
 
 	@Override

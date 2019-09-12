@@ -42,7 +42,7 @@ class KeyboardData implements InstanceData, Cloneable {
 	}
 
 	public boolean isDisplayValid() {
-		return dispValid;
+		return !dispValid;
 	}
 
 	public int getDisplayStart() {
@@ -118,7 +118,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		int len = bufferLength;
 		if (len == 0) return '\0';
 		char ret = buf[0];
-		for (int i = 1; i < len; i++) buf[i - 1] = buf[i];
+		if (len - 1 >= 0) System.arraycopy(buf, 1, buf, 0, len - 1);
 		bufferLength = len - 1;
 		int pos = cursorPos;
 		if (pos > 0) cursorPos = pos - 1;
@@ -132,7 +132,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		int len = bufferLength;
 		if (len >= buf.length) return false;
 		int pos = cursorPos;
-		for (int i = len; i > pos; i--) buf[i] = buf[i - 1];
+		if (len - pos >= 0) System.arraycopy(buf, pos, buf, pos + 1, len - pos);
 		buf[pos] = value;
 		bufferLength = len + 1;
 		cursorPos = pos + 1;
@@ -146,7 +146,7 @@ class KeyboardData implements InstanceData, Cloneable {
 		int len = bufferLength;
 		int pos = cursorPos;
 		if (pos >= len) return false;
-		for (int i = pos + 1; i < len; i++) buf[i - 1] = buf[i];
+		if (len - pos + 1 >= 0) System.arraycopy(buf, pos + 1, buf, pos + 1 - 1, len - pos + 1);
 		bufferLength = len - 1;
 		str = null;
 		dispValid = false;
@@ -198,7 +198,7 @@ class KeyboardData implements InstanceData, Cloneable {
 					i1 += pos - i0;
 					i0 = pos;
 				}
-				if (pos == i0 && i0 > 0) {
+				if (i0 > 0) {
 					i0--;
 					i1--;
 				}
@@ -208,7 +208,7 @@ class KeyboardData implements InstanceData, Cloneable {
 					i0 += pos - i1;
 					i1 = pos;
 				}
-				if (pos == i1 && i1 < len) {
+				if (i1 < len) {
 					i0++;
 					i1++;
 				}

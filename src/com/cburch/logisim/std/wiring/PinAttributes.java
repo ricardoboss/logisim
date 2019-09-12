@@ -13,10 +13,8 @@ import java.util.List;
 
 class PinAttributes extends ProbeAttributes {
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{
-		StdAttr.FACING, Pin.ATTR_TYPE, StdAttr.WIDTH, Pin.ATTR_TRISTATE,
-		Pin.ATTR_PULL, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT
-	});
+		= Arrays.asList(StdAttr.FACING, Pin.ATTR_TYPE, StdAttr.WIDTH, Pin.ATTR_TRISTATE,
+		Pin.ATTR_PULL, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT);
 	public static PinAttributes instance = new PinAttributes();
 	BitWidth width = BitWidth.ONE;
 	boolean threeState = true;
@@ -54,9 +52,9 @@ class PinAttributes extends ProbeAttributes {
 		if (attr == StdAttr.WIDTH) {
 			width = (BitWidth) value;
 		} else if (attr == Pin.ATTR_TRISTATE) {
-			threeState = ((Boolean) value).booleanValue();
+			threeState = (Boolean) value;
 		} else if (attr == Pin.ATTR_TYPE) {
-			type = ((Boolean) value).booleanValue() ? EndData.OUTPUT_ONLY : EndData.INPUT_ONLY;
+			type = (Boolean) value ? EndData.OUTPUT_ONLY : EndData.INPUT_ONLY;
 		} else if (attr == Pin.ATTR_PULL) {
 			pull = value;
 		} else {

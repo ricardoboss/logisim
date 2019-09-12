@@ -5,11 +5,12 @@ package com.cburch.logisim;
 
 public class LogisimVersion {
 	private static final int FINAL_REVISION = Integer.MAX_VALUE / 4;
-	private int major;
-	private int minor;
-	private int release;
-	private int revision;
+	private final int major;
+	private final int minor;
+	private final int release;
+	private final int revision;
 	private String repr;
+
 	private LogisimVersion(int major, int minor, int release, int revision) {
 		this.major = major;
 		this.minor = minor;
@@ -37,7 +38,7 @@ public class LogisimVersion {
 			if (parts.length >= 2) minor = Integer.parseInt(parts[1]);
 			if (parts.length >= 3) release = Integer.parseInt(parts[2]);
 			if (parts.length >= 4) revision = Integer.parseInt(parts[3]);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException ignored) {
 		}
 		return new LogisimVersion(major, minor, release, revision);
 	}

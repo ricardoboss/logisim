@@ -13,7 +13,7 @@ public class BitWidth implements Comparable<BitWidth> {
 	public static final BitWidth ONE = new BitWidth(1);
 
 	private static BitWidth[] prefab = null;
-	final int width;
+	private final int width;
 
 	private BitWidth(int width) {
 		this.width = width;
@@ -35,7 +35,7 @@ public class BitWidth implements Comparable<BitWidth> {
 		}
 	}
 
-	public static BitWidth parse(String str) {
+	private static BitWidth parse(String str) {
 		if (str == null || str.length() == 0) {
 			throw new NumberFormatException("Width string cannot be null");
 		}
@@ -85,15 +85,15 @@ public class BitWidth implements Comparable<BitWidth> {
 	}
 
 	static class Attribute extends com.cburch.logisim.data.Attribute<BitWidth> {
-		private BitWidth[] choices;
+		private final BitWidth[] choices;
 
-		public Attribute(String name, StringGetter disp) {
+		Attribute(String name, StringGetter disp) {
 			super(name, disp);
 			ensurePrefab();
 			choices = prefab;
 		}
 
-		public Attribute(String name, StringGetter disp, int min, int max) {
+		Attribute(String name, StringGetter disp, int min, int max) {
 			super(name, disp);
 			choices = new BitWidth[max - min + 1];
 			for (int i = 0; i < choices.length; i++) {
@@ -108,7 +108,7 @@ public class BitWidth implements Comparable<BitWidth> {
 
 		@Override
 		public java.awt.Component getCellEditor(BitWidth value) {
-			JComboBox combo = new JComboBox(choices);
+			JComboBox<BitWidth> combo = new JComboBox<>(choices);
 			if (value != null) {
 				int wid = value.getWidth();
 				if (wid <= 0 || wid > prefab.length) {

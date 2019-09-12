@@ -15,18 +15,18 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ManagedComponent extends AbstractComponent {
-	private EventSourceWeakSupport<ComponentListener> listeners
-		= new EventSourceWeakSupport<ComponentListener>();
-	private Location loc;
+	private final EventSourceWeakSupport<ComponentListener> listeners
+		= new EventSourceWeakSupport<>();
+	private final Location loc;
+	private final ArrayList<EndData> ends;
+	private final List<EndData> endsView;
 	private AttributeSet attrs;
-	private ArrayList<EndData> ends;
-	private List<EndData> endsView;
 	private Bounds bounds = null;
 
-	public ManagedComponent(Location loc, AttributeSet attrs, int num_ends) {
+	protected ManagedComponent(Location loc, AttributeSet attrs, int num_ends) {
 		this.loc = loc;
 		this.attrs = attrs;
-		this.ends = new ArrayList<EndData>(num_ends);
+		this.ends = new ArrayList<>(num_ends);
 		this.endsView = Collections.unmodifiableList(ends);
 	}
 
@@ -44,7 +44,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 		listeners.remove(l);
 	}
 
-	protected void fireEndChanged(ComponentEvent e) {
+	private void fireEndChanged(ComponentEvent e) {
 		ComponentEvent copy = null;
 		for (ComponentListener l : listeners) {
 			if (copy == null) {
@@ -56,7 +56,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 		}
 	}
 
-	protected void fireEndsChanged(List<EndData> oldEnds, List<EndData> newEnds) {
+	private void fireEndsChanged(List<EndData> oldEnds, List<EndData> newEnds) {
 		ComponentEvent e = null;
 		for (ComponentListener l : listeners) {
 			if (e == null) e = new ComponentEvent(this, oldEnds, newEnds);
@@ -106,11 +106,11 @@ public abstract class ManagedComponent extends AbstractComponent {
 		return endsView;
 	}
 
-	public void setEnds(EndData[] newEnds) {
+	protected void setEnds(EndData[] newEnds) {
 		List<EndData> oldEnds = ends;
 		int minLen = Math.min(oldEnds.size(), newEnds.length);
-		ArrayList<EndData> changesOld = new ArrayList<EndData>();
-		ArrayList<EndData> changesNew = new ArrayList<EndData>();
+		ArrayList<EndData> changesOld = new ArrayList<>();
+		ArrayList<EndData> changesNew = new ArrayList<>();
 		for (int i = 0; i < minLen; i++) {
 			EndData old = oldEnds.get(i);
 			if (newEnds[i] != null && !newEnds[i].equals(old)) {
@@ -153,7 +153,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 		ends.remove(index);
 	}
 
-	public void setEnd(int i, EndData data) {
+	private void setEnd(int i, EndData data) {
 		if (i == ends.size()) {
 			ends.add(data);
 			fireEndChanged(new ComponentEvent(this, null, data));
@@ -174,7 +174,7 @@ public abstract class ManagedComponent extends AbstractComponent {
 		setEnd(i, new EndData(end, width, type, exclusive));
 	}
 
-	public Location getEndLocation(int i) {
+	protected Location getEndLocation(int i) {
 		return getEnd(i).getLocation();
 	}
 

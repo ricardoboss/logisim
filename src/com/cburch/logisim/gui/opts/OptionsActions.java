@@ -34,9 +34,9 @@ class OptionsActions {
 	}
 
 	private static class SetAction extends Action {
-		private AttributeSet attrs;
-		private Attribute<Object> attr;
-		private Object newval;
+		private final AttributeSet attrs;
+		private final Attribute<Object> attr;
+		private final Object newval;
 		private Object oldval;
 
 		SetAction(AttributeSet attrs, Attribute<?> attr,
@@ -67,10 +67,10 @@ class OptionsActions {
 	}
 
 	private static class SetMapping extends Action {
-		MouseMappings mm;
-		Integer mods;
+		final MouseMappings mm;
+		final Integer mods;
+		final Tool tool;
 		Tool oldtool;
-		Tool tool;
 
 		SetMapping(MouseMappings mm, Integer mods, Tool tool) {
 			this.mm = mm;
@@ -96,8 +96,8 @@ class OptionsActions {
 	}
 
 	private static class RemoveMapping extends Action {
-		MouseMappings mm;
-		Integer mods;
+		final MouseMappings mm;
+		final Integer mods;
 		Tool oldtool;
 
 		RemoveMapping(MouseMappings mm, Integer mods) {

@@ -59,9 +59,11 @@ import java.io.OutputStream;
  * @version 0.90 21 Apr 1996
  */
 public class GifEncoder {
-	private short width_, height_;
+	private final short width_;
+	private final short height_;
 	private int numColors_;
-	private byte pixels_[], colors_[];
+	private byte[] pixels_;
+	private byte[] colors_;
 
 	/**
 	 * Construct a GIFEncoder. The constructor will convert the image to
@@ -73,11 +75,11 @@ public class GifEncoder {
 	 *                      can happen if Java runs out of memory. It may also indicate that the image
 	 *                      contains more than 256 colors.
 	 */
-	public GifEncoder(Image image, ProgressMonitor monitor) throws AWTException {
+	private GifEncoder(Image image, ProgressMonitor monitor) throws AWTException {
 		width_ = (short) image.getWidth(null);
 		height_ = (short) image.getHeight(null);
 
-		int values[] = new int[width_ * height_];
+		int[] values = new int[width_ * height_];
 		PixelGrabber grabber;
 		if (monitor != null) {
 			grabber = new MyGrabber(monitor, image, 0, 0, width_, height_, values, 0, width_);
@@ -86,16 +88,15 @@ public class GifEncoder {
 		}
 
 		try {
-			if (grabber.grabPixels() != true)
+			if (!grabber.grabPixels())
 				throw new AWTException(Strings.get("grabberError") + ": "
 					+ grabber.status());
-		} catch (InterruptedException e) {
-			;
+		} catch (InterruptedException ignored) {
 		}
 
-		byte r[][] = new byte[width_][height_];
-		byte g[][] = new byte[width_][height_];
-		byte b[][] = new byte[width_][height_];
+		byte[][] r = new byte[width_][height_];
+		byte[][] g = new byte[width_][height_];
+		byte[][] b = new byte[width_][height_];
 		int index = 0;
 		for (int y = 0; y < height_; ++y)
 			for (int x = 0; x < width_; ++x) {
@@ -121,14 +122,14 @@ public class GifEncoder {
 	 * @throws AWTException Will be thrown if the image contains more than
 	 *                      256 colors.
 	 */
-	public GifEncoder(byte r[][], byte g[][], byte b[][]) throws AWTException {
+	public GifEncoder(byte[][] r, byte[][] g, byte[][] b) throws AWTException {
 		width_ = (short) (r.length);
 		height_ = (short) (r[0].length);
 
 		ToIndexedColor(r, g, b);
 	}
 
-	public static void toFile(Image img, String filename, ProgressMonitor monitor)
+	private static void toFile(Image img, String filename, ProgressMonitor monitor)
 		throws IOException, AWTException {
 		FileOutputStream out = new FileOutputStream(filename);
 		new GifEncoder(img, monitor).write(out);
@@ -161,7 +162,7 @@ public class GifEncoder {
 	 *               buffered stream.
 	 * @throws IOException Will be thrown if a write operation fails.
 	 */
-	public void write(OutputStream output) throws IOException {
+	private void write(OutputStream output) throws IOException {
 		BitUtils.WriteString(output, "GIF87a");
 
 		ScreenDescriptor sd = new ScreenDescriptor(width_, height_,
@@ -186,8 +187,8 @@ public class GifEncoder {
 		output.flush();
 	}
 
-	void ToIndexedColor(byte r[][], byte g[][],
-						byte b[][]) throws AWTException {
+	private void ToIndexedColor(byte[][] r, byte[][] g,
+								byte[][] b) throws AWTException {
 		pixels_ = new byte[width_ * height_];
 		colors_ = new byte[256 * 3];
 		int colornum = 0;
@@ -214,14 +215,14 @@ public class GifEncoder {
 			}
 		}
 		numColors_ = 1 << BitUtils.BitsNeeded(colornum);
-		byte copy[] = new byte[numColors_ * 3];
+		byte[] copy = new byte[numColors_ * 3];
 		System.arraycopy(colors_, 0, copy, 0, numColors_ * 3);
 		colors_ = copy;
 	}
 
 	private static class BitFile {
-		OutputStream output_;
-		byte buffer_[];
+		final OutputStream output_;
+		final byte[] buffer_;
 		int index_, bitsLeft_;
 
 		BitFile(OutputStream output) {
@@ -283,9 +284,9 @@ public class GifEncoder {
 		private final static short HASHSIZE = 9973;
 		private final static short HASHSTEP = 2039;
 
-		byte strChr_[];
-		short strNxt_[];
-		short strHsh_[];
+		final byte[] strChr_;
+		final short[] strNxt_;
+		final short[] strHsh_;
 		short numStrings_;
 
 		LZWStringTable() {
@@ -295,7 +296,7 @@ public class GifEncoder {
 		}
 
 		static int Hash(short index, byte lastbyte) {
-			return ((int) ((short) (lastbyte << 8) ^ index) & 0xFFFF) % HASHSIZE;
+			return (((short) (lastbyte << 8) ^ index) & 0xFFFF) % HASHSIZE;
 		}
 
 		int AddCharString(short index, byte b) {
@@ -346,7 +347,7 @@ public class GifEncoder {
 
 	private static class LZWCompressor {
 		static void LZWCompress(OutputStream output, int codesize,
-								byte toCompress[]) throws IOException {
+								byte[] toCompress) throws IOException {
 			byte c;
 			short index;
 			int clearcode, endofinfo, numbits, limit;
@@ -364,8 +365,8 @@ public class GifEncoder {
 			strings.ClearTable(codesize);
 			bitFile.WriteBits(clearcode, numbits);
 
-			for (int loop = 0; loop < toCompress.length; ++loop) {
-				c = toCompress[loop];
+			for (byte compress : toCompress) {
+				c = compress;
 				if ((index = strings.FindCharString(prefix, c)) != -1)
 					prefix = index;
 				else {
@@ -392,8 +393,10 @@ public class GifEncoder {
 	}
 
 	private static class ScreenDescriptor {
-		short localScreenWidth_, localScreenHeight_;
-		byte backgroundColorIndex_, pixelAspectRatio_;
+		final short localScreenWidth_;
+		final short localScreenHeight_;
+		final byte backgroundColorIndex_;
+		final byte pixelAspectRatio_;
 		private byte byte_;
 
 		ScreenDescriptor(short width, short height, int numColors) {
@@ -433,8 +436,11 @@ public class GifEncoder {
 	}
 
 	private static class ImageDescriptor {
-		byte separator_;
-		short leftPosition_, topPosition_, width_, height_;
+		final byte separator_;
+		final short leftPosition_;
+		final short topPosition_;
+		final short width_;
+		final short height_;
 		private byte byte_;
 
 		ImageDescriptor(short width, short height, char separator) {
@@ -507,9 +513,9 @@ public class GifEncoder {
 	}
 
 	private static class MyGrabber extends PixelGrabber {
-		ProgressMonitor monitor;
+		final ProgressMonitor monitor;
+		final int goal;
 		int progress;
-		int goal;
 
 		MyGrabber(ProgressMonitor monitor, Image image, int x, int y, int width, int height,
 				  int[] values, int start, int scan) {

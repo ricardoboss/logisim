@@ -16,25 +16,22 @@ import com.cburch.logisim.util.Icons;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 
 class NotGate extends InstanceFactory {
 	public static final AttributeOption SIZE_NARROW
-		= new AttributeOption(Integer.valueOf(20),
+		= new AttributeOption(20,
 		Strings.getter("gateSizeNarrowOpt"));
 	public static final AttributeOption SIZE_WIDE
-		= new AttributeOption(Integer.valueOf(30),
+		= new AttributeOption(30,
 		Strings.getter("gateSizeWideOpt"));
 	public static final Attribute<AttributeOption> ATTR_SIZE
 		= Attributes.forOption("size", Strings.getter("gateSizeAttr"),
 		new AttributeOption[]{SIZE_NARROW, SIZE_WIDE});
-
+	public static final InstanceFactory FACTORY = new NotGate();
 	private static final String RECT_LABEL = "1";
 	private static final Icon toolIcon = Icons.getIcon("notGate.gif");
 	private static final Icon toolIconRect = Icons.getIcon("notGateRect.gif");
 	private static final Icon toolIconDin = Icons.getIcon("dinNotGate.gif");
-
-	public static InstanceFactory FACTORY = new NotGate();
 
 	private NotGate() {
 		super("NOT Gate", Strings.getter("notGateComponent"));
@@ -139,12 +136,10 @@ class NotGate extends InstanceFactory {
 	@Override
 	protected Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == ExpressionComputer.class) {
-			return new ExpressionComputer() {
-				public void computeExpression(Map<Location, Expression> expressionMap) {
-					Expression e = expressionMap.get(instance.getPortLocation(1));
-					if (e != null) {
-						expressionMap.put(instance.getPortLocation(0), Expressions.not(e));
-					}
+			return (ExpressionComputer) expressionMap -> {
+				Expression e = expressionMap.get(instance.getPortLocation(1));
+				if (e != null) {
+					expressionMap.put(instance.getPortLocation(0), Expressions.not(e));
 				}
 			};
 		}

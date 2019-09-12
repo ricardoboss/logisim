@@ -14,7 +14,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 
-public class PainterShaped {
+class PainterShaped {
 	private static final GeneralPath PATH_NARROW;
 	private static final GeneralPath PATH_MEDIUM;
 	private static final GeneralPath PATH_WIDE;
@@ -22,7 +22,7 @@ public class PainterShaped {
 	private static final GeneralPath SHIELD_NARROW;
 	private static final GeneralPath SHIELD_MEDIUM;
 	private static final GeneralPath SHIELD_WIDE;
-	private static HashMap<Integer, int[]> INPUT_LENGTHS = new HashMap<Integer, int[]>();
+	private static final HashMap<Integer, int[]> INPUT_LENGTHS = new HashMap<>();
 
 	static {
 		PATH_NARROW = new GeneralPath();
@@ -189,10 +189,11 @@ public class PainterShaped {
 			int dx = Math.min(20, wingHeight / 4);
 
 			GeneralPath path = new GeneralPath();
-			path.moveTo(-width, -height / 2);
-			path.quadTo(-width + dx, -(width + height) / 4, -width, -width / 2);
+			path.moveTo(-width, -height / 2f);
+			path.quadTo(-width + dx, -(width + height) / 4f, -width, -width / 2f);
 			path.append(base, true);
-			path.quadTo(-width + dx, (width + height) / 4, -width, height / 2);
+			path.quadTo(-width + dx, (width + height) / 4f, -width, height / 2f);
+
 			return path;
 		}
 	}
@@ -246,8 +247,8 @@ public class PainterShaped {
 
 	private static int[] getInputLineLengths(GateAttributes attrs, AbstractGate factory) {
 		int inputs = attrs.inputs;
-		int mainHeight = ((Integer) attrs.size.getValue()).intValue();
-		Integer key = Integer.valueOf(inputs * 31 + mainHeight);
+		int mainHeight = (Integer) attrs.size.getValue();
+		Integer key = inputs * 31 + mainHeight;
 		Object ret = INPUT_LENGTHS.get(key);
 		if (ret != null) {
 			return (int[]) ret;
@@ -261,13 +262,12 @@ public class PainterShaped {
 
 		int[] lengths = new int[inputs];
 		INPUT_LENGTHS.put(key, lengths);
-		int width = mainHeight;
 		Location loc0 = OrGate.FACTORY.getInputOffset(attrs, 0);
 		Location locn = OrGate.FACTORY.getInputOffset(attrs, inputs - 1);
 		int totalHeight = 10 + loc0.manhattanDistanceTo(locn);
-		if (totalHeight < width) totalHeight = width;
+		if (totalHeight < mainHeight) totalHeight = mainHeight;
 
-		GeneralPath path = computeShield(width, totalHeight);
+		GeneralPath path = computeShield(mainHeight, totalHeight);
 		for (int i = 0; i < inputs; i++) {
 			Location loci = OrGate.FACTORY.getInputOffset(attrs, i);
 			Point2D p = new Point2D.Float(loci.getX() + 1, loci.getY());

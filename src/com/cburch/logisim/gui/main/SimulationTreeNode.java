@@ -8,7 +8,7 @@ import com.cburch.logisim.comp.ComponentFactory;
 import javax.swing.tree.TreeNode;
 import java.util.Enumeration;
 
-public abstract class SimulationTreeNode implements TreeNode {
+abstract class SimulationTreeNode implements TreeNode {
 	public abstract ComponentFactory getComponentFactory();
 
 	public boolean isCurrentView(SimulationTreeModel model) {

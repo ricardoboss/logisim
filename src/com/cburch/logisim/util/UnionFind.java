@@ -8,12 +8,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class UnionFind<E extends UnionFindElement<E>> implements Iterable<E> {
-	private HashMap<E, Integer> sizes;
+class UnionFind<E extends UnionFindElement<E>> implements Iterable<E> {
+	private final HashMap<E, Integer> sizes;
 
 	public UnionFind(Collection<E> values) {
-		this.sizes = new HashMap<E, Integer>();
-		Integer one = Integer.valueOf(1);
+		this.sizes = new HashMap<>();
+		Integer one = 1;
 		for (E elt : values) {
 			elt.setUnionFindParent(elt);
 			sizes.put(elt, one);
@@ -37,7 +37,7 @@ public class UnionFind<E extends UnionFindElement<E>> implements Iterable<E> {
 		return Collections.unmodifiableSet(sizes.keySet());
 	}
 
-	public E findRepresentative(E value) {
+	private E findRepresentative(E value) {
 		E parent = value.getUnionFindParent();
 		if (parent == value) {
 			return value;

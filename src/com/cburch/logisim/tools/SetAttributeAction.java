@@ -18,21 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetAttributeAction extends Action {
-	private StringGetter nameGetter;
-	private Circuit circuit;
-	private List<Component> comps;
-	private List<Attribute<Object>> attrs;
-	private List<Object> values;
-	private List<Object> oldValues;
+	private final StringGetter nameGetter;
+	private final Circuit circuit;
+	private final List<Component> comps;
+	private final List<Attribute<Object>> attrs;
+	private final List<Object> values;
+	private final List<Object> oldValues;
 	private CircuitTransaction xnReverse;
 
 	public SetAttributeAction(Circuit circuit, StringGetter nameGetter) {
 		this.nameGetter = nameGetter;
 		this.circuit = circuit;
-		this.comps = new ArrayList<Component>();
-		this.attrs = new ArrayList<Attribute<Object>>();
-		this.values = new ArrayList<Object>();
-		this.oldValues = new ArrayList<Object>();
+		this.comps = new ArrayList<>();
+		this.attrs = new ArrayList<>();
+		this.values = new ArrayList<>();
+		this.oldValues = new ArrayList<>();
 	}
 
 	public void set(Component comp, Attribute<?> attr, Object value) {
@@ -44,7 +44,7 @@ public class SetAttributeAction extends Action {
 	}
 
 	public boolean isEmpty() {
-		return comps.isEmpty();
+		return !comps.isEmpty();
 	}
 
 	@Override

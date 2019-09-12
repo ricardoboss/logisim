@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 class ExperimentalOptions extends OptionsPanel {
-	private JLabel accelRestart = new JLabel();
-	private PrefOptionList accel;
+	private final JLabel accelRestart = new JLabel();
+	private final PrefOptionList accel;
 
 	public ExperimentalOptions(PreferencesFrame window) {
 		super(window);

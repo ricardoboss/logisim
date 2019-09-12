@@ -24,7 +24,7 @@ import java.io.Reader;
  * Adapts a <code>Reader</code> as an <code>InputStream</code>.
  * Adapted from <CODE>StringInputStream</CODE>.
  */
-public class ReaderInputStream extends InputStream {
+class ReaderInputStream extends InputStream {
 
 	/**
 	 * Source Reader
@@ -43,7 +43,7 @@ public class ReaderInputStream extends InputStream {
 	 *
 	 * @param reader <CODE>Reader</CODE>.  Must not be <code>null</code>.
 	 */
-	public ReaderInputStream(Reader reader) {
+	private ReaderInputStream(Reader reader) {
 		in = reader;
 	}
 
@@ -85,7 +85,6 @@ public class ReaderInputStream extends InputStream {
 		} else {
 			byte[] buf = new byte[1];
 			if (read(buf, 0, 1) <= 0) {
-				result = -1;
 			}
 			result = buf[0];
 		}

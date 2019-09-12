@@ -8,13 +8,15 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class VerticalSplitPane extends JPanel {
-	private JComponent comp0;
-	private JComponent comp1;
-	private MyDragbar dragbar;
+	private final JComponent comp0;
+	private final JComponent comp1;
+	private final MyDragbar dragbar;
 	private double fraction;
+
 	public VerticalSplitPane(JComponent comp0, JComponent comp1) {
 		this(comp0, comp1, 0.5);
 	}
+
 	public VerticalSplitPane(JComponent comp0, JComponent comp1,
 							 double fraction) {
 		this.comp0 = comp0;
@@ -32,7 +34,7 @@ public class VerticalSplitPane extends JPanel {
 		return fraction;
 	}
 
-	public void setFraction(double value) {
+	private void setFraction(double value) {
 		if (value < 0.0) value = 0.0;
 		if (value > 1.0) value = 1.0;
 		if (fraction != value) {

@@ -9,29 +9,29 @@ import java.util.Collection;
 import java.util.EventObject;
 
 public class SelectionEvent extends EventObject {
-    public static final int ACTION_ADDED = 0;
-    public static final int ACTION_REMOVED = 1;
-    public static final int ACTION_HANDLE = 2;
+	public static final int ACTION_ADDED = 0;
+	public static final int ACTION_REMOVED = 1;
+	public static final int ACTION_HANDLE = 2;
 
-    private int action;
-    private Collection<CanvasObject> affected;
+	private final int action;
+	private final Collection<CanvasObject> affected;
 
-    public SelectionEvent(Selection source, int action,
-                          Collection<CanvasObject> affected) {
-        super(source);
-        this.action = action;
-        this.affected = affected;
-    }
+	public SelectionEvent(Selection source, int action,
+						  Collection<CanvasObject> affected) {
+		super(source);
+		this.action = action;
+		this.affected = affected;
+	}
 
-    public Selection getSelection() {
-        return (Selection) getSource();
-    }
+	public Selection getSelection() {
+		return (Selection) getSource();
+	}
 
-    public int getAction() {
-        return action;
-    }
+	public int getAction() {
+		return action;
+	}
 
-    public Collection<CanvasObject> getAffected() {
-        return affected;
-    }
+	public Collection<CanvasObject> getAffected() {
+		return affected;
+	}
 }

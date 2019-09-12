@@ -21,13 +21,13 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 class BuildCircuitButton extends JButton {
-	private MyListener myListener = new MyListener();
-	private JFrame parent;
-	private AnalyzerModel model;
+	private final JFrame parent;
+	private final AnalyzerModel model;
 
 	BuildCircuitButton(JFrame parent, AnalyzerModel model) {
 		this.parent = parent;
 		this.model = model;
+		MyListener myListener = new MyListener();
 		addActionListener(myListener);
 	}
 
@@ -61,7 +61,7 @@ class BuildCircuitButton extends JButton {
 	}
 
 	private static class ProjectItem {
-		Project project;
+		final Project project;
 
 		ProjectItem(Project project) {
 			this.project = project;
@@ -74,12 +74,10 @@ class BuildCircuitButton extends JButton {
 	}
 
 	private class DialogPanel extends JPanel {
-		private JLabel projectLabel = new JLabel();
-		private JComboBox project;
-		private JLabel nameLabel = new JLabel();
-		private JTextField name = new JTextField(10);
-		private JCheckBox twoInputs = new JCheckBox();
-		private JCheckBox nands = new JCheckBox();
+		private final JComboBox project;
+		private final JTextField name = new JTextField(10);
+		private final JCheckBox twoInputs = new JCheckBox();
+		private final JCheckBox nands = new JCheckBox();
 
 		DialogPanel() {
 			List<Project> projects = Projects.getOpenProjects();
@@ -126,6 +124,7 @@ class BuildCircuitButton extends JButton {
 
 			gc.gridx = 0;
 			gc.gridy = 0;
+			JLabel projectLabel = new JLabel();
 			gb.setConstraints(projectLabel, gc);
 			add(projectLabel);
 			gc.gridx = 1;
@@ -133,6 +132,7 @@ class BuildCircuitButton extends JButton {
 			add(project);
 			gc.gridy++;
 			gc.gridx = 0;
+			JLabel nameLabel = new JLabel();
 			gb.setConstraints(nameLabel, gc);
 			add(nameLabel);
 			gc.gridx = 1;

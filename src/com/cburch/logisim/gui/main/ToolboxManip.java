@@ -24,13 +24,14 @@ import com.cburch.logisim.tools.Tool;
 import javax.swing.*;
 
 class ToolboxManip implements ProjectExplorerListener {
-	private Project proj;
-	private ProjectExplorer explorer;
-	private MyListener myListener = new MyListener();
+	private final Project proj;
+	private final ProjectExplorer explorer;
 	private Tool lastSelected = null;
+
 	ToolboxManip(Project proj, ProjectExplorer explorer) {
 		this.proj = proj;
 		this.explorer = explorer;
+		MyListener myListener = new MyListener();
 		proj.addProjectListener(myListener);
 		myListener.setFile(null, proj.getLogisimFile());
 	}

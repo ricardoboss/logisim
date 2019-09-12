@@ -15,30 +15,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SimulateOptions extends OptionsPanel {
-	private MyListener myListener = new MyListener();
-	private JLabel simLimitLabel = new JLabel();
-	private JComboBox simLimit = new JComboBox(new Integer[]{
-		Integer.valueOf(200),
-		Integer.valueOf(500),
-		Integer.valueOf(1000),
-		Integer.valueOf(2000),
-		Integer.valueOf(5000),
-		Integer.valueOf(10000),
-		Integer.valueOf(20000),
-		Integer.valueOf(50000),
+	private final JLabel simLimitLabel = new JLabel();
+	private final JComboBox simLimit = new JComboBox(new Integer[]{
+		200,
+		500,
+		1000,
+		2000,
+		5000,
+		10000,
+		20000,
+		50000,
 	});
-	private JCheckBox simRandomness = new JCheckBox();
-	private JLabel gateUndefinedLabel = new JLabel();
-	private JComboBox gateUndefined = new JComboBox(new Object[]{
+	private final JCheckBox simRandomness = new JCheckBox();
+	private final JLabel gateUndefinedLabel = new JLabel();
+	private final JComboBox gateUndefined = new JComboBox(new Object[]{
 		new ComboOption(Options.GATE_UNDEFINED_IGNORE),
 		new ComboOption(Options.GATE_UNDEFINED_ERROR)
 	});
+
 	public SimulateOptions(OptionsFrame window) {
 		super(window);
 
 		JPanel simLimitPanel = new JPanel();
 		simLimitPanel.add(simLimitLabel);
 		simLimitPanel.add(simLimit);
+		MyListener myListener = new MyListener();
 		simLimit.addActionListener(myListener);
 
 		JPanel gateUndefinedPanel = new JPanel();
@@ -117,11 +118,11 @@ class SimulateOptions extends OptionsPanel {
 		}
 
 		private void loadSimLimit(Integer val) {
-			int value = val.intValue();
+			int value = val;
 			ComboBoxModel model = simLimit.getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Integer opt = (Integer) model.getElementAt(i);
-				if (opt.intValue() == value) {
+				if (opt == value) {
 					simLimit.setSelectedItem(opt);
 				}
 			}
@@ -132,7 +133,7 @@ class SimulateOptions extends OptionsPanel {
 		}
 
 		private void loadSimRandomness(Integer val) {
-			simRandomness.setSelected(val.intValue() > 0);
+			simRandomness.setSelected(val > 0);
 		}
 	}
 }

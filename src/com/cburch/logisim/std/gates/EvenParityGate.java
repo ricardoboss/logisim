@@ -10,7 +10,7 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 
 class EvenParityGate extends AbstractGate {
-	public static EvenParityGate FACTORY = new EvenParityGate();
+	public static final EvenParityGate FACTORY = new EvenParityGate();
 
 	private EvenParityGate() {
 		super("Even Parity", Strings.getter("evenParityComponent"));

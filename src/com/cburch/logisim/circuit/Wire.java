@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public final class Wire implements Component, AttributeSet, CustomHandles,
 	Iterable<Location> {
 	/**
@@ -25,20 +26,20 @@ public final class Wire implements Component, AttributeSet, CustomHandles,
 
 	public static final AttributeOption VALUE_HORZ
 		= new AttributeOption("horz", Strings.getter("wireDirectionHorzOption"));
-	public static final AttributeOption VALUE_VERT
+	public static final Attribute<Integer> len_attr
+		= Attributes.forInteger("length", Strings.getter("wireLengthAttr"));
+	private static final AttributeOption VALUE_VERT
 		= new AttributeOption("vert", Strings.getter("wireDirectionVertOption"));
 	public static final Attribute<AttributeOption> dir_attr
 		= Attributes.forOption("direction", Strings.getter("wireDirectionAttr"),
 		new AttributeOption[]{VALUE_HORZ, VALUE_VERT});
-	public static final Attribute<Integer> len_attr
-		= Attributes.forInteger("length", Strings.getter("wireLengthAttr"));
-
 	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[]{dir_attr, len_attr});
+		= Arrays.asList(dir_attr, len_attr);
 	private static final Cache cache = new Cache();
 	final Location e0;
 	final Location e1;
 	final boolean is_x_equal;
+
 	private Wire(Location e0, Location e1) {
 		this.is_x_equal = e0.getX() == e1.getX();
 		if (is_x_equal) {
@@ -253,7 +254,7 @@ public final class Wire implements Component, AttributeSet, CustomHandles,
 		return is_x_equal;
 	}
 
-	public Location getEndLocation(int index) {
+	private Location getEndLocation(int index) {
 		return index == 0 ? e0 : e1;
 	}
 

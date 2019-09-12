@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 class PropagationPoints {
-	private HashSet<Entry> data;
+	private final HashSet<Entry> data;
 
 	PropagationPoints() {
-		this.data = new HashSet<Entry>();
+		this.data = new HashSet<>();
 	}
 
 	void add(CircuitState state, Location loc) {
@@ -36,7 +36,7 @@ class PropagationPoints {
 		if (data.isEmpty()) return;
 
 		CircuitState state = context.getCircuitState();
-		HashMap<CircuitState, CircuitState> stateMap = new HashMap<CircuitState, CircuitState>();
+		HashMap<CircuitState, CircuitState> stateMap = new HashMap<>();
 		for (CircuitState s : state.getSubstates()) {
 			addSubstates(stateMap, s, s);
 		}
@@ -66,8 +66,8 @@ class PropagationPoints {
 	}
 
 	private static class Entry {
-		private CircuitState state;
-		private Location loc;
+		private final CircuitState state;
+		private final Location loc;
 
 		private Entry(CircuitState state, Location loc) {
 			this.state = state;

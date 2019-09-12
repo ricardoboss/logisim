@@ -55,7 +55,7 @@ public abstract class Library {
 		return false;
 	}
 
-	public int indexOf(ComponentFactory query) {
+	private int indexOf(ComponentFactory query) {
 		int index = -1;
 		for (Tool obj : getTools()) {
 			index++;

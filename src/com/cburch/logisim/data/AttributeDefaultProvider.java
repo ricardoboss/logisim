@@ -6,7 +6,7 @@ package com.cburch.logisim.data;
 import com.cburch.logisim.LogisimVersion;
 
 public interface AttributeDefaultProvider {
-	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
+	boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
 
-	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver);
+	Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver);
 }

@@ -77,8 +77,7 @@ class InstanceStateImpl implements InstanceState {
 	}
 
 	public InstanceData getData() {
-		InstanceData ret = (InstanceData) circuitState.getData(component);
-		return ret;
+		return (InstanceData) circuitState.getData(component);
 	}
 
 	public void setData(InstanceData value) {
@@ -92,7 +91,7 @@ class InstanceStateImpl implements InstanceState {
 	}
 
 	public boolean isCircuitRoot() {
-		return !circuitState.isSubstate();
+		return circuitState.isSubstate();
 	}
 
 	public long getTickCount() {

@@ -15,15 +15,16 @@ import java.util.*;
 class SelectionAttributes extends AbstractAttributeSet {
 	private static final Attribute<?>[] EMPTY_ATTRIBUTES = new Attribute<?>[0];
 	private static final Object[] EMPTY_VALUES = new Object[0];
-	private Canvas canvas;
-	private Selection selection;
-	private Listener listener;
+	private final Canvas canvas;
+	private final Selection selection;
+	private final Listener listener;
 	private boolean listening;
 	private Set<Component> selected;
 	private Attribute<?>[] attrs;
 	private boolean[] readOnly;
 	private Object[] values;
 	private List<Attribute<?>> attrsView;
+
 	public SelectionAttributes(Canvas canvas, Selection selection) {
 		this.canvas = canvas;
 		this.selection = selection;
@@ -49,9 +50,9 @@ class SelectionAttributes extends AbstractAttributeSet {
 		}
 
 		if (includeWires) {
-			return new HashSet<Component>(comps);
+			return new HashSet<>(comps);
 		} else {
-			HashSet<Component> ret = new HashSet<Component>();
+			HashSet<Component> ret = new HashSet<>();
 			for (Component comp : comps) {
 				if (!(comp instanceof Wire)) ret.add(comp);
 			}
@@ -61,7 +62,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 
 	private static boolean haveSameElements(Collection<Component> a, Collection<Component> b) {
 		if (a == null) {
-			return b == null ? true : b.size() == 0;
+			return b == null || b.size() == 0;
 		} else if (b == null) {
 			return a.size() == 0;
 		} else if (a.size() != b.size()) {
@@ -76,7 +77,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 
 	private static LinkedHashMap<Attribute<Object>, Object> computeAttributes(Collection<Component> newSel) {
 		LinkedHashMap<Attribute<Object>, Object> attrMap;
-		attrMap = new LinkedHashMap<Attribute<Object>, Object>();
+		attrMap = new LinkedHashMap<>();
 		Iterator<Component> sit = newSel.iterator();
 		if (sit.hasNext()) {
 			AttributeSet first = sit.next().getAttributeSet();
@@ -117,7 +118,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 				if (!oldAttrs[j].equals(a) || j >= oldValues.length) return false;
 				Object ov = oldValues[j];
 				Object nv = entry.getValue();
-				if (ov == null ? nv != null : !ov.equals(nv)) return false;
+				if (!Objects.equals(ov, nv)) return false;
 			}
 			return true;
 		}
@@ -135,7 +136,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 		return selection;
 	}
 
-	void setListening(boolean value) {
+	private void setListening(boolean value) {
 		if (listening != value) {
 			listening = value;
 			if (value) {
@@ -186,7 +187,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 			}
 			if (newSel != oldSel) this.selected = newSel;
 			this.attrs = newAttrs;
-			this.attrsView = new UnmodifiableList<Attribute<?>>(newAttrs);
+			this.attrsView = new UnmodifiableList<>(newAttrs);
 			this.values = newValues;
 			this.readOnly = newReadOnly;
 
@@ -204,8 +205,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 				for (i = 0; i < oldValues.length; i++) {
 					Object oldVal = oldValues[i];
 					Object newVal = newValues[i];
-					boolean sameVals = oldVal == null ? newVal == null
-						: oldVal.equals(newVal);
+					boolean sameVals = Objects.equals(oldVal, newVal);
 					if (!sameVals) {
 						@SuppressWarnings("unchecked")
 						Attribute<Object> attr = (Attribute<Object>) oldAttrs[i];
@@ -244,7 +244,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 		} else {
 			int i = findIndex(attr);
 			boolean[] ro = readOnly;
-			return i >= 0 && i < ro.length ? ro[i] : true;
+			return i < 0 || i >= ro.length || ro[i];
 		}
 	}
 

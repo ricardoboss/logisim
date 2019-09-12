@@ -11,17 +11,17 @@ import java.awt.*;
 import java.util.Arrays;
 
 public class Shifter extends InstanceFactory {
-	static final AttributeOption SHIFT_LOGICAL_LEFT
+	private static final AttributeOption SHIFT_LOGICAL_LEFT
 		= new AttributeOption("ll", Strings.getter("shiftLogicalLeft"));
-	static final AttributeOption SHIFT_LOGICAL_RIGHT
+	private static final AttributeOption SHIFT_LOGICAL_RIGHT
 		= new AttributeOption("lr", Strings.getter("shiftLogicalRight"));
-	static final AttributeOption SHIFT_ARITHMETIC_RIGHT
+	private static final AttributeOption SHIFT_ARITHMETIC_RIGHT
 		= new AttributeOption("ar", Strings.getter("shiftArithmeticRight"));
-	static final AttributeOption SHIFT_ROLL_LEFT
+	private static final AttributeOption SHIFT_ROLL_LEFT
 		= new AttributeOption("rl", Strings.getter("shiftRollLeft"));
-	static final AttributeOption SHIFT_ROLL_RIGHT
+	private static final AttributeOption SHIFT_ROLL_RIGHT
 		= new AttributeOption("rr", Strings.getter("shiftRollRight"));
-	static final Attribute<AttributeOption> ATTR_SHIFT
+	private static final Attribute<AttributeOption> ATTR_SHIFT
 		= Attributes.forOption("shift", Strings.getter("shifterShiftAttr"),
 		new AttributeOption[]{SHIFT_LOGICAL_LEFT, SHIFT_LOGICAL_RIGHT,
 			SHIFT_ARITHMETIC_RIGHT, SHIFT_ROLL_LEFT, SHIFT_ROLL_RIGHT});

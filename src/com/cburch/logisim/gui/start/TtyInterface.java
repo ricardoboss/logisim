@@ -75,7 +75,7 @@ public class TtyInterface {
 		Project proj = new Project(file);
 		Circuit circuit = file.getMainCircuit();
 		Map<Instance, String> pinNames = Analyze.getPinLabels(circuit);
-		ArrayList<Instance> outputPins = new ArrayList<Instance>();
+		ArrayList<Instance> outputPins = new ArrayList<>();
 		Instance haltPin = null;
 		for (Map.Entry<Instance, String> entry : pinNames.entrySet()) {
 			Instance pin = entry.getKey();
@@ -124,18 +124,18 @@ public class TtyInterface {
 			Library lib = count.getLibrary();
 			String libName = lib == null ? "-" : lib.getDisplayName();
 			System.out.printf(fmtNormal, //OK
-				Integer.valueOf(count.getUniqueCount()),
-				Integer.valueOf(count.getRecursiveCount()),
+				count.getUniqueCount(),
+				count.getRecursiveCount(),
 				count.getFactory().getDisplayName(), libName);
 		}
 		FileStatistics.Count totalWithout = stats.getTotalWithoutSubcircuits();
 		System.out.printf(fmt + "%s\n", //OK
-			Integer.valueOf(totalWithout.getUniqueCount()),
-			Integer.valueOf(totalWithout.getRecursiveCount()),
+			totalWithout.getUniqueCount(),
+			totalWithout.getRecursiveCount(),
 			Strings.get("statsTotalWithout"));
 		System.out.printf(fmt + "%s\n", //OK
-			Integer.valueOf(total.getUniqueCount()),
-			Integer.valueOf(total.getRecursiveCount()),
+			total.getUniqueCount(),
+			total.getRecursiveCount(),
 			Strings.get("statsTotalWith"));
 	}
 
@@ -201,7 +201,7 @@ public class TtyInterface {
 		ArrayList<InstanceState> keyboardStates = null;
 		StdinThread stdinThread = null;
 		if (showTty) {
-			keyboardStates = new ArrayList<InstanceState>();
+			keyboardStates = new ArrayList<>();
 			boolean ttyFound = prepareForTty(circState, keyboardStates);
 			if (!ttyFound) {
 				System.err.println(Strings.get("ttyNoTtyError")); //OK
@@ -222,7 +222,7 @@ public class TtyInterface {
 		ArrayList<Value> prevOutputs = null;
 		Propagator prop = circState.getPropagator();
 		while (true) {
-			ArrayList<Value> curOutputs = new ArrayList<Value>();
+			ArrayList<Value> curOutputs = new ArrayList<>();
 			for (Instance pin : outputPins) {
 				InstanceState pinState = circState.getInstanceState(pin);
 				Value val = Pin.FACTORY.getValue(pinState);
@@ -262,7 +262,7 @@ public class TtyInterface {
 		if (showHalt || retCode != 0) {
 			if (retCode == 0) {
 				System.out.println(Strings.get("ttyHaltReasonPin")); //OK
-			} else if (retCode == 1) {
+			} else {
 				System.out.println(Strings.get("ttyHaltReasonOscillation")); //OK
 			}
 		}
@@ -314,13 +314,13 @@ public class TtyInterface {
 	// but this doesn't quite work because on some systems, the keyboard input
 	// is not interactively echoed until System.in.read() is invoked.
 	private static class StdinThread extends Thread {
-		private LinkedList<char[]> queue; // of char[]
+		private final LinkedList<char[]> queue; // of char[]
 
-		public StdinThread() {
-			queue = new LinkedList<char[]>();
+		StdinThread() {
+			queue = new LinkedList<>();
 		}
 
-		public char[] getBuffer() {
+		char[] getBuffer() {
 			synchronized (queue) {
 				if (queue.isEmpty()) {
 					return null;
@@ -334,6 +334,8 @@ public class TtyInterface {
 		public void run() {
 			InputStreamReader stdin = new InputStreamReader(System.in);
 			char[] buffer = new char[32];
+
+			//noinspection InfiniteLoopStatement
 			while (true) {
 				try {
 					int nbytes = stdin.read(buffer);
@@ -344,7 +346,7 @@ public class TtyInterface {
 							queue.addLast(add);
 						}
 					}
-				} catch (IOException e) {
+				} catch (IOException ignored) {
 				}
 			}
 		}

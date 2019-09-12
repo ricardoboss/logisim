@@ -3,10 +3,10 @@
 
 package com.cburch.logisim.data;
 
-public interface AttributeOptionInterface {
-	public Object getValue();
+interface AttributeOptionInterface {
+	Object getValue();
 
-	public String toString();
+	String toString();
 
-	public String toDisplayString();
+	String toDisplayString();
 }

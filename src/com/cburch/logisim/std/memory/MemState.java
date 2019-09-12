@@ -84,7 +84,7 @@ class MemState implements InstanceData, Cloneable, HexModelListener {
 	//
 	// methods for accessing data within memory
 	//
-	int getAddrBits() {
+	private int getAddrBits() {
 		return contents.getLogLength();
 	}
 

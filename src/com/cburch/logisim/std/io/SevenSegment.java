@@ -11,8 +11,8 @@ import com.cburch.logisim.instance.*;
 import java.awt.*;
 
 public class SevenSegment extends InstanceFactory {
-	static Bounds[] SEGMENTS = null;
-	static Color DEFAULT_OFF = new Color(220, 220, 220);
+	static final Color DEFAULT_OFF = new Color(220, 220, 220);
+	private static Bounds[] SEGMENTS = null;
 
 	public SevenSegment() {
 		super("7-Segment Display", Strings.getter("sevenSegmentComponent"));
@@ -37,9 +37,9 @@ public class SevenSegment extends InstanceFactory {
 	static void drawBase(InstancePainter painter) {
 		ensureSegments();
 		InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
-		int summ = (data == null ? 0 : ((Integer) data.getValue()).intValue());
+		int summ = (data == null ? 0 : (Integer) data.getValue());
 		Boolean active = painter.getAttributeValue(Io.ATTR_ACTIVE);
-		int desired = active == null || active.booleanValue() ? 1 : 0;
+		int desired = active == null || active ? 1 : 0;
 
 		Bounds bds = painter.getBounds();
 		int x = bds.getX() + 5;
@@ -70,7 +70,7 @@ public class SevenSegment extends InstanceFactory {
 		painter.drawPorts();
 	}
 
-	static void ensureSegments() {
+	private static void ensureSegments() {
 		if (SEGMENTS == null) {
 			SEGMENTS = new Bounds[]{
 				Bounds.create(3, 8, 19, 4),
@@ -91,7 +91,7 @@ public class SevenSegment extends InstanceFactory {
 			Value val = state.getPort(i);
 			if (val == Value.TRUE) summary |= 1 << i;
 		}
-		Object value = Integer.valueOf(summary);
+		Object value = summary;
 		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 		if (data == null) {
 			state.setData(new InstanceDataSingleton(value));

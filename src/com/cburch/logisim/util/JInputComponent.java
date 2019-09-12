@@ -4,7 +4,7 @@
 package com.cburch.logisim.util;
 
 public interface JInputComponent {
-	public Object getValue();
+	Object getValue();
 
-	public void setValue(Object value);
+	void setValue(Object value);
 }

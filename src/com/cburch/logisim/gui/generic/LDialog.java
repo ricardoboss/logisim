@@ -6,7 +6,7 @@ package com.cburch.logisim.gui.generic;
 import javax.swing.*;
 import java.awt.*;
 
-public class LDialog extends JDialog {
+class LDialog extends JDialog {
 	public LDialog(Frame owner, String title, boolean modal) {
 		super(owner, title, modal);
 		init();

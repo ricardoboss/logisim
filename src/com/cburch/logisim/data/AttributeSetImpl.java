@@ -8,12 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AttributeSetImpl extends AbstractAttributeSet {
-	private AttrList list = new AttrList();
+	private final AttrList list = new AttrList();
 	private Node head = null;
 	private Node tail = null;
 	private int count = 0;
+
 	public AttributeSetImpl() {
 	}
+
 	public AttributeSetImpl(Attribute<Object>[] attrs, Object[] values) {
 		if (attrs.length != values.length) {
 			throw new IllegalArgumentException("arrays must have same length");
@@ -50,7 +52,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 		return list;
 	}
 
-	public <V> void addAttribute(Attribute<? super V> attr, V value) {
+	private <V> void addAttribute(Attribute<? super V> attr, V value) {
 		if (attr == null) {
 			throw new IllegalArgumentException("Adding null attribute");
 		}
@@ -140,7 +142,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 				+ attr + " is read-only");
 		}
 		if (value.equals(n.value)) {
-			; // do nothing - why change what's already there?
+			// do nothing - why change what's already there?
 		} else {
 			n.value = value;
 			fireAttributeValueChanged(attr, value);
@@ -158,7 +160,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	}
 
 	private static class Node {
-		Attribute<?> attr;
+		final Attribute<?> attr;
 		Object value;
 		boolean is_read_only;
 		Node next;
@@ -179,7 +181,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 		}
 	}
 
-	private class AttrIterator implements Iterator<Attribute<?>> {
+	private static class AttrIterator implements Iterator<Attribute<?>> {
 		Node n;
 
 		AttrIterator(Node n) {

@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KeyConfigurationResult {
-	private KeyConfigurationEvent event;
-	private Map<Attribute<?>, Object> attrValueMap;
+	private final KeyConfigurationEvent event;
+	private final Map<Attribute<?>, Object> attrValueMap;
 
 	public KeyConfigurationResult(KeyConfigurationEvent event, Attribute<?> attr,
 								  Object value) {
 		this.event = event;
-		Map<Attribute<?>, Object> singleMap = new HashMap<Attribute<?>, Object>(1);
+		Map<Attribute<?>, Object> singleMap = new HashMap<>(1);
 		singleMap.put(attr, value);
 		this.attrValueMap = singleMap;
 	}

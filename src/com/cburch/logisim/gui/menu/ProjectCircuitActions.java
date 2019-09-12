@@ -81,8 +81,8 @@ public class ProjectCircuitActions {
 			dlog.setVisible(true);
 			field.requestFocusInWindow();
 			Object action = pane.getValue();
-			if (action == null || !(action instanceof Integer)
-				|| ((Integer) action).intValue() != JOptionPane.OK_OPTION) {
+			if (!(action instanceof Integer)
+				|| (Integer) action != JOptionPane.OK_OPTION) {
 				return null;
 			}
 
@@ -133,8 +133,8 @@ public class ProjectCircuitActions {
 
 	public static void doAnalyze(Project proj, Circuit circuit) {
 		Map<Instance, String> pinNames = Analyze.getPinLabels(circuit);
-		ArrayList<String> inputNames = new ArrayList<String>();
-		ArrayList<String> outputNames = new ArrayList<String>();
+		ArrayList<String> inputNames = new ArrayList<>();
+		ArrayList<String> outputNames = new ArrayList<>();
 		for (Map.Entry<Instance, String> entry : pinNames.entrySet()) {
 			Instance pin = entry.getKey();
 			boolean isInput = Pin.FACTORY.isInputPin(pin);
@@ -207,6 +207,5 @@ public class ProjectCircuitActions {
 		JOptionPane.showMessageDialog(proj.getFrame(), message,
 			Strings.get("analyzeErrorTitle"),
 			JOptionPane.ERROR_MESSAGE);
-		return;
 	}
 }

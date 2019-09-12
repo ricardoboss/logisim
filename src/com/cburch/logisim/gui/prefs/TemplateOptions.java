@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 class TemplateOptions extends OptionsPanel {
-	private MyListener myListener = new MyListener();
-	private JRadioButton plain = new JRadioButton();
-	private JRadioButton empty = new JRadioButton();
-	private JRadioButton custom = new JRadioButton();
-	private JTextField templateField = new JTextField(40);
-	private JButton templateButton = new JButton();
+	private final JRadioButton plain = new JRadioButton();
+	private final JRadioButton empty = new JRadioButton();
+	private final JRadioButton custom = new JRadioButton();
+	private final JTextField templateField = new JTextField(40);
+	private final JButton templateButton = new JButton();
+
 	public TemplateOptions(PreferencesFrame window) {
 		super(window);
 
@@ -37,6 +37,7 @@ class TemplateOptions extends OptionsPanel {
 		bgroup.add(empty);
 		bgroup.add(custom);
 
+		MyListener myListener = new MyListener();
 		plain.addActionListener(myListener);
 		empty.addActionListener(myListener);
 		custom.addActionListener(myListener);
@@ -129,7 +130,7 @@ class TemplateOptions extends OptionsPanel {
 						LogisimFile.load(reader2, loader); // to see if OK
 						AppPreferences.setTemplateFile(file, template);
 						AppPreferences.setTemplateType(AppPreferences.TEMPLATE_CUSTOM);
-					} catch (LoaderException ex) {
+					} catch (LoaderException ignored) {
 					} catch (IOException ex) {
 						JOptionPane.showMessageDialog(getPreferencesFrame(),
 							StringUtil.format(Strings.get("templateErrorMessage"), ex.toString()),
@@ -138,11 +139,11 @@ class TemplateOptions extends OptionsPanel {
 					} finally {
 						try {
 							if (reader != null) reader.close();
-						} catch (IOException ex) {
+						} catch (IOException ignored) {
 						}
 						try {
 							if (reader != null) reader2.close();
-						} catch (IOException ex) {
+						} catch (IOException ignored) {
 						}
 					}
 				}

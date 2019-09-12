@@ -12,9 +12,9 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.SetAttributeAction;
 
 class AttrTableComponentModel extends AttributeSetTableModel {
-	Project proj;
-	Circuit circ;
-	Component comp;
+	private final Project proj;
+	private final Circuit circ;
+	private final Component comp;
 
 	AttrTableComponentModel(Project proj, Circuit circ, Component comp) {
 		super(comp.getAttributeSet());

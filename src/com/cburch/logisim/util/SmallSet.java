@@ -5,22 +5,24 @@ package com.cburch.logisim.util;
 
 import java.util.*;
 
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class SmallSet<E> extends AbstractSet<E> {
 	private static final int HASH_POINT = 4;
 	private int size = 0;
 	private int version = 0;
 	private Object values = null;
+
 	public SmallSet() {
 	}
 
 	public static void main(String[] args) throws java.io.IOException {
-		SmallSet<String> set = new SmallSet<String>();
+		SmallSet<String> set = new SmallSet<>();
 		java.io.BufferedReader in = new java.io.BufferedReader(
 			new java.io.InputStreamReader(System.in));
 		while (true) {
 			System.out.print(set.size() + ":"); //OK
-			for (Iterator<String> it = set.iterator(); it.hasNext(); ) {
-				System.out.print(" " + it.next()); //OK
+			for (String s : set) {
+				System.out.print(" " + s); //OK
 			}
 			System.out.println(); //OK
 			System.out.print("> "); //OK
@@ -28,7 +30,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 			if (cmd == null) break;
 			cmd = cmd.trim();
 			if (cmd.equals("")) {
-				;
 			} else if (cmd.startsWith("+")) {
 				set.add(cmd.substring(1));
 			} else if (cmd.startsWith("-")) {
@@ -44,14 +45,14 @@ public class SmallSet<E> extends AbstractSet<E> {
 
 	@Override
 	public SmallSet<E> clone() {
-		SmallSet<E> ret = new SmallSet<E>();
+		SmallSet<E> ret = new SmallSet<>();
 		ret.size = this.size;
 		if (size == 1) {
 			ret.values = this.values;
 		} else if (size <= HASH_POINT) {
 			Object[] oldVals = (Object[]) this.values;
 			Object[] retVals = new Object[size];
-			for (int i = size - 1; i >= 0; i--) retVals[i] = oldVals[i];
+			System.arraycopy(oldVals, 0, retVals, 0, size - 1 + 1);
 		} else {
 			@SuppressWarnings("unchecked")
 			HashSet<E> oldVals = (HashSet<E>) this.values;
@@ -114,8 +115,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 				version = newVersion;
 				return true;
 			} else {
-				Object curValue = oldValues;
-				if (curValue.equals(value)) {
+				if (oldValues.equals(value)) {
 					return false;
 				} else {
 					Object[] newValues = new Object[HASH_POINT];
@@ -132,7 +132,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 			E[] vals = (E[]) oldValues;
 			for (int i = 0; i < oldSize; i++) {
 				Object val = vals[i];
-				boolean same = val == null ? value == null : val.equals(value);
+				boolean same = Objects.equals(val, value);
 				if (same) return false;
 			}
 			if (oldSize < HASH_POINT) {
@@ -141,8 +141,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 				version = newVersion;
 				return true;
 			} else {
-				HashSet<E> newValues = new HashSet<E>();
-				for (int i = 0; i < oldSize; i++) newValues.add(vals[i]);
+				HashSet<E> newValues = new HashSet<>(Arrays.asList(vals).subList(0, oldSize));
 				newValues.add(value);
 				values = newValues;
 				size = oldSize + 1;
@@ -252,9 +251,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 					values = myValues;
 					size = 1;
 				} else {
-					for (int i = pos; i < size; i++) {
-						vals[i - 1] = vals[i];
-					}
+					if (size - pos >= 0) System.arraycopy(vals, pos, vals, pos - 1, size - pos);
 					--pos;
 					--size;
 					vals[size] = null;

@@ -11,7 +11,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 import java.awt.*;
 
 public class Multiplier extends InstanceFactory {
-	static final int PER_DELAY = 1;
+	private static final int PER_DELAY = 1;
 
 	private static final int IN0 = 0;
 	private static final int IN1 = 1;
@@ -41,7 +41,7 @@ public class Multiplier extends InstanceFactory {
 		setPorts(ps);
 	}
 
-	static Value[] computeProduct(BitWidth width, Value a, Value b, Value c_in) {
+	private static Value[] computeProduct(BitWidth width, Value a, Value b, Value c_in) {
 		int w = width.getWidth();
 		if (c_in == Value.NIL || c_in.isUnknown()) c_in = Value.createKnown(width, 0);
 		if (a.isFullyDefined() && b.isFullyDefined() && c_in.isFullyDefined()) {

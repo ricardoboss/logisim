@@ -3,9 +3,9 @@
 
 package com.cburch.logisim.gui.generic;
 
-public class AttrTableModelEvent {
-	private AttrTableModel model;
-	private int index;
+class AttrTableModelEvent {
+	private final AttrTableModel model;
+	private final int index;
 
 	public AttrTableModelEvent(AttrTableModel model) {
 		this(model, -1);

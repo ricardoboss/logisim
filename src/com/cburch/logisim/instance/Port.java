@@ -15,15 +15,15 @@ public class Port {
 	public static final String OUTPUT = "output";
 	public static final String INOUT = "inout";
 
-	public static final String EXCLUSIVE = "exclusive";
-	public static final String SHARED = "shared";
+	private static final String EXCLUSIVE = "exclusive";
+	private static final String SHARED = "shared";
 
-	private int dx;
-	private int dy;
-	private int type;
-	private BitWidth widthFixed;
-	private Attribute<BitWidth> widthAttr;
-	private boolean exclude;
+	private final int dx;
+	private final int dy;
+	private final int type;
+	private final BitWidth widthFixed;
+	private final Attribute<BitWidth> widthAttr;
+	private final boolean exclude;
 	private StringGetter toolTip;
 
 	public Port(int dx, int dy, String type, BitWidth bits) {
@@ -38,7 +38,7 @@ public class Port {
 		this(dx, dy, type, BitWidth.create(bits), exclude);
 	}
 
-	public Port(int dx, int dy, String type, BitWidth bits, String exclude) {
+	private Port(int dx, int dy, String type, BitWidth bits, String exclude) {
 		this.dx = dx;
 		this.dy = dy;
 		this.type = toType(type);
@@ -52,8 +52,8 @@ public class Port {
 		this(dx, dy, type, attr, defaultExclusive(type));
 	}
 
-	public Port(int dx, int dy, String type, Attribute<BitWidth> attr,
-				String exclude) {
+	private Port(int dx, int dy, String type, Attribute<BitWidth> attr,
+				 String exclude) {
 		this.dx = dx;
 		this.dy = dy;
 		this.type = toType(type);
@@ -104,11 +104,11 @@ public class Port {
 		if (widthFixed != null) {
 			return new EndData(pt, widthFixed, type, exclude);
 		} else {
-			Object val = attrs.getValue(widthAttr);
+			BitWidth val = attrs.getValue(widthAttr);
 			if (!(val instanceof BitWidth)) {
 				throw new IllegalArgumentException("Width attribute not set");
 			}
-			return new EndData(pt, (BitWidth) val, type, exclude);
+			return new EndData(pt, val, type, exclude);
 		}
 	}
 }

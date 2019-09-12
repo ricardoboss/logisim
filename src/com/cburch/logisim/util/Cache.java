@@ -8,14 +8,14 @@ package com.cburch.logisim.util;
  * the creation of duplicate objects.
  */
 public class Cache {
-	private int mask;
-	private Object[] data;
+	private final int mask;
+	private final Object[] data;
 
 	public Cache() {
 		this(8);
 	}
 
-	public Cache(int logSize) {
+	private Cache(int logSize) {
 		if (logSize > 12) logSize = 12;
 
 		data = new Object[1 << logSize];

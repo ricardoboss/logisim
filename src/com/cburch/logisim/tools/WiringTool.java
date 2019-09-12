@@ -27,7 +27,7 @@ public class WiringTool extends Tool {
 	private static final Icon toolIcon = Icons.getIcon("wiring.gif");
 	private static final int HORIZONTAL = 1;
 	private static final int VERTICAL = 2;
-	private static Cursor cursor
+	private static final Cursor cursor
 		= Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 	private boolean exists = false;
 	private boolean inCanvas = false;
@@ -261,7 +261,7 @@ public class WiringTool extends Tool {
 			exists = false;
 			super.mouseReleased(canvas, g, e);
 
-			ArrayList<Wire> ws = new ArrayList<Wire>(2);
+			ArrayList<Wire> ws = new ArrayList<>(2);
 			if (cur.getY() == start.getY() || cur.getX() == start.getX()) {
 				Wire w = Wire.create(cur, start);
 				w = checkForRepairs(canvas, w, w.getEnd0());
@@ -375,13 +375,14 @@ public class WiringTool extends Tool {
 
 	@Override
 	public void keyPressed(Canvas canvas, KeyEvent event) {
-		switch (event.getKeyCode()) {
-			case KeyEvent.VK_BACK_SPACE:
-				if (lastAction != null && canvas.getProject().getLastAction() == lastAction) {
-					canvas.getProject().undoAction();
-					lastAction = null;
-				}
-		}
+		if (event.getKeyCode() != KeyEvent.VK_BACK_SPACE)
+			return;
+
+		if (lastAction == null || canvas.getProject().getLastAction() != lastAction)
+			return;
+
+		canvas.getProject().undoAction();
+		lastAction = null;
 	}
 
 	@Override

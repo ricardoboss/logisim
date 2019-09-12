@@ -131,15 +131,15 @@ class ExportImage {
 	}
 
 	private static class OptionsPanel extends JPanel implements ChangeListener {
-		JSlider slider;
-		JLabel curScale;
-		JCheckBox printerView;
-		JRadioButton formatPng;
-		JRadioButton formatGif;
-		JRadioButton formatJpg;
-		GridBagLayout gridbag;
-		GridBagConstraints gbc;
-		Dimension curScaleDim;
+		final JSlider slider;
+		final JLabel curScale;
+		final JCheckBox printerView;
+		final JRadioButton formatPng;
+		final JRadioButton formatGif;
+		final JRadioButton formatJpg;
+		final GridBagLayout gridbag;
+		final GridBagConstraints gbc;
+		final Dimension curScaleDim;
 
 		OptionsPanel(JList list) {
 			// set up components
@@ -228,9 +228,9 @@ class ExportImage {
 	}
 
 	private static class ImageFileFilter extends FileFilter {
-		private int type;
-		private String[] extensions;
-		private StringGetter desc;
+		private final int type;
+		private final String[] extensions;
+		private final StringGetter desc;
 
 		private ImageFileFilter(int type, StringGetter desc, String[] exts) {
 			this.type = type;
@@ -244,8 +244,8 @@ class ExportImage {
 		@Override
 		public boolean accept(File f) {
 			String name = f.getName().toLowerCase();
-			for (int i = 0; i < extensions.length; i++) {
-				if (name.endsWith(extensions[i])) return true;
+			for (String extension : extensions) {
+				if (name.endsWith(extension)) return true;
 			}
 			return f.isDirectory();
 		}
@@ -257,14 +257,14 @@ class ExportImage {
 	}
 
 	private static class ExportThread extends Thread {
-		Frame frame;
-		Canvas canvas;
-		File dest;
-		ImageFileFilter filter;
-		List<Circuit> circuits;
-		double scale;
-		boolean printerView;
-		ProgressMonitor monitor;
+		final Frame frame;
+		final Canvas canvas;
+		final File dest;
+		final ImageFileFilter filter;
+		final List<Circuit> circuits;
+		final double scale;
+		final boolean printerView;
+		final ProgressMonitor monitor;
 
 		ExportThread(Frame frame, Canvas canvas, File dest, ImageFileFilter f,
 					 List<Circuit> circuits, double scale, boolean printerView,
@@ -300,7 +300,7 @@ class ExportImage {
 			g.setColor(Color.black);
 			if (g instanceof Graphics2D) {
 				((Graphics2D) g).scale(scale, scale);
-				((Graphics2D) g).translate(-bds.getX(), -bds.getY());
+				g.translate(-bds.getX(), -bds.getY());
 			} else {
 				JOptionPane.showMessageDialog(frame,
 					Strings.get("couldNotCreateImage"));

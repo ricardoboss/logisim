@@ -10,10 +10,11 @@ import com.cburch.draw.toolbar.ToolbarModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class KeyboardToolSelection extends AbstractAction {
-	private Toolbar toolbar;
-	private int index;
-	public KeyboardToolSelection(Toolbar toolbar, int index) {
+class KeyboardToolSelection extends AbstractAction {
+	private final Toolbar toolbar;
+	private final int index;
+
+	private KeyboardToolSelection(Toolbar toolbar, int index) {
 		this.toolbar = toolbar;
 		this.index = index;
 	}
@@ -21,7 +22,7 @@ public class KeyboardToolSelection extends AbstractAction {
 	public static void register(Toolbar toolbar) {
 		ActionMap amap = toolbar.getActionMap();
 		InputMap imap = toolbar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		int mask = toolbar.getToolkit().getMenuShortcutKeyMask();
+		int mask = toolbar.getToolkit().getMenuShortcutKeyMaskEx();
 		for (int i = 0; i < 10; i++) {
 			KeyStroke keyStroke = KeyStroke.getKeyStroke((char) ('0' + i), mask);
 			int j = (i == 0 ? 10 : i - 1);

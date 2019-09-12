@@ -38,7 +38,7 @@ class WireFactory extends AbstractComponentFactory {
 	@Override
 	public Component createComponent(Location loc, AttributeSet attrs) {
 		Object dir = attrs.getValue(Wire.dir_attr);
-		int len = attrs.getValue(Wire.len_attr).intValue();
+		int len = attrs.getValue(Wire.len_attr);
 
 		if (dir == Wire.VALUE_HORZ) {
 			return Wire.create(loc, loc.translate(len, 0));
@@ -50,7 +50,7 @@ class WireFactory extends AbstractComponentFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Object dir = attrs.getValue(Wire.dir_attr);
-		int len = attrs.getValue(Wire.len_attr).intValue();
+		int len = attrs.getValue(Wire.len_attr);
 
 		if (dir == Wire.VALUE_HORZ) {
 			return Bounds.create(0, -2, len, 5);
@@ -67,7 +67,7 @@ class WireFactory extends AbstractComponentFactory {
 						  Color color, int x, int y, AttributeSet attrs) {
 		Graphics g = context.getGraphics();
 		Object dir = attrs.getValue(Wire.dir_attr);
-		int len = attrs.getValue(Wire.len_attr).intValue();
+		int len = attrs.getValue(Wire.len_attr);
 
 		g.setColor(color);
 		GraphicsUtil.switchToWidth(g, 3);

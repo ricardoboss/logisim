@@ -13,14 +13,13 @@ import java.awt.*;
 
 public class Tunnel extends InstanceFactory {
 	public static final Tunnel FACTORY = new Tunnel();
-
-	static final int MARGIN = 3;
 	static final int ARROW_MARGIN = 5;
-	static final int ARROW_DEPTH = 4;
-	static final int ARROW_MIN_WIDTH = 16;
-	static final int ARROW_MAX_WIDTH = 20;
+	private static final int MARGIN = 3;
+	private static final int ARROW_DEPTH = 4;
+	private static final int ARROW_MIN_WIDTH = 16;
+	private static final int ARROW_MAX_WIDTH = 20;
 
-	public Tunnel() {
+	private Tunnel() {
 		super("Tunnel", Strings.getter("tunnelComponent"));
 		setIconName("tunnel.gif");
 		setFacingAttribute(StdAttr.FACING);
@@ -51,7 +50,7 @@ public class Tunnel extends InstanceFactory {
 	// graphics methods
 	//
 	@Override
-	public void paintGhost(InstancePainter painter) {
+	protected void paintGhost(InstancePainter painter) {
 		TunnelAttributes attrs = (TunnelAttributes) painter.getAttributeSet();
 		Direction facing = attrs.getFacing();
 		String label = attrs.getLabel();
@@ -151,7 +150,7 @@ public class Tunnel extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		; // nothing to do - handled by circuit
+		// nothing to do - handled by circuit
 	}
 
 	//

@@ -9,10 +9,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class Attribute<V> {
-	private String name;
-	private StringGetter disp;
+	private final String name;
+	private final StringGetter disp;
 
-	public Attribute(String name, StringGetter disp) {
+	protected Attribute(String name, StringGetter disp) {
 		this.name = name;
 		this.disp = disp;
 	}

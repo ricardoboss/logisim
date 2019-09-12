@@ -9,12 +9,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 class MenuItemHelper implements ActionListener {
-	private JMenuItem source;
-	private LogisimMenuItem menuItem;
-	private Menu menu;
+	private final JMenuItem source;
+	private final LogisimMenuItem menuItem;
+	private final Menu menu;
+	private final ArrayList<ActionListener> listeners;
 	private boolean enabled;
 	private boolean inActionListener;
-	private ArrayList<ActionListener> listeners;
 
 	public MenuItemHelper(JMenuItem source, Menu menu, LogisimMenuItem menuItem) {
 		this.source = source;
@@ -22,7 +22,7 @@ class MenuItemHelper implements ActionListener {
 		this.menuItem = menuItem;
 		this.enabled = true;
 		this.inActionListener = false;
-		this.listeners = new ArrayList<ActionListener>();
+		this.listeners = new ArrayList<>();
 	}
 
 	public boolean hasListeners() {
