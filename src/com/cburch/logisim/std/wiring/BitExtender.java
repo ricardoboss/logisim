@@ -26,7 +26,7 @@ public class BitExtender extends InstanceFactory {
 			new AttributeOption("input", "input", Strings.getter("extenderInputType")),
 		});
 
-	private BitExtender() {
+	public BitExtender() {
 		super("Bit Extender", Strings.getter("extenderComponent"));
 		setIconName("extender.gif");
 		setAttributes(new Attribute[]{

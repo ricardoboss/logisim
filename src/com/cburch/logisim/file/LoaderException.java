@@ -3,7 +3,7 @@
 
 package com.cburch.logisim.file;
 
-class LoaderException extends RuntimeException {
+public class LoaderException extends RuntimeException {
 	private final boolean shown;
 
 	LoaderException(String desc) {

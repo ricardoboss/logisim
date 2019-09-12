@@ -98,21 +98,21 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		paintIcon(painter);
 		g.translate(-x, -y);
 
-		if (painter.getFactory() == null) {
-			Icon i = icon;
-			if (i == null) {
-				String n = iconName;
-				if (n != null) {
-					i = Icons.getIcon(n);
-					if (i == null) {
-					}
-				}
+		if (painter.getFactory() != null)
+			return;
+
+		Icon i = icon;
+		if (i == null) {
+			String n = iconName;
+			if (n != null) {
+				i = Icons.getIcon(n);
 			}
-			if (i != null) {
-				i.paintIcon(context.getDestination(), g, x + 2, y + 2);
-			} else {
-				super.paintIcon(context, x, y, attrs);
-			}
+		}
+
+		if (i == null) {
+			super.paintIcon(context, x, y, attrs);
+		} else {
+			i.paintIcon(context.getDestination(), g, x + 2, y + 2);
 		}
 	}
 
@@ -203,7 +203,7 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		portList = Collections.unmodifiableList(ports);
 	}
 
-	public StringGetter getDefaultToolTip() {
+	StringGetter getDefaultToolTip() {
 		return defaultToolTip;
 	}
 

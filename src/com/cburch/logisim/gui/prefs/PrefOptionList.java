@@ -19,8 +19,8 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 	private final JLabel label;
 	private final JComboBox combo;
 
-	public PrefOptionList(PrefMonitor<String> pref, StringGetter labelStr,
-						  PrefOption[] options) {
+	PrefOptionList(PrefMonitor<String> pref, StringGetter labelStr,
+				   PrefOption[] options) {
 		this.pref = pref;
 		this.labelStr = labelStr;
 

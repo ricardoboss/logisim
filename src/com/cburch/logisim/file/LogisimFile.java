@@ -233,7 +233,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		return main;
 	}
 
-	public void setMainCircuit(Circuit circuit) {
+	void setMainCircuit(Circuit circuit) {
 		if (circuit == null) return;
 		this.main = circuit;
 		fireEvent(LibraryEvent.SET_MAIN, circuit);
@@ -264,7 +264,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 	//
 	// modification actions
 	//
-	public void addMessage(String msg) {
+	void addMessage(String msg) {
 		messages.addLast(msg);
 	}
 
@@ -272,14 +272,14 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		addCircuit(circuit, tools.size());
 	}
 
-	public void addCircuit(Circuit circuit, int index) {
+	void addCircuit(Circuit circuit, int index) {
 		AddTool tool = new AddTool(circuit.getSubcircuitFactory());
 		tools.add(index, tool);
 		if (tools.size() == 1) setMainCircuit(circuit);
 		fireEvent(LibraryEvent.ADD_TOOL, tool);
 	}
 
-	public void removeCircuit(Circuit circuit) {
+	void removeCircuit(Circuit circuit) {
 		if (tools.size() <= 1) {
 			throw new RuntimeException("Cannot remove last circuit");
 		}
@@ -297,7 +297,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 	}
 
-	public void moveCircuit(AddTool tool, int index) {
+	void moveCircuit(AddTool tool, int index) {
 		int oldIndex = tools.indexOf(tool);
 		if (oldIndex < 0) {
 			tools.add(index, tool);
@@ -309,12 +309,12 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 	}
 
-	public void addLibrary(Library lib) {
+	void addLibrary(Library lib) {
 		libraries.add(lib);
 		fireEvent(LibraryEvent.ADD_LIBRARY, lib);
 	}
 
-	public void removeLibrary(Library lib) {
+	void removeLibrary(Library lib) {
 		libraries.remove(lib);
 		fireEvent(LibraryEvent.REMOVE_LIBRARY, lib);
 	}
@@ -363,12 +363,12 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		} catch (TransformerException e) {
 			String msg = e.getMessage();
 			String err = Strings.get("xmlConversionError");
-			if (msg == null) err += ": " + msg;
+			if (msg == null) err += ": " + null;
 			loader.showError(err);
 		}
 	}
 
-	public LogisimFile cloneLogisimFile(Loader newloader) {
+	LogisimFile cloneLogisimFile(Loader newloader) {
 		PipedInputStream reader = new PipedInputStream();
 		PipedOutputStream writer = new PipedOutputStream();
 		try {
@@ -414,12 +414,8 @@ public class LogisimFile extends Library implements LibraryEventSource {
 
 		@Override
 		public void run() {
-			try {
-				file.write(out, file.loader);
-			} catch (IOException e) {
-				file.loader.showError(StringUtil.format(
-					Strings.get("fileDuplicateError"), e.toString()));
-			}
+			file.write(out, file.loader);
+
 			try {
 				out.close();
 			} catch (IOException e) {

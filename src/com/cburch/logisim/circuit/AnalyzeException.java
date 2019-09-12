@@ -5,7 +5,7 @@ package com.cburch.logisim.circuit;
 
 import com.cburch.logisim.util.StringUtil;
 
-class AnalyzeException extends Exception {
+public class AnalyzeException extends Exception {
 	AnalyzeException() {
 	}
 

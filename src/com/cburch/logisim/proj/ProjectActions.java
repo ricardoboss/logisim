@@ -38,7 +38,7 @@ public class ProjectActions {
 		LogisimFile file = null;
 		try {
 			file = loader.openLogisimFile(templReader);
-		} catch (IOException | LoadFailedException ex) {
+		} catch (IOException ex) {
 			displayException(monitor, ex);
 		} finally {
 			try {
@@ -92,11 +92,6 @@ public class ProjectActions {
 			file = loader.openLogisimFile(templReader);
 		} catch (IOException ex) {
 			displayException(baseProject.getFrame(), ex);
-			file = createEmptyFile(loader);
-		} catch (LoadFailedException ex) {
-			if (ex.isShown()) {
-				displayException(baseProject.getFrame(), ex);
-			}
 			file = createEmptyFile(loader);
 		} finally {
 			try {
