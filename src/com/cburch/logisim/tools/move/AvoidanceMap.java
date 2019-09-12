@@ -24,7 +24,7 @@ class AvoidanceMap {
 		return ret;
 	}
 
-	public AvoidanceMap cloneMap() {
+	AvoidanceMap cloneMap() {
 		return new AvoidanceMap(new HashMap<>(avoid));
 	}
 
@@ -32,7 +32,7 @@ class AvoidanceMap {
 		return avoid.get(loc);
 	}
 
-	public void markAll(Collection<Component> elements, int dx, int dy) {
+	void markAll(Collection<Component> elements, int dx, int dy) {
 		// first we go through the components, saying that we should not
 		// intersect with any point that lies within a component
 		for (Component el : elements) {
@@ -61,7 +61,7 @@ class AvoidanceMap {
 				// put it into the map as if it is - and in the rare event
 				// that loc isn't in the component, we can remove it.
 				String prev = avoid.put(loc, Connector.ALLOW_NEITHER);
-				if (!prev.equals(Connector.ALLOW_NEITHER)) {
+				if (!Objects.equals(prev, Connector.ALLOW_NEITHER)) {
 					Location baseLoc = translated ? loc.translate(-dx, -dy) : loc;
 					if (!comp.contains(baseLoc)) {
 						if (prev == null) {
@@ -75,7 +75,7 @@ class AvoidanceMap {
 		}
 	}
 
-	public void markWire(Wire w, int dx, int dy) {
+	void markWire(Wire w, int dx, int dy) {
 		HashMap<Location, String> avoid = this.avoid;
 		boolean translated = dx != 0 || dy != 0;
 		Location loc0 = w.getEnd0();
@@ -113,7 +113,7 @@ class AvoidanceMap {
 		avoid.remove(loc);
 	}
 
-	public void unmarkWire(Wire w, Location deletedEnd, Set<Location> unmarkable) {
+	void unmarkWire(Wire w, Location deletedEnd, Set<Location> unmarkable) {
 		Location loc0 = w.getEnd0();
 		Location loc1 = w.getEnd1();
 		if (unmarkable == null || unmarkable.contains(deletedEnd)) {
