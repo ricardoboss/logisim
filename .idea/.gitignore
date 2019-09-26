@@ -4,3 +4,6 @@
 !*.iml
 !modules.xml
 !vcs.xmls
+
+!runConfigurations/
+!runConfigurations/**
