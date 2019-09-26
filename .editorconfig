@@ -10,3 +10,8 @@ max_line_length = 120
 
 [*.properties]
 end_of_line = lf
+
+[*.yml]
+end_of_line = lf
+indent_size = 2
+indent_style = space
