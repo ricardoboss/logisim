@@ -3,15 +3,30 @@ name: Java CI
 on: [push]
 
 jobs:
-  build:
+	test:
+		runs-on: windows-latest
 
-    runs-on: windows-latest
+		steps:
+			- uses: actions/checkout@latest
+			- name: Set up JDK 12
+			  uses: actions/setup-java@latest
+			  with:
+				  java-version: 12
+			- name: Test with Maven
+			  run: mvn test --file pom.xml
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 12
-      uses: actions/setup-java@v1
-      with:
-        java-version: 12
-    - name: Build with Maven
-      run: mvn package --file pom.xml
+	build:
+		runs-on: windows-latest
+
+		steps:
+			-   uses: actions/checkout@latest
+			-   name: Set up JDK 12
+				uses: actions/setup-java@latest
+				with:
+					java-version: 12
+			-   name: Build with Maven
+				run: mvn package --file pom.xml
+			- uses: actions/upload-artifact@master
+				with:
+					name: logisim-jar
+					path: target/*.jar
